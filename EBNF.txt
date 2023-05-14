@@ -1,13 +1,13 @@
 # Description of EBNF Syntax for describing the configuration of a logic circuit
 # Descriping the basics for EBNF
-letters = 'A'|'B'|'C'|'D'|'E'|'F'|'G'|'H'|'I'|'J'|'K'|'L'|'M'|'N'|'O'|'P'|'Q'|'R'|'S'|'T'|'U'|'V'|'W'|'X'|'Y'|'Z';
+letters = 'a'|'b'|'c'|'d'|'e'|'f'|'g'|'h'|'i'|'j'|'k'|'l'|'m'|'n'|'o'|'p'|'q'|'r'|'s'|'t'|'u'|'v'|'w'|'x'|'y'|'z';
 bool_digits = '0'|'1';
 non_zero_digits = '1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9';
 digits = '0'|non_zero_digits;
 integer = non_zero_digits, {digits};
 alpha_numeric_word = letters, {letters|digits|'_'};
 
-# Describing devices
+# Describing devices - There must always be at least one device
 devices = "DEVICES:", device, {',', device}, ';';
 device = CLOCK|SWITCH|AND|NAND|OR|NOR|DTYPE|XOR;
 CLOCK = "CLOCK", device_name, clock_speed;
@@ -25,18 +25,19 @@ XOR = "XOR", device_name;
 
 
 # Describing connections
-connections = "CONNECTIONS", connection, {',', connection}, ';';
+connections = "CONNECT:", connection, {',', connection}, ';';
 connection = device_name,['.', output],'->', device_name,['.', input];
 output = 'Q'|'QBAR';
 input = ['I',number_inputs]|'DATA'|'CLK'|'SET'|'CLEAR'; # TODO: that this is the method of doing I plus number or DATA, CLK, SET, CLEAR
 
 
 # Describing monitors
-monitors = "MONITORS", monitor, {',', monitor}, ';';
+monitors = "MONITOR:", monitor, {',', monitor}, ';';
 monitor = device_name,['.', output];
 
 #TODO: Check that the following is correct
 # An example of having a clock, switch and an AND gate is:
 # DEVICES: CLOCK clock1 10, SWITCH switch1 0, AND and1 2;
-# CONNECTIONS: switch1 -> and1.I1, clock1 -> and1.I2;
-# MONITORS: and1;
+# CONNECT: switch1 -> and1.I1, clock1 -> and1.I2;
+# MONITOR: and1;
+# END;
