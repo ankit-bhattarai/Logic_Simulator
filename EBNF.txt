@@ -1,4 +1,8 @@
 # Description of EBNF Syntax for describing the configuration of a logic circuit
+# Comments are denoted by a hash symbol '#' and end of lines are denoted by a semi-colon ';'
+#TODO: The code has to be made modular, which means that the EBNF must itself also be modular and be able to be split into different components which all work together
+
+
 # Descriping the basics for EBNF
 letters = 'a'|'b'|'c'|'d'|'e'|'f'|'g'|'h'|'i'|'j'|'k'|'l'|'m'|'n'|'o'|'p'|'q'|'r'|'s'|'t'|'u'|'v'|'w'|'x'|'y'|'z';
 bool_digits = '0'|'1';
@@ -23,17 +27,19 @@ NOR = "NOR", device_name, number_inputs;
 DTYPE = "DTYPE", device_name;
 XOR = "XOR", device_name;
 
-
 # Describing connections
 connections = "CONNECT:", connection, {',', connection}, ';';
 connection = device_name,['.', output],'->', device_name,['.', input];
 output = 'Q'|'QBAR';
-input = ['I',number_inputs]|'DATA'|'CLK'|'SET'|'CLEAR'; # TODO: that this is the method of doing I plus number or DATA, CLK, SET, CLEAR
-
+input = input_pin|'DATA'|'CLK'|'SET'|'CLEAR'; 
+input_pin = 'I',number_inputs;
 
 # Describing monitors
 monitors = "MONITOR:", monitor, {',', monitor}, ';';
 monitor = device_name,['.', output];
+
+#Describing overall logic circuit
+circuit = devices, connections, monitors, "END;";
 
 #TODO: Check that the following is correct
 # An example of having a clock, switch and an AND gate is:
