@@ -29,7 +29,7 @@ XOR = "XOR", device_name;
 
 # Describing connections
 connections = "CONNECT:", connection, {',', connection}, ';';
-connection = device_name,['.', output],'->', device_name,['.', input];
+connection = device_name,['.', output],'>', device_name,'.', input;
 output = 'Q'|'QBAR';
 input = input_pin|'DATA'|'CLK'|'SET'|'CLEAR'; 
 input_pin = 'I',number_inputs;
@@ -44,6 +44,6 @@ circuit = devices, connections, monitors, "END;";
 #TODO: Check that the following is correct
 # An example of having a clock, switch and an AND gate is:
 # DEVICES: CLOCK clock1 10, SWITCH switch1 0, AND and1 2;
-# CONNECT: switch1 -> and1.I1, clock1 -> and1.I2;
+# CONNECT: switch1 > and1.I1, clock1 > and1.I2;
 # MONITOR: and1;
 # END;
