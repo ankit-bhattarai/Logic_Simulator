@@ -10,33 +10,33 @@ non_zero_digits = '1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9';
 digits = '0'|non_zero_digits;
 integer = non_zero_digits, {digits};
 device_name = letters, {letters|digits|'_'};
+number_inputs = non_zero_digits|'10'|'11'|'12'|'13'|'14'|'15'|'16';
+clock_speed = integer;
+switch_state = bool_digits;
+input_pin = 'I',number_inputs;
+input = input_pin|'DATA'|'CLK'|'SET'|'CLEAR'; 
+output = 'Q'|'QBAR';
 
 # Describing devices - There must always be at least one device
-devices = "DEVICES:", device, {',', device}, ';';
+devices = "DEVICES:", device, {',', device};
 device = CLOCK|SWITCH|LOGIC_DEVICE|DTYPE|XOR;
 CLOCK = "CLOCK", device_name, clock_speed;
-clock_speed = integer;
 SWITCH = "SWITCH", device_name, switch_state;
-switch_state = bool_digits;
 LOGIC_DEVICE = logic_device_name, device_name, number_inputs;
 logic_device_name = "AND"|"NAND"|"OR"|"NOR";
-number_inputs = non_zero_digits|'10'|'11'|'12'|'13'|'14'|'15'|'16';
 DTYPE = "DTYPE", device_name;
 XOR = "XOR", device_name;
 
 # Describing connections
-connections = "CONNECT:", connection, {',', connection}, ';';
+connections = "CONNECT:", connection, {',', connection};
 connection = device_name,['.', output],'>', device_name,'.', input;
-output = 'Q'|'QBAR';
-input = input_pin|'DATA'|'CLK'|'SET'|'CLEAR'; 
-input_pin = 'I',number_inputs;
 
 # Describing monitors
-monitors = "MONITOR:", monitor, {',', monitor}, ';';
+monitors = "MONITOR:", monitor, {',', monitor};
 monitor = device_name,['.', output];
 
 #Describing overall logic circuit
-circuit = devices, connections, monitors, "END;";
+circuit = devices, ';',  connections, ';',  monitors, ';', "END;";
 
 #TODO: Check that the following is correct
 # An example of having a clock, switch and an AND gate is:
