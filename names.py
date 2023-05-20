@@ -10,7 +10,6 @@ Names - maps variable names and string names to unique integers.
 
 
 class Names:
-
     """Map variable names and string names to unique integers.
 
     This class deals with storing grammatical keywords and user-defined words,
@@ -41,6 +40,7 @@ class Names:
     def __init__(self):
         """Initialise names list."""
         self.error_code_count = 0  # how many error codes have been declared
+        self.names_list = []
 
     def unique_error_codes(self, num_error_codes):
         """Return a list of unique integer error codes."""
@@ -53,8 +53,20 @@ class Names:
     def query(self, name_string):
         """Return the corresponding name ID for name_string.
 
-        If the name string is not present in the names list, return None.
+        If the name string is not present in names_list, return None.
+
+        Parameters
+        ----------
+        name_string: str
+
+        Returns
+        -------
+        index: {int or None}
+            Returns an integer if name ID present otherwise None
         """
+        if name_string in self.names_list:
+            return self.names_list.index(name_string)
+        return None
 
     def lookup(self, name_string_list):
         """Return a list of name IDs for each name string in name_string_list.
