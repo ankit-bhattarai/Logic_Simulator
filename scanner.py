@@ -9,7 +9,7 @@ Scanner - reads definition file and translates characters into symbols.
 Symbol - encapsulates a symbol and stores its properties.
 """
 max_number_of_input_pins = 16
-keywords = {'DEVICE', 'CONNECT', 'MONITOR', 'END', 'AND', 'NAND', 'OR', 'NOR',
+keywords = {'DEVICES', 'CONNECT', 'MONITOR', 'END', 'AND', 'NAND', 'OR', 'NOR',
             'DTYPE', 'XOR', 'SWITCH', 'CLOCK'}
 dtype_input_pins = {"DATA", "SET", "CLEAR", "CLK"}
 gate_pins = {f"I{i}" for i in range(1, max_number_of_input_pins + 1)}
