@@ -72,7 +72,26 @@ class Names:
         """Return a list of name IDs for each name string in name_string_list.
 
         If the name string is not present in the names list, add it.
+
+        Parameters
+        ----------
+        name_string_list: list of str
+            List of strings whose IDs need to be looked up
+
+        Returns
+        -------
+        name_ids: list of int
+            List of integer indexes of the names in name_string_list
         """
+        name_ids = []
+        for name_string in name_string_list:
+            id = self.query(name_string)
+            if id is None:
+                self.names_list.append(name_string)
+                # Added to end of list so index is length minus 1
+                id = len(self.names_list) - 1
+            name_ids.append(id)
+        return name_ids
 
     def get_name_string(self, name_id):
         """Return the corresponding name string for name_id.
