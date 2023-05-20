@@ -61,7 +61,7 @@ class Names:
 
         Returns
         -------
-        index: {int or None}
+        index: int or None
             Returns an integer if name ID present otherwise None
         """
         if name_string in self.names_list:
@@ -78,4 +78,16 @@ class Names:
         """Return the corresponding name string for name_id.
 
         If the name_id is not an index in the names list, return None.
+
+        Parameters
+        ----------
+        name_id: int
+            Integer index of the name string in the names list.
+        Returns
+        -------
+        name_string: str or None
+            Returns a string if name ID is a valid index otherwise None
         """
+        if 0 <= name_id < len(self.names_list):
+            return self.names_list[name_id]
+        return None
