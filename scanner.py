@@ -345,7 +345,7 @@ class Scanner:
         """
         symbol = Symbol()
         symbol.type = Symbol.determine_type(str)  # Determine symbol type
-        symbol.id = self.names.lookup([str])  # Lookup requires a list
+        symbol.id = self.names.lookup([str])[0]  # Lookup requires a list
         symbol.column_number = column_number
         symbol.line_number = line_number
         return symbol
