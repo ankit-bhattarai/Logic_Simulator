@@ -195,6 +195,11 @@ class Scanner:
         self.current_line_number = 1
         self.current_column_number = 1
         self.current_char = None
+        self.symbol_counter = -1
+
+    def reset_symbol_counter(self):
+        """Reset the symbol counter to -1."""
+        self.symbol_counter = -1
 
     def open_file(self):
         """Open the file."""
