@@ -386,6 +386,8 @@ class Scanner:
         """
         self.open_file()
         self.list_of_symbols = []
+        self.line_number = 1
+        self.column_number = 1
         character = self.get_next_char()  # Only need to do this at the start
         while True:
             column_number = self.current_column_number
@@ -416,6 +418,34 @@ class Scanner:
                 character = self.get_next_char()
         self.close_file()
 
+    def verify_file_scanned(self):
+        """Verify that the file has been scanned.
+
+        Will scan the file and store the symbols if they have not been scanned
+
+        Returns
+        -------
+        success:bool
+        """
+        if self.list_of_symbols == []:
+            self.get_symbols()
+        return True
+
+    def get_symbol(self):
+        """Return the next symbol from the list of symbols.
+
+        Returns
+        -------
+        symbol: Symbol
+            The next symbol from the list of symbols.
+        """
+        self.verify_file_scanned()
+        next_symbol = self.symbol_counter + 1
+        if next_symbol < len(self.list_of_symbols):  # Within the file
+            self.symbol_counter += 1
+            return self.list_of_symbols[self.symbol_counter]
+        return None  # End of file
+
     def get_list_of_symbols(self):
         """Return the list of symbols.
 
@@ -426,8 +456,7 @@ class Scanner:
         list_of_symbols: list of Symbol
             The list of symbols created from the input file.
         """
-        if self.list_of_symbols == []:
-            self.get_symbols()
+        self.verify_file_scanned()
         return self.list_of_symbols
 
     def get_line(self, line_number):
