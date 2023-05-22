@@ -32,12 +32,12 @@ class Symbol:
     No public methods.
     """
 
-    def __init__(self):
+    def __init__(self, string, id, line_number, column_number):
         """Initialise symbol properties."""
-        self.type = None
-        self.id = None
-        self.line_number = None
-        self.column_number = None
+        self.id = id
+        self.type = self.determine_type(string)
+        self.line_number = line_number
+        self.column_number = column_number
 
     @staticmethod
     def is_string(string):
