@@ -35,10 +35,43 @@ class Parser:
 
     def __init__(self, names, devices, network, monitors, scanner):
         """Initialise constants."""
+        self.names = names
+        self.devices = devices
+        self.network = network
+        self.monitors = monitors
+        self.scanner = scanner
+        
+    def display_semantic_error(self, error_type, symbol, **kwargs):
+        """Display the semantic error."""
+        return 
+    
+    def display_syntax_error(self, error_type, symbol, **kwargs):
+        """Display the syntax error."""
+        return 
+    
+    def verify_syntax(self):
+        """Verify the syntax of the circuit definition file.""" 
+        # For now just return True, so that userint and gui can run in the
+        # skeleton code. When complete, should return False when there are
+        # errors in the circuit definition file.
+        return True
+
+    def build_network(self):
+        """Build the logic network."""
+        # For now just return True, so that userint and gui can run in the
+        # skeleton code. When complete, should return False when there are
+        # errors in the circuit definition file.
+        return True 
 
     def parse_network(self):
         """Parse the circuit definition file."""
         # For now just return True, so that userint and gui can run in the
         # skeleton code. When complete, should return False when there are
         # errors in the circuit definition file.
-        return True
+        syntax_verified = self.verify_syntax()
+        if syntax_verified:
+            semantics_verified = self.build_network()
+        else:
+            return False
+
+        return semantics_verified
