@@ -17,7 +17,9 @@ input_pins = gate_pins.union(dtype_input_pins)
 output_pins = {"Q", "QBAR"}
 punctuation = {";": "semi-colon", ":": "colon", ",": "comma", ".": "dot",
                ">": "arrow"}
-comment = {"#"}
+single_line_comment = "#"
+multi_line_comment = "!"
+comment = {single_line_comment, multi_line_comment}
 
 
 class Symbol:
@@ -32,12 +34,12 @@ class Symbol:
     No public methods.
     """
 
-    def __init__(self):
+    def __init__(self, string, id, line_number, column_number):
         """Initialise symbol properties."""
-        self.type = None
-        self.id = None
-        self.line_number = None
-        self.column_number = None
+        self.id = id
+        self.type = self.determine_type(string)
+        self.line_number = line_number
+        self.column_number = column_number
 
     @staticmethod
     def is_string(string):
@@ -195,6 +197,11 @@ class Scanner:
         self.current_line_number = 1
         self.current_column_number = 1
         self.current_char = None
+        self.symbol_counter = -1
+
+    def reset_symbol_counter(self):
+        """Reset the symbol counter to -1."""
+        self.symbol_counter = -1
 
     def open_file(self):
         """Open the file."""
@@ -305,27 +312,48 @@ class Scanner:
                 continue
             return character
 
-    def skip_comment(self):
+    def skip_comment(self, comment_character):
         """When a comment is detected, skip over the rest of the line.
 
-        Method is called when a comment is detected. it skips over the rest of
-        the line and returns the first character of the next line or "" if the
-        end of the file has been reached.
+        Method is called when a comment is detected. For a single line comment
+        it  skips over the rest of the line and returns the first character of
+        the next line or "" if the end of the file has been reached. For a
+        multi-line comment, it skips over all the content until it reaches the
+        terminating comment character and returns the first character after it.
+        If the end of the file is reached before the terminating comment, it
+        will return None.
+        For multi-line comment the start and terminating comment characters
+        are the same.
+
+        Parameters
+        ----------
+        comment_character: string
+            The character that was detected as the start of a comment
 
         Returns
         -------
-        character: string
-            The first character of the next line or "" if at the end of file
+        character: string or None
+            The first character after the comment or None if a multi-line
+            comment was not terminated before the end of the file
         """
-        while True:
-            character = self.get_next_char()
-            if character == "":  # Reached end of file
-                return character
-            if character == "\n":  # Reached end of line
-                return self.get_next_char()  # Move to next line
-            continue
+        if comment_character == single_line_comment:  # Single line comment
+            while True:
+                character = self.get_next_char()
+                if character == "\n":  # Reached end of line
+                    return self.get_next_char()  # Move to next line
+                if character == "":  # Reached end of file
+                    return character
+                continue
+        else:  # Multi-line comment
+            while True:
+                character = self.get_next_char()
+                if character == multi_line_comment:  # Reached end of comment
+                    return self.get_next_char()  # Move to next character
+                if character == "":  # Reached end of file
+                    return None
+                continue
 
-    def create_symbol(self, str, column_number, line_number):
+    def create_symbol(self, string, column_number, line_number):
         """Create a symbol.
 
         In the process of creating the symbol, the type of the symbol from its
@@ -343,11 +371,8 @@ class Scanner:
         symbol: Symbol
             The symbol created from the string.
         """
-        symbol = Symbol()
-        symbol.type = Symbol.determine_type(str)  # Determine symbol type
-        symbol.id = self.names.lookup([str])[0]  # Lookup requires a list
-        symbol.column_number = column_number
-        symbol.line_number = line_number
+        symbol_id = self.names.lookup([string])[0]  # Lookup requires a list
+        symbol = Symbol(string, symbol_id, line_number, column_number)
         return symbol
 
     def get_symbols(self):
@@ -384,6 +409,8 @@ class Scanner:
         """
         self.open_file()
         self.list_of_symbols = []
+        self.line_number = 1
+        self.column_number = 1
         character = self.get_next_char()  # Only need to do this at the start
         while True:
             column_number = self.current_column_number
@@ -406,13 +433,41 @@ class Scanner:
             elif character.isspace():  # Case 4 - Space or tab
                 character = self.skip_spaces()
             elif character in comment:  # Case 5 - Comment
-                character = self.skip_comment()
+                character = self.skip_comment(character)
             else:  # Case 6 - Non-comment punctuation
                 symbol = self.create_symbol(character, column_number,
                                             line_number)
                 self.list_of_symbols.append(symbol)
                 character = self.get_next_char()
         self.close_file()
+
+    def verify_file_scanned(self):
+        """Verify that the file has been scanned.
+
+        Will scan the file and store the symbols if they have not been scanned
+
+        Returns
+        -------
+        success:bool
+        """
+        if self.list_of_symbols == []:
+            self.get_symbols()
+        return True
+
+    def get_symbol(self):
+        """Return the next symbol from the list of symbols.
+
+        Returns
+        -------
+        symbol: Symbol
+            The next symbol from the list of symbols.
+        """
+        self.verify_file_scanned()
+        next_symbol = self.symbol_counter + 1
+        if next_symbol < len(self.list_of_symbols):  # Within the file
+            self.symbol_counter += 1
+            return self.list_of_symbols[self.symbol_counter]
+        return None  # End of file
 
     def get_list_of_symbols(self):
         """Return the list of symbols.
@@ -424,8 +479,7 @@ class Scanner:
         list_of_symbols: list of Symbol
             The list of symbols created from the input file.
         """
-        if self.list_of_symbols == []:
-            self.get_symbols()
+        self.verify_file_scanned()
         return self.list_of_symbols
 
     def get_line(self, line_number):

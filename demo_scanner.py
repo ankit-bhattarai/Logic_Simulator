@@ -21,7 +21,10 @@ for symbol in list_of_symbols_1:
 print()
 
 print("Contents of def2.txt")
-for symbol in list_of_symbols_2:
+while True:
+    symbol = scanner_2.get_symbol()
+    if symbol is None:
+        break
     id = symbol.id
     name = names_2.get_name_string(id)
     if name == "CONNECT" or name == "MONITOR" or name == "Q":
