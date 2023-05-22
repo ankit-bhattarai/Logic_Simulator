@@ -17,7 +17,9 @@ input_pins = gate_pins.union(dtype_input_pins)
 output_pins = {"Q", "QBAR"}
 punctuation = {";": "semi-colon", ":": "colon", ",": "comma", ".": "dot",
                ">": "arrow"}
-comment = {"#"}
+single_line_comment = "#"
+multi_line_comment = "!"
+comment = {single_line_comment, multi_line_comment}
 
 
 class Symbol:
@@ -310,25 +312,46 @@ class Scanner:
                 continue
             return character
 
-    def skip_comment(self):
+    def skip_comment(self, comment_character):
         """When a comment is detected, skip over the rest of the line.
 
-        Method is called when a comment is detected. it skips over the rest of
-        the line and returns the first character of the next line or "" if the
-        end of the file has been reached.
+        Method is called when a comment is detected. For a single line comment
+        it  skips over the rest of the line and returns the first character of
+        the next line or "" if the end of the file has been reached. For a
+        multi-line comment, it skips over all the content until it reaches the
+        terminating comment character and returns the first character after it.
+        If the end of the file is reached before the terminating comment, it
+        will return None.
+        For multi-line comment the start and terminating comment characters
+        are the same.
+
+        Parameters
+        ----------
+        comment_character: string
+            The character that was detected as the start of a comment
 
         Returns
         -------
-        character: string
-            The first character of the next line or "" if at the end of file
+        character: string or None
+            The first character after the comment or None if a multi-line
+            comment was not terminated before the end of the file
         """
-        while True:
-            character = self.get_next_char()
-            if character == "":  # Reached end of file
-                return character
-            if character == "\n":  # Reached end of line
-                return self.get_next_char()  # Move to next line
-            continue
+        if comment_character == single_line_comment:  # Single line comment
+            while True:
+                character = self.get_next_char()
+                if character == "\n":  # Reached end of line
+                    return self.get_next_char()  # Move to next line
+                if character == "":  # Reached end of file
+                    return character
+                continue
+        else:  # Multi-line comment
+            while True:
+                character = self.get_next_char()
+                if character == multi_line_comment:  # Reached end of comment
+                    return self.get_next_char()  # Move to next character
+                if character == "":  # Reached end of file
+                    return None
+                continue
 
     def create_symbol(self, string, column_number, line_number):
         """Create a symbol.
@@ -410,7 +433,7 @@ class Scanner:
             elif character.isspace():  # Case 4 - Space or tab
                 character = self.skip_spaces()
             elif character in comment:  # Case 5 - Comment
-                character = self.skip_comment()
+                character = self.skip_comment(character)
             else:  # Case 6 - Non-comment punctuation
                 symbol = self.create_symbol(character, column_number,
                                             line_number)

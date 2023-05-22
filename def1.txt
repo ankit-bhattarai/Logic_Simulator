@@ -4,6 +4,10 @@ SWITCH switch2 0,
 AND and1 2, 
 OR or1 2, 
 NAND nand1 2;
+! This is where DEVICES end
+and below is where CONNECT begins
+This definition file is equally valid as the white space and
+new lines are ignored by the scanner!
 CONNECT: 
 switch1 > and1.I1,
 switch1 > or1.I1,
