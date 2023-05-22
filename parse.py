@@ -41,27 +41,29 @@ class Parser:
         self.monitors = monitors
         self.scanner = scanner
         self.semantic_error_types = {devices.INVALID_QUALIFIER: "Invalid qualifier",
-                                    devices.NO_QUALIFIER: "No qualifier",
-                                    devices.BAD_DEVICE: "Bad device", 
-                                    devices.QUALIFIER_PRESENT: "Qualifier present",
-                                    devices.DEVICE_PRESENT: "Device present",
-                                    network.INPUT_TO_INPUT: "Input to input",
-                                    network.OUTPUT_TO_OUTPUT: "Output to output",   
-                                    network.INPUT_CONNECTED: "Input connected",
-                                    network.PORT_ABSENT: "Port absent",
-                                    network.DEVICE_ABSENT: "Device absent",
-                                    monitors.NOT_OUTPUT: "Not output",
-                                    monitors.MONITOR_PRESENT: "Monitor present"}
+                                     devices.NO_QUALIFIER: "No qualifier",
+                                     devices.BAD_DEVICE: "Bad device", 
+                                     devices.QUALIFIER_PRESENT: "Qualifier present",
+                                     devices.DEVICE_PRESENT: "Device present",
+                                     network.INPUT_TO_INPUT: "Input to input",
+                                     network.OUTPUT_TO_OUTPUT: "Output to output",   
+                                     network.INPUT_CONNECTED: "Input connected",
+                                     network.PORT_ABSENT: "Port absent",
+                                     network.DEVICE_ABSENT: "Device absent",
+                                     monitors.NOT_OUTPUT: "Not output",
+                                     monitors.MONITOR_PRESENT: "Monitor present"}
 
     def display_semantic_error(self, error_type, symbols, **kwargs):
         """Prints the semantic error.
-        
         Parameters
         ----------
         error_type: str
             Desription of the semantic error that occured 
         symbol: list of symbols
             Symbols associated with the semantic error
+        Returns
+        -------
+        None
         """
         if error_type == 'Invalid qualifier':
             pass
@@ -92,18 +94,39 @@ class Parser:
 
     
     def display_syntax_error(self, error_type, symbol, **kwargs):
-        """Display the syntax error."""
+        """Display the syntax error.
+        Parameters
+        ----------
+        error_type: str
+            Description of the syntax error that occured
+        symbol: Symbol
+            Symbol associated with the syntax error
+        Returns
+        -------
+        None"""
         return 
     
     def network_dict(self):
         """Verify the syntax of the circuit definition file and returns a 
-        dictionary of symbols describing the network."""
+        dictionary of symbols describing the network.
+        Returns
+        -------
+        dict: Dictionary of list of list of symbols describing the network."""
         # For now just return True, so that userint and gui can run in the
         # skeleton code. When complete, should return False when there are
         # errors in the circuit definition file.
         return True
     
     def build_devices(self, devices_list):
+        """Build the devices.
+        Parameters:
+        -----------
+        devices_list: list of list of symbols
+            List of list of symbols describing the devices.
+        Returns
+        -------
+        bool: True if the devices are semantically correct,
+        False otherwise."""
         for device in devices_list: 
             device_type = device[0].id
             device_name = device[1].id
@@ -120,6 +143,15 @@ class Parser:
         return True     
     
     def build_connections(self, connections_list):
+        """Build the connections.
+        Parameters:
+        -----------
+        connections_list: list of list of symbols
+            List of list of symbols describing the connections.
+        Returns
+        -------
+        bool: True if the connections are semantically correct,
+        False otherwise."""
         for connection in connections_list:
             first_device = connection[0].id
             first_port = second_port = None
@@ -148,7 +180,17 @@ class Parser:
         
         return True
     
-    def build_monitors(self, monitors_list):    
+    def build_monitors(self, monitors_list):
+        """Build the monitors.
+        Parameters:
+        -----------
+        monitors_list: list of list of symbols
+            List of list of symbols describing the monitors.
+        Returns
+        -------
+        bool: True if the monitors are semantically correct,
+        False otherwise."""
+        
         for monitor in monitors_list:
             device_name = monitor[0].id
             port_name = monitor[3].id if len(monitor) == 3 else None
@@ -164,10 +206,17 @@ class Parser:
         return True  
     
     def build_network(self, network_dict):
-        """Build the logic network."""
-        # For now just return True, so that userint and gui can run in the
-        # skeleton code. When complete, should return False when there are
-        # errors in the circuit definition file.
+        """Build the logic network.
+        Parameters:
+        -----------
+        network_dict: dict
+            Dictionary of list of list ofsymbols describing the network. 
+            (Keys: DEVICES, CONNECTIONS, MONITORS)
+        Returns
+        ------- 
+        bool: True if the circuit definition file is semantically correct,
+        False otherwise.
+        """
 
         devices_success = self.build_devices(network_dict["DEVICES"])
         connections_success = self.build_connections(network_dict["CONNECTIONS"])
@@ -177,10 +226,12 @@ class Parser:
         return False
 
     def parse_network(self):
-        """Parse the circuit definition file."""
-        # For now just return True, so that userint and gui can run in the
-        # skeleton code. When complete, should return False when there are
-        # errors in the circuit definition file.
+        """Parse the circuit definition file.
+        Returns
+        -------
+        bool: True if the circuit definition file is syntactically and 
+        semantically correct, False otherwise.        
+        """
         network_dict = self.network_dict()
         if network_dict:
             build_network = self.build_network()
