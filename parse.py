@@ -41,23 +41,55 @@ class Parser:
         self.monitors = monitors
         self.scanner = scanner
         self.semantic_error_types = {devices.INVALID_QUALIFIER: "Invalid qualifier",
-                                     devices.NO_QUALIFIER: "No qualifier",
-                                     devices.BAD_DEVICE: "Bad device",
-                                     devices.QUALIFIER_PRESENT: "Qualifier present",
-                                     devices.DEVICE_PRESENT: "Device present", 
-                                     network.INVALID_DEVICE: "Invalid device",
-                                     network.INVALID_PORT: "Invalid port",
-                                     network.PORT_PRESENT: "Port present",
-                                     network.DEVICE_PRESENT: "Device present",
-                                     network.SAME_DEVICE: "Same device",
-                                     network.SAME_PORT: "Same port",
-                                     network.INVALID_CONNECTION: "Invalid connection",
-                                     monitors.NOT_OUTPUT: "Not output",
-                                     monitors.MONITOR_PRESENT: "Monitor present"}
+                                    devices.NO_QUALIFIER: "No qualifier",
+                                    devices.BAD_DEVICE: "Bad device", 
+                                    devices.QUALIFIER_PRESENT: "Qualifier present",
+                                    devices.DEVICE_PRESENT: "Device present",
+                                    network.INPUT_TO_INPUT: "Input to input",
+                                    network.OUTPUT_TO_OUTPUT: "Output to output",   
+                                    network.INPUT_CONNECTED: "Input connected",
+                                    network.PORT_ABSENT: "Port absent",
+                                    network.DEVICE_ABSENT: "Device absent",
+                                    monitors.NOT_OUTPUT: "Not output",
+                                    monitors.MONITOR_PRESENT: "Monitor present"}
 
-    def display_semantic_error(self, error_type, symbol, **kwargs):
-        """Display the semantic error."""
-        return 
+    def display_semantic_error(self, error_type, symbols, **kwargs):
+        """Prints the semantic error.
+        
+        Parameters
+        ----------
+        error_type: str
+            Desription of the semantic error that occured 
+        symbol: list of symbols
+            Symbols associated with the semantic error
+        """
+        if error_type == 'Invalid qualifier':
+            pass
+        elif error_type == 'No qualifier':
+            pass
+        elif error_type == 'Bad device':
+            pass
+        elif error_type == 'Qualifier present':
+            pass
+        elif error_type == 'Device present':
+            pass
+        elif error_type == 'Input to input':
+            pass
+        elif error_type == 'Output to output':
+            pass
+        elif error_type == 'Input connected':
+            pass
+        elif error_type == 'Port absent':
+            pass
+        elif error_type == 'Device absent':
+            pass
+        elif error_type == 'Not output':
+            pass
+        elif error_type == "Input not connected":
+            pass
+        elif error_type == 'Monitor present':
+            pass # Warning - Not error message
+
     
     def display_syntax_error(self, error_type, symbol, **kwargs):
         """Display the syntax error."""
@@ -75,16 +107,16 @@ class Parser:
         for device in devices_list: 
             device_type = device[0].id
             device_name = device[1].id
-            device_property = device[2].id if len(device)==3 else None
+            device_property = int(self.names.get_name_string(device[2].id)) if len(device) == 3 else None 
 
-            device_error_code = self.devices.make_device(device_type, 
-                                                        device_name, 
-                                                        device_property)
+            device_error_code = self.devices.make_device(device_name, 
+                                                         device_type, 
+                                                         device_property)
             device_error = self.semantic_error_types.get(device_error_code, None)
             
             if device_error:
                 self.display_semantic_error(device_error, device)
-                return False
+
         return True     
     
     def build_connections(self, connections_list):
@@ -105,22 +137,30 @@ class Parser:
             connection_error_code = self.network.make_connection(first_device, first_port, 
                                                                  second_device, second_port)  
             connection_error = self.semantic_error_types.get(connection_error_code, None)
+
             if connection_error:
                 self.display_semantic_error(connection_error, connection)
                 return False
+            
+        if not self.network.check_network(): # TODO: Consider how to showcase this error to the user
+            self.display_semantic_error("Input not connected", None)
+            return False
+        
         return True
     
     def build_monitors(self, monitors_list):    
         for monitor in monitors_list:
             device_name = monitor[0].id
-            port_name = monitor[3].id if len(monitor)==3 else None
+            port_name = monitor[3].id if len(monitor) == 3 else None
 
             monitor_error_code = self.monitors.make_monitor(device_name, port_name)
             monitor_error = self.semantic_error_types.get(monitor_error_code, None)
-            
+
             if monitor_error:
                 self.display_semantic_error(monitor_error, monitor)
-                return False   
+                if monitor_error != "Monitor present":
+                    return False
+
         return True  
     
     def build_network(self, network_dict):
@@ -128,14 +168,13 @@ class Parser:
         # For now just return True, so that userint and gui can run in the
         # skeleton code. When complete, should return False when there are
         # errors in the circuit definition file.
-        # Semantic error identification and handling
-        if not self.build_devices(network_dict["DEVICES"]):
-            return False
-        if not self.build_connections(network_dict["CONNECTIONS"]):
-            return False
-        if not self.build_monitors(network_dict["MONITORS"]):
-            return False
-        return True 
+
+        devices_success = self.build_devices(network_dict["DEVICES"])
+        connections_success = self.build_connections(network_dict["CONNECTIONS"])
+        monitors_success = self.build_monitors(network_dict["MONITORS"])
+        if all([devices_success, connections_success, monitors_success]):
+            return True
+        return False
 
     def parse_network(self):
         """Parse the circuit definition file."""
