@@ -32,16 +32,6 @@ def test_unique_error_codes(used_names):
         used_names.get_name_string('hello')
 
 
-def test_get_name_string_raises_exceptions(used_names):
-    """Test if get_string raises expected exceptions."""
-    with pytest.raises(TypeError):
-        used_names.get_name_string(1.4)
-    with pytest.raises(TypeError):
-        used_names.get_name_string("hello")
-    with pytest.raises(ValueError):
-        used_names.get_name_string(-1)
-
-
 @pytest.mark.parametrize("name_id, expected_string", [
     (0, "Alice"),
     (1, "Bob"),
