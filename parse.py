@@ -71,7 +71,7 @@ class Parser:
         # errors in the circuit definition file.
         return True
     
-    def build_connections(self, devices_list):
+    def build_devices(self, devices_list):
         for device in devices_list: 
             device_type = device[0].id
             device_name = device[1].id
@@ -128,7 +128,7 @@ class Parser:
         # For now just return True, so that userint and gui can run in the
         # skeleton code. When complete, should return False when there are
         # errors in the circuit definition file.
-        # Device semantic errors
+        # Semantic error identification and handling
         if not self.build_devices(network_dict["DEVICES"]):
             return False
         if not self.build_connections(network_dict["CONNECTIONS"]):
