@@ -325,7 +325,7 @@ class Scanner:
                 return self.get_next_char()  # Move to next line
             continue
 
-    def create_symbol(self, str, column_number, line_number):
+    def create_symbol(self, string, column_number, line_number):
         """Create a symbol.
 
         In the process of creating the symbol, the type of the symbol from its
@@ -343,11 +343,8 @@ class Scanner:
         symbol: Symbol
             The symbol created from the string.
         """
-        symbol = Symbol()
-        symbol.type = Symbol.determine_type(str)  # Determine symbol type
-        symbol.id = self.names.lookup([str])[0]  # Lookup requires a list
-        symbol.column_number = column_number
-        symbol.line_number = line_number
+        symbol_id = self.names.lookup([string])[0]  # Lookup requires a list
+        symbol = Symbol(string, symbol_id, line_number, column_number)
         return symbol
 
     def get_symbols(self):
