@@ -45,17 +45,22 @@ class Parser:
 
     def display_syntax_error(self, error_type, symbol, **kwargs):
         """Display the syntax error.
+
         Parameters
         ----------
-        error_type: str
-            Description of the syntax error that occured
+        error_index: int
+            Index of the syntax error that occured
         symbol: Symbol
             Symbol associated with the syntax error
+
         Returns
         -------
-        None"""
-        return
-
+        bool
+            True if the syntax error is printed, False otherwise.
+        """
+        error_message = self.syntax_error_types[error_index]
+        return self.scanner.print_error(symbol, 0, error_message)
+    
     def network_dict(self):
         """Verify the syntax of the circuit definition file and returns a
         dictionary of symbols describing the network.

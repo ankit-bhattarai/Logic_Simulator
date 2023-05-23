@@ -528,7 +528,7 @@ class Scanner:
             position_of_arrow = column_number + index_of_arrow
             arrow_string = " " * (position_of_arrow - 1) + "^"
             print(message)
-            print(line_string)
+            print(line_string.rstrip())  # Remove trailing newline from end
             print(arrow_string)
             return True
         except Exception:

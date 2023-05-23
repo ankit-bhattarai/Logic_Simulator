@@ -41,3 +41,21 @@ scanner_2.print_error(second_last_symbol, index_of_arrow=1,
                       message="Error message should point at N")
 scanner_2.print_error(second_last_symbol, index_of_arrow=2,
                       message="Error message should point at D")
+
+
+# Look at the 6th last symbol to show that printing works well for symbols
+# that are not on the last line of the file
+print("Showing this works well for symbols that are not on the last line")
+sixth_last = list_of_symbols_2[-6]
+scanner_2.print_error(sixth_last, index_of_arrow=0,
+                      message="Error message should point at n")
+
+scanner_2.print_error(sixth_last, index_of_arrow=1,
+                      message="Error message should point at o")
+
+scanner_2.print_error(sixth_last, index_of_arrow=2,
+                      message="Error message should point at r")
+
+scanner_2.print_error(sixth_last, index_of_arrow=3,
+                      message="Error message should point at 1")
+
