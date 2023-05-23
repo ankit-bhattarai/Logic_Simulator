@@ -53,6 +53,113 @@ class Parser:
                                      monitors.NOT_OUTPUT: "Not output",
                                      monitors.MONITOR_PRESENT: "Monitor present"}
 
+    def check_name(self):
+        """Check if the current symbol is a name.
+
+        If it is not, display an error message.
+
+        Returns
+        -------
+        bool
+            True if the current symbol is a name, False otherwise.
+        """
+        if self.symbol.type == "name":
+            return True
+        else:
+            self.display_syntax_error(9, self.symbol)
+            return False
+
+    def connection(self, con_list):
+        """Parses a single connection, returns errors upon detection
+
+        Creates a list of the current connection.
+        Appends this list to the list of connections if no error is detected.
+        Appends None to the list of connections if an error is detected.
+
+        Parameters
+        ----------
+        con_list: list
+            list of connections
+
+        Returns
+        -------
+        bool
+            True if no errors detected, return nothing otherwise
+        """
+        con = []
+        if self.check_name():
+            con.append(self.names.get_name_string(self.symbol.id))
+        else:
+            con_list.append(None)
+            return
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol.type == "dot":
+            con.append(self.names.get_name_string(self.symbol.id))
+            self.symbol = self.scanner.get_symbol()
+            if self.symbol.type == "output_pin":
+                con.append(self.names.get_name_string(self.symbol.id))
+                self.symbol = self.scanner.get_symbol()
+            else:
+                con_list.append(None)
+                self.display_syntax_error(14, self.symbol)
+                return
+        if self.symbol.type == "arrow":
+            con.append(self.names.get_name_string(self.symbol.id))
+        else:
+            con_list.append(None)
+            self.display_syntax_error(15, self.symbol)
+            return
+        self.symbol = self.scanner.get_symbol()
+        if self.check_name():
+            con.append(self.names.get_name_string(self.symbol.id))
+        else:
+            return
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol.type == "dot":
+            con.append(self.names.get_name_string(self.symbol.id))
+        else:
+            con_list.append(None)
+            self.display_syntax_error(16, self.symbol)
+            return
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol.type == "input_pin":
+            con.append(self.names.get_name_string(self.symbol.id))
+            con_list.append(con)
+            return True
+        else:
+            con_list.append(None)
+            self.display_syntax_error(17, self.symbol)
+            return
+
+    def connection_list(self):
+        """Parses all connections, returns errors upon detection
+
+        Returns
+        -------
+        con_list: list
+            list of connections
+        """
+        con_list = []
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol.type == "semi-colon":  # No connections
+            return con_list
+        else:
+            self.connection(con_list)
+        while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
+            self.symbol = self.scanner.get_symbol()
+        while self.symbol.type == "comma":
+            self.symbol = self.scanner.get_symbol()
+            self.connection(con_list)
+            self.symbol = self.scanner.get_symbol()
+        if self.symbol.type == "semi-colon":
+            if None not in con_list:
+                return con_list
+            else:
+                return None
+        else:
+            self.display_syntax_error(13, self.symbol)
+            return
+
     def display_semantic_error(self, error_type, symbols, **kwargs):
         """Prints the semantic error.
         Parameters
@@ -92,20 +199,24 @@ class Parser:
         elif error_type == 'Monitor present':
             pass # Warning - Not error message
 
-    
-    def display_syntax_error(self, error_type, symbol, **kwargs):
+    def display_syntax_error(self, error_index, symbol, **kwargs):
         """Display the syntax error.
+
         Parameters
         ----------
-        error_type: str
-            Description of the syntax error that occured
+        error_index: int
+            Index of the syntax error that occured
         symbol: Symbol
             Symbol associated with the syntax error
+
         Returns
         -------
-        None"""
-        return 
-    
+        bool
+            True if the error is displayed, False otherwise.
+        """
+        error_message = self.syntax_error_types[error_index]
+        return self.scanner.print_error(symbol, 0, error_message)  # index_of_arrow!
+
     def network_dict(self):
         """Verify the syntax of the circuit definition file and returns a 
         dictionary of symbols describing the network.
@@ -116,7 +227,7 @@ class Parser:
         # skeleton code. When complete, should return False when there are
         # errors in the circuit definition file.
         return True
-    
+
     def build_devices(self, devices_list):
         """Build the devices.
         Parameters:
