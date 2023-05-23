@@ -62,20 +62,7 @@ class Parser:
             17: "NameError: The input pin should be one of the following: I1, I2,...,I16, DATA, CLK, SET, CLEAR.",
             18: "ValueError: The required number of parameters for a monitor is 1. Should also check for incorrect placement or missing punctuations."
         }
-        self.semantic_error_types = {
-            devices.INVALID_QUALIFIER: "Invalid qualifier",
-            devices.NO_QUALIFIER: "No qualifier",
-            devices.BAD_DEVICE: "Bad device",
-            devices.QUALIFIER_PRESENT: "Qualifier present",
-            devices.DEVICE_PRESENT: "Device present",
-            network.INPUT_TO_INPUT: "Input to input",
-            network.OUTPUT_TO_OUTPUT: "Output to output",
-            network.INPUT_CONNECTED: "Input connected",
-            network.PORT_ABSENT: "Port absent",
-            network.DEVICE_ABSENT: "Device absent",
-            monitors.NOT_OUTPUT: "Not output",
-            monitors.MONITOR_PRESENT: "Monitor present",
-        }
+        self.semantic_error_handler = SemanticErrorHandler(self.names, self.devices, self.network, self.monitors)
 
     def check_name(self):
         """Check if the current symbol is a name.
@@ -234,7 +221,7 @@ class Parser:
             error_code = self.devices.make_device(device_name, device_type,
                                                   device_property)
     
-            if self.semantic_error_handler.display_error(error_code, device):
+            if self.semantic_error_handler.handle_error(error_code, device):
                 return False
 
         return True
