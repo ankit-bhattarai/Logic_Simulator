@@ -55,6 +55,127 @@ class Parser:
             monitors.MONITOR_PRESENT: "Monitor present",
         }
 
+    def get_labelled_symbols(self, symbols):
+        """
+        Returns the symbols labelled with description.
+        Parameters
+        ----------
+        symbols: list of symbols asscoiated with the connection
+        Returns
+        -------
+        dict: Dictionary of labelled symbols
+        """
+        labelled_symbols = {
+            "First device": None,
+            "First port": None,
+            "Second device": None,
+            "Second port": None,
+        }
+
+        labelled_symbols["First device"] = symbols[0]
+
+        if symbols[1].type == "dot":
+            labelled_symbols["First port"] = symbols[2]
+            labelled_symbols["Second device"] = symbols[4]
+            if symbols[5].type == "dot":
+                labelled_symbols["Second port"] = symbols[6]
+        else:
+            labelled_symbols["Second device"] = symbols[2]
+            if symbols[3].type == "dot":
+                labelled_symbols["Second port"] = symbols[4]
+        return labelled_symbols
+
+    def get_devices_strings(self, labelled_symbols):
+        """Returns the device strings.
+        Parameters
+        ----------
+        labelled_symbols: dict
+            Dictionary of labelled symbols for a connection
+        Returns
+        -------
+        first_device: str
+            String associated for first device + port
+        second_device: str
+            String associated for second device + port
+        """
+        first_device = self.names.get_name_string(labelled_symbols["First device"].id)
+        second_device = self.names.get_name_string(labelled_symbols["Second device"].id)
+
+        if labelled_symbols["First port"]:
+            first_device += "." + self.names.get_name_string(
+                labelled_symbols["First port"].id
+            )
+        if labelled_symbols["Second port"]:
+            second_device += "." + self.names.get_name_string(
+                labelled_symbols["Second port"].id
+            )
+
+        return first_device, second_device
+
+    def display_device_present_error(self, device_name):
+        """Prints the device present error.
+        Parameters
+        ----------
+        device_name: symbol
+            Symbol associated with the device present error
+        Returns
+        -------
+        None
+        """
+        self.scanner.print_error(device_name, 0,
+                                 "Device names are not unique. {} is already the name of a device".format(self.names.get_name_string(device_name.id))
+        )
+
+    def display_input_input_error(self, symbols):
+        """Prints the input input error.
+        Parameters
+        ----------
+        symbols: List of symbols
+            Symbols associated with the input input error
+        Returns
+        -------
+        None
+        """
+        labelled_symbols = self.get_labelled_symbols(symbols)
+        first_device, second_device = self.get_devices_strings(labelled_symbols)
+        self.scanner.print_error(labelled_symbols["First device"], 0, 
+                                 "Input {} is connected to input {}".format(first_device, second_device)
+                                 + "Connections must be from outputs to inputs.")
+
+    def display_output_output_error(self, symbols):
+        """Prints the output output error.
+        Parameters
+        ----------
+        symbols: List of symbols
+            Symbols associated with the output output error
+        Returns
+        -------
+        None
+        """
+        labelled_symbols = self.get_labelled_symbols(symbols)
+        first_device, second_device = self.get_devices_strings(labelled_symbols)
+        self.scanner.print_error(labelled_symbols["Second device"], 0,
+                                 "Output {} is connected to output {}".format(first_device, second_device)
+                                 + "Connections must be from outputs to inputs.")
+
+    def display_input_connected_error(self, symbols):
+        """Prints the input connected error.
+        Parameters
+        ----------
+        symbols: List of symbols
+            Symbols associated with the input connected error
+        Returns
+        -------
+        None
+        """
+        labelled_symbols = self.get_labelled_symbols(symbols)
+        first_device, second_device = self.get_devices_strings(labelled_symbols)
+
+        self.scanner.print_error(labelled_symbols["Second device"], 0,
+            "Signal is already connected to input {}".format(second_device)
+            + "Only one signal must be connected to an input.")
+        
+
     def display_semantic_error(self, error_type, symbols, **kwargs):
         """Prints the semantic error.
         Parameters
@@ -66,23 +187,17 @@ class Parser:
         Returns
         -------
         None
+        Shouldn't occur -
+        Invalid qualifier, no qualifier, Bad device, Qualifier present
         """
-        if error_type == "Invalid qualifier":
-            pass
-        elif error_type == "No qualifier":
-            pass
-        elif error_type == "Bad device":
-            pass
-        elif error_type == "Qualifier present":
-            pass
-        elif error_type == "Device present":
-            pass
+        if error_type == "Device present":
+            self.display_device_present_error(symbols[1])
         elif error_type == "Input to input":
-            pass
+            self.display_input_input_error(symbols)
         elif error_type == "Output to output":
-            pass
+            self.display_output_output_error(symbols)
         elif error_type == "Input connected":
-            pass
+            self.display_input_connected_error(symbols)
         elif error_type == "Port absent":
             pass
         elif error_type == "Device absent":
@@ -140,8 +255,7 @@ class Parser:
             device_error_code = self.devices.make_device(
                 device_name, device_type, device_property
             )
-            device_error = self.semantic_error_types.get(device_error_code,
-                                                         None)
+            device_error = self.semantic_error_types.get(device_error_code, None)
 
             if device_error:
                 self.display_semantic_error(device_error, device)
@@ -206,10 +320,8 @@ class Parser:
             device_name = monitor[0].id
             port_name = monitor[3].id if len(monitor) == 3 else None
 
-            monitor_error_code = self.monitors.make_monitor(device_name,
-                                                            port_name)
-            monitor_error = self.semantic_error_types.get(monitor_error_code,
-                                                          None)
+            monitor_error_code = self.monitors.make_monitor(device_name, port_name)
+            monitor_error = self.semantic_error_types.get(monitor_error_code, None)
 
             if monitor_error:
                 self.display_semantic_error(monitor_error, monitor)
@@ -232,8 +344,7 @@ class Parser:
         """
 
         devices_success = self.build_devices(network_dict["DEVICES"])
-        connections_success = self.build_connections(
-                                            network_dict["CONNECTIONS"])
+        connections_success = self.build_connections(network_dict["CONNECTIONS"])
         monitors_success = self.build_monitors(network_dict["MONITORS"])
         if all([devices_success, connections_success, monitors_success]):
             return True
