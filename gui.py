@@ -19,6 +19,9 @@ from monitors import Monitors
 from scanner import Scanner
 from parse import Parser
 
+change_button_cycles = False
+text_min_height = 1
+
 
 class MyGLCanvas(wxcanvas.GLCanvas):
     """Handle all drawing operations.
@@ -204,6 +207,69 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                 GLUT.glutBitmapCharacter(font, ord(character))
 
 
+class RightPanel(wx.Panel):
+    def __init__(self, parent):
+        super().__init__(parent=parent)  # Initialise
+        self.parent = parent
+        # Creating the sizers
+        main_sizer = wx.BoxSizer(wx.VERTICAL)
+        top_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        middle_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        main_sizer.Add(top_sizer, 0, wx.ALL, 5)
+        main_sizer.Add(middle_sizer, 0, wx.ALL, 5)
+
+        # Add the text on the top
+        self.text = wx.StaticText(self, wx.ID_ANY, "Cycles: ")
+        top_sizer.Add(self.text, 1, wx.EXPAND | wx.ALL, 10)
+
+        # Create the spin object
+        self.spin = wx.SpinCtrl(self, wx.ID_ANY, "10", size=wx.Size(120, 10))
+        # Can't have 0 cycles, default max seems to be 100!
+        self.spin.SetMin(1)
+        # Bind the spin object
+        self.spin.Bind(wx.EVT_SPINCTRL, self.OnSpin)
+        # Add spin to top sizer
+        # self.spin.SetMinSize((wx.DefaultCoord, text_min_height))
+        top_sizer.Add(self.spin, 1, wx.EXPAND | wx.ALL, 5)
+
+        # Create the two buttons
+        self.run_button_id, self.continue_button_id = wx.NewIdRef(count=2)
+        self.button_run = wx.Button(self, self.run_button_id, "Run")
+        self.button_continue = wx.Button(self, self.continue_button_id,
+                                         "Continue")
+        # Bind buttons
+        self.button_run.Bind(wx.EVT_BUTTON, self.OnButtonRun)
+        self.button_continue.Bind(wx.EVT_BUTTON, self.OnButtonContinue)
+        # Add buttons to bottom sizer
+        middle_sizer.Add(self.button_run, 1, wx.ALL, 5)
+        middle_sizer.Add(self.button_continue, 1, wx.ALL, 5)
+        self.SetSizer(main_sizer)
+        # Want to hide this until the run button is pressed!
+        self.button_continue.Hide()
+
+    def OnButtonRun(self, event):
+        """Handle the event when the user clicks the run button."""
+        text = "Run button pressed."
+        self.parent.canvas.render(text)
+        self.button_continue.Show()
+        self.Layout()
+
+    def OnButtonContinue(self, event):
+        """Handle the event when the user clicks the continue button."""
+        text = "Continue button pressed."
+        self.parent.canvas.render(text)
+
+    def OnSpin(self, event):
+        spin_value = self.spin.GetValue()
+        self.parent.canvas.render(f"Spin value: {spin_value}")
+        # Can modify the text of the buttons to this
+        if change_button_cycles:
+            self.button_run.SetLabel(f"Run for: {spin_value}")
+            self.button_continue.SetLabel(f"Continue for: {spin_value}")
+            self.GetSizer().Layout()
+            self.parent.GetSizer().Layout()
+
+
 class Gui(wx.Frame):
     """Configure the main window and all the widgets.
 
@@ -251,35 +317,16 @@ class Gui(wx.Frame):
         # Canvas for drawing signals
         self.canvas = MyGLCanvas(self, devices, monitors)
 
-        # Configure the widgets
-        self.text = wx.StaticText(self, wx.ID_ANY, "Cycles")
-        self.spin = wx.SpinCtrl(self, wx.ID_ANY, "10", min=1)
-        # Minimum of 1 cycle as you can't have zero cycles
-        self.run_button = wx.Button(self, wx.ID_ANY, "Run")
-        self.continue_button = wx.Button(self, wx.ID_ANY, "Continue")
-        self.text_box = wx.TextCtrl(self, wx.ID_ANY, "",
-                                    style=wx.TE_PROCESS_ENTER)
-        self.continue_button.Hide()  # Hide it until run button is pressed
-
         # Bind events to widgets
         self.Bind(wx.EVT_MENU, self.on_menu)
-        self.spin.Bind(wx.EVT_SPINCTRL, self.on_spin)
-        self.run_button.Bind(wx.EVT_BUTTON, self.on_run_button)
-        self.continue_button.Bind(wx.EVT_BUTTON, self.on_continue_button)
-        self.text_box.Bind(wx.EVT_TEXT_ENTER, self.on_text_box)
 
         # Configure sizers for layout
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        side_sizer = wx.BoxSizer(wx.VERTICAL)
 
         main_sizer.Add(self.canvas, 5, wx.EXPAND | wx.ALL, 5)
-        main_sizer.Add(side_sizer, 1, wx.ALL, 5)
 
-        side_sizer.Add(self.text, 1, wx.TOP, 10)
-        side_sizer.Add(self.spin, 1, wx.ALL, 5)
-        side_sizer.Add(self.run_button, 1, wx.ALL, 5)
-        side_sizer.Add(self.continue_button, 1, wx.ALL, 5)
-        side_sizer.Add(self.text_box, 1, wx.ALL, 5)
+        right_panel = RightPanel(self)
+        main_sizer.Add(right_panel, 1, wx.EXPAND | wx.ALL, 5)
 
         self.SetSizeHints(600, 600)
         self.SetSizer(main_sizer)
@@ -308,30 +355,3 @@ class Gui(wx.Frame):
             print("Help: EBNF Syntax required")
         elif Id == self.help_id_2:
             print("Help: User guide required")
-
-    def on_spin(self, event):
-        """Handle the event when the user changes the spin control value."""
-        spin_value = self.spin.GetValue()
-        text = "".join(["New spin control value: ", str(spin_value)])
-        self.canvas.render(text)
-        # self.run_button.SetLabel(f"Run: {spin_value}")
-        # self.continue_button.SetLabel(f"Continue: {spin_value}")
-        # self.Layout()
-
-    def on_run_button(self, event):
-        """Handle the event when the user clicks the run button."""
-        text = "Run button pressed."
-        self.canvas.render(text)
-        self.continue_button.Show()
-        self.Layout()
-
-    def on_continue_button(self, event):
-        """Handle the event when the user clicks the continue button."""
-        text = "Continue button pressed."
-        self.canvas.render(text)
-
-    def on_text_box(self, event):
-        """Handle the event when the user enters text."""
-        text_box_value = self.text_box.GetValue()
-        text = "".join(["New text box value: ", text_box_value])
-        self.canvas.render(text)
