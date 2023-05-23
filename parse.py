@@ -40,59 +40,60 @@ class Parser:
         self.network = network
         self.monitors = monitors
         self.scanner = scanner
-        self.semantic_error_types = {devices.INVALID_QUALIFIER: "Invalid qualifier",
-                                     devices.NO_QUALIFIER: "No qualifier",
-                                     devices.BAD_DEVICE: "Bad device", 
-                                     devices.QUALIFIER_PRESENT: "Qualifier present",
-                                     devices.DEVICE_PRESENT: "Device present",
-                                     network.INPUT_TO_INPUT: "Input to input",
-                                     network.OUTPUT_TO_OUTPUT: "Output to output",   
-                                     network.INPUT_CONNECTED: "Input connected",
-                                     network.PORT_ABSENT: "Port absent",
-                                     network.DEVICE_ABSENT: "Device absent",
-                                     monitors.NOT_OUTPUT: "Not output",
-                                     monitors.MONITOR_PRESENT: "Monitor present"}
+        self.semantic_error_types = {
+            devices.INVALID_QUALIFIER: "Invalid qualifier",
+            devices.NO_QUALIFIER: "No qualifier",
+            devices.BAD_DEVICE: "Bad device",
+            devices.QUALIFIER_PRESENT: "Qualifier present",
+            devices.DEVICE_PRESENT: "Device present",
+            network.INPUT_TO_INPUT: "Input to input",
+            network.OUTPUT_TO_OUTPUT: "Output to output",
+            network.INPUT_CONNECTED: "Input connected",
+            network.PORT_ABSENT: "Port absent",
+            network.DEVICE_ABSENT: "Device absent",
+            monitors.NOT_OUTPUT: "Not output",
+            monitors.MONITOR_PRESENT: "Monitor present",
+        }
 
     def display_semantic_error(self, error_type, symbols, **kwargs):
         """Prints the semantic error.
         Parameters
         ----------
         error_type: str
-            Desription of the semantic error that occured 
+            Desription of the semantic error that occured
         symbol: list of symbols
             Symbols associated with the semantic error
         Returns
         -------
         None
         """
-        if error_type == 'Invalid qualifier':
+        if error_type == "Invalid qualifier":
             pass
-        elif error_type == 'No qualifier':
+        elif error_type == "No qualifier":
             pass
-        elif error_type == 'Bad device':
+        elif error_type == "Bad device":
             pass
-        elif error_type == 'Qualifier present':
+        elif error_type == "Qualifier present":
             pass
-        elif error_type == 'Device present':
+        elif error_type == "Device present":
             pass
-        elif error_type == 'Input to input':
+        elif error_type == "Input to input":
             pass
-        elif error_type == 'Output to output':
+        elif error_type == "Output to output":
             pass
-        elif error_type == 'Input connected':
+        elif error_type == "Input connected":
             pass
-        elif error_type == 'Port absent':
+        elif error_type == "Port absent":
             pass
-        elif error_type == 'Device absent':
+        elif error_type == "Device absent":
             pass
-        elif error_type == 'Not output':
+        elif error_type == "Not output":
             pass
         elif error_type == "Input not connected":
             pass
-        elif error_type == 'Monitor present':
-            pass # Warning - Not error message
+        elif error_type == "Monitor present":
+            pass  # Warning - Not error message
 
-    
     def display_syntax_error(self, error_type, symbol, **kwargs):
         """Display the syntax error.
         Parameters
@@ -104,10 +105,10 @@ class Parser:
         Returns
         -------
         None"""
-        return 
-    
+        return
+
     def network_dict(self):
-        """Verify the syntax of the circuit definition file and returns a 
+        """Verify the syntax of the circuit definition file and returns a
         dictionary of symbols describing the network.
         Returns
         -------
@@ -116,7 +117,7 @@ class Parser:
         # skeleton code. When complete, should return False when there are
         # errors in the circuit definition file.
         return True
-    
+
     def build_devices(self, devices_list):
         """Build the devices.
         Parameters:
@@ -127,21 +128,26 @@ class Parser:
         -------
         bool: True if the devices are semantically correct,
         False otherwise."""
-        for device in devices_list: 
+        for device in devices_list:
             device_type = device[0].id
             device_name = device[1].id
-            device_property = int(self.names.get_name_string(device[2].id)) if len(device) == 3 else None 
+            device_property = (
+                int(self.names.get_name_string(device[2].id))
+                if len(device) == 3
+                else None
+            )
 
-            device_error_code = self.devices.make_device(device_name, 
-                                                         device_type, 
-                                                         device_property)
-            device_error = self.semantic_error_types.get(device_error_code, None)
-            
+            device_error_code = self.devices.make_device(
+                device_name, device_type, device_property
+            )
+            device_error = self.semantic_error_types.get(device_error_code,
+                                                         None)
+
             if device_error:
                 self.display_semantic_error(device_error, device)
 
-        return True     
-    
+        return True
+
     def build_connections(self, connections_list):
         """Build the connections.
         Parameters:
@@ -165,21 +171,26 @@ class Parser:
                 second_device = connection[2].id
                 if connection[3].type == "dot":
                     second_port = connection[4].id
-                
-            connection_error_code = self.network.make_connection(first_device, first_port, 
-                                                                 second_device, second_port)  
-            connection_error = self.semantic_error_types.get(connection_error_code, None)
+
+            connection_error_code = self.network.make_connection(
+                first_device, first_port, second_device, second_port
+            )
+            connection_error = self.semantic_error_types.get(
+                connection_error_code, None
+            )
 
             if connection_error:
                 self.display_semantic_error(connection_error, connection)
                 return False
-            
-        if not self.network.check_network(): # TODO: Consider how to showcase this error to the user
+
+        if (
+            not self.network.check_network()
+        ):  # TODO: Consider how to showcase this error to the user
             self.display_semantic_error("Input not connected", None)
             return False
-        
+
         return True
-    
+
     def build_monitors(self, monitors_list):
         """Build the monitors.
         Parameters:
@@ -190,36 +201,39 @@ class Parser:
         -------
         bool: True if the monitors are semantically correct,
         False otherwise."""
-        
+
         for monitor in monitors_list:
             device_name = monitor[0].id
             port_name = monitor[3].id if len(monitor) == 3 else None
 
-            monitor_error_code = self.monitors.make_monitor(device_name, port_name)
-            monitor_error = self.semantic_error_types.get(monitor_error_code, None)
+            monitor_error_code = self.monitors.make_monitor(device_name,
+                                                            port_name)
+            monitor_error = self.semantic_error_types.get(monitor_error_code,
+                                                          None)
 
             if monitor_error:
                 self.display_semantic_error(monitor_error, monitor)
                 if monitor_error != "Monitor present":
                     return False
 
-        return True  
-    
+        return True
+
     def build_network(self, network_dict):
         """Build the logic network.
         Parameters:
         -----------
         network_dict: dict
-            Dictionary of list of list ofsymbols describing the network. 
+            Dictionary of list of list ofsymbols describing the network.
             (Keys: DEVICES, CONNECTIONS, MONITORS)
         Returns
-        ------- 
+        -------
         bool: True if the circuit definition file is semantically correct,
         False otherwise.
         """
 
         devices_success = self.build_devices(network_dict["DEVICES"])
-        connections_success = self.build_connections(network_dict["CONNECTIONS"])
+        connections_success = self.build_connections(
+                                            network_dict["CONNECTIONS"])
         monitors_success = self.build_monitors(network_dict["MONITORS"])
         if all([devices_success, connections_success, monitors_success]):
             return True
@@ -229,12 +243,12 @@ class Parser:
         """Parse the circuit definition file.
         Returns
         -------
-        bool: True if the circuit definition file is syntactically and 
-        semantically correct, False otherwise.        
+        bool: True if the circuit definition file is syntactically and
+        semantically correct, False otherwise.
         """
         network_dict = self.network_dict()
         if network_dict:
-            build_network = self.build_network()
+            build_network = self.build_network(network_dict=network_dict)
         else:
             return False
 
