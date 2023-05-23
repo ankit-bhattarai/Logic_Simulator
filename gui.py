@@ -231,12 +231,21 @@ class Gui(wx.Frame):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(800, 600))
 
+        # File path for circuit file which can be chosen from the GUI
+        self.file_path = None
+
         # Configure the file menu
         fileMenu = wx.Menu()
+        helpMenu = wx.Menu()
         menuBar = wx.MenuBar()
+        self.open_id, self.help_id_1, self.help_id_2 = wx.NewIdRef(count=3)
+        fileMenu.Append(self.open_id, "&Open")
         fileMenu.Append(wx.ID_ABOUT, "&About")
         fileMenu.Append(wx.ID_EXIT, "&Exit")
+        helpMenu.Append(self.help_id_1, "&EBNF Syntax")
+        helpMenu.Append(self.help_id_2, "&User Guide")
         menuBar.Append(fileMenu, "&File")
+        menuBar.Append(helpMenu, "&Help")
         self.SetMenuBar(menuBar)
 
         # Canvas for drawing signals
@@ -244,15 +253,19 @@ class Gui(wx.Frame):
 
         # Configure the widgets
         self.text = wx.StaticText(self, wx.ID_ANY, "Cycles")
-        self.spin = wx.SpinCtrl(self, wx.ID_ANY, "10")
+        self.spin = wx.SpinCtrl(self, wx.ID_ANY, "10", min=1)
+        # Minimum of 1 cycle as you can't have zero cycles
         self.run_button = wx.Button(self, wx.ID_ANY, "Run")
+        self.continue_button = wx.Button(self, wx.ID_ANY, "Continue")
         self.text_box = wx.TextCtrl(self, wx.ID_ANY, "",
                                     style=wx.TE_PROCESS_ENTER)
+        self.continue_button.Hide()  # Hide it until run button is pressed
 
         # Bind events to widgets
         self.Bind(wx.EVT_MENU, self.on_menu)
         self.spin.Bind(wx.EVT_SPINCTRL, self.on_spin)
         self.run_button.Bind(wx.EVT_BUTTON, self.on_run_button)
+        self.continue_button.Bind(wx.EVT_BUTTON, self.on_continue_button)
         self.text_box.Bind(wx.EVT_TEXT_ENTER, self.on_text_box)
 
         # Configure sizers for layout
@@ -265,6 +278,7 @@ class Gui(wx.Frame):
         side_sizer.Add(self.text, 1, wx.TOP, 10)
         side_sizer.Add(self.spin, 1, wx.ALL, 5)
         side_sizer.Add(self.run_button, 1, wx.ALL, 5)
+        side_sizer.Add(self.continue_button, 1, wx.ALL, 5)
         side_sizer.Add(self.text_box, 1, wx.ALL, 5)
 
         self.SetSizeHints(600, 600)
@@ -275,19 +289,45 @@ class Gui(wx.Frame):
         Id = event.GetId()
         if Id == wx.ID_EXIT:
             self.Close(True)
-        if Id == wx.ID_ABOUT:
-            wx.MessageBox("Logic Simulator\nCreated by Mojisola Agboola\n2017",
+        elif Id == wx.ID_ABOUT:
+            wx.MessageBox("Logic Simulator\nCreated by Ankit Adhi Jessy\n2023",
                           "About Logsim", wx.ICON_INFORMATION | wx.OK)
+        elif Id == self.open_id:
+            openFileDialog = wx.FileDialog(self, "Open definition file", "",
+                                           "",
+                                           wildcard="TXT files (*.txt)|*.txt",
+                                           style=wx.FD_OPEN +
+                                           wx.FD_FILE_MUST_EXIST)
+            if openFileDialog.ShowModal() == wx.ID_CANCEL:
+                return  # Cancelled, nothing selected
+            # Proceed loading the file chosen by the user
+            self.file_path = openFileDialog.GetPath()
+            print("Path: ", self.file_path)
+
+        elif Id == self.help_id_1:
+            print("Help: EBNF Syntax required")
+        elif Id == self.help_id_2:
+            print("Help: User guide required")
 
     def on_spin(self, event):
         """Handle the event when the user changes the spin control value."""
         spin_value = self.spin.GetValue()
         text = "".join(["New spin control value: ", str(spin_value)])
         self.canvas.render(text)
+        # self.run_button.SetLabel(f"Run: {spin_value}")
+        # self.continue_button.SetLabel(f"Continue: {spin_value}")
+        # self.Layout()
 
     def on_run_button(self, event):
         """Handle the event when the user clicks the run button."""
         text = "Run button pressed."
+        self.canvas.render(text)
+        self.continue_button.Show()
+        self.Layout()
+
+    def on_continue_button(self, event):
+        """Handle the event when the user clicks the continue button."""
+        text = "Continue button pressed."
         self.canvas.render(text)
 
     def on_text_box(self, event):
