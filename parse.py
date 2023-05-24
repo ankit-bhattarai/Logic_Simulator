@@ -62,7 +62,7 @@ class Parser:
             17: "NameError: The input pin should be one of the following: I1, I2,...,I16, DATA, CLK, SET, CLEAR.",
             18: "TypeError: Monitors should be separated by comma and ended by semi-colon."
         }
-        self.semantic_error_handler = SemanticErrorHandler(self.names, self.devices, self.network, self.monitors)
+        self.semantic_error_handler = SemanticErrorHandler(self.names, self.devices, self.network, self.monitors, self.scanner)
 
     def check_name(self):
         """Check if the current symbol is a name.
@@ -173,12 +173,20 @@ class Parser:
 
     def monitor(self, mon_list):
         """Parses a monitor, returns errors upon detection
+
+        Creates a list of the current monitor.
+        Appends this list to the list of monitors if no error is detected.
+        Appends None to the list of monitors if an error is detected.
+
         Parameters
         ----------
+        mon_list: list
+            list of monitors
 
         Returns
         -------
-        None
+        bool
+            True if no errors detected, return nothing otherwise
         """
         mon = []
         if self.check_name():
@@ -206,7 +214,13 @@ class Parser:
                 return
 
     def monitor_list(self):
-        """Parses all monitors, returns errors upon detection"""
+        """Parses all monitors, returns errors upon detection
+        
+        Returns
+        -------
+        mon_list: list
+            list of monitors
+        """
         mon_list = []
         self.symbol = self.scanner.get_symbol()
         if self.symbol.type == "semi-colon":  # No monitors
