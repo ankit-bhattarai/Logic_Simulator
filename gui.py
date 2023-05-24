@@ -221,6 +221,11 @@ class RightPanel(wx.Panel):
                               "monitor5", "monitor6", "monitor7", "monitor8",
                               "monitor9", "monitor10"]
 
+        self.switch_states = {"switch1": 0, "switch2": 1, "switch3": 0,
+                              "switch4": 1, "switch5": 0, "switch6": 1,
+                              "switch7": 0, "switch8": 1, "switch9": 0,
+                              "switch10": 1}
+
         # Creating the sizers
         main_sizer = wx.BoxSizer(wx.VERTICAL)
         top_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -267,7 +272,8 @@ class RightPanel(wx.Panel):
         self.button_continue.Hide()
 
         # Text for the switches
-        self.switch_text = wx.StaticText(self, wx.ID_ANY, "Select Switch: ")
+        self.switch_text = wx.StaticText(
+            self, wx.ID_ANY, "Select Switch and state: ")
         switch_select_sizer.Add(self.switch_text, 1, wx.EXPAND | wx.ALL, 10)
 
         # Have to create the combo box for the switches
@@ -281,6 +287,29 @@ class RightPanel(wx.Panel):
         self.combo_box_switch.Bind(wx.EVT_TEXT_ENTER, self.OnComboSwitch)
         # Add combo box to switch sizer
         switch_select_sizer.Add(self.combo_box_switch, 1, wx.ALL, 5)
+        self.switch_text = None  # The option chosen on the combo box
+
+        # For representing the state of the switch, will have two buttons
+        # The button corresponding to the current state of the switch
+        # will be green and the other one will be red
+
+        # Create the two buttons
+        self.switch_button_id_0, self.switch_button_id_1 = wx.NewIdRef(count=2)
+        self.button_switch_0 = wx.Button(self, self.switch_button_id_0, "Open")
+        self.button_switch_1 = wx.Button(
+            self, self.switch_button_id_1, "Closed")
+        # Bind buttons
+        self.button_switch_0.Bind(wx.EVT_BUTTON, self.OnButtonSwitch0)
+        self.button_switch_1.Bind(wx.EVT_BUTTON, self.OnButtonSwitch1)
+        # Add buttons to switch state sizer
+        switch_state_sizer.Add(self.button_switch_0, 1, wx.ALL, 5)
+        switch_state_sizer.Add(self.button_switch_1, 1, wx.ALL, 5)
+        # Initially hide the buttons
+        self.button_switch_0.Hide()
+        self.button_switch_1.Hide()
+        # Specify the colors for the buttons
+        self.red = wx.Colour(226, 126, 126, 255)
+        self.green = wx.Colour(0, 255, 0, 255)
 
         # Set the sizer for the panel
         self.SetSizer(main_sizer)
@@ -307,14 +336,61 @@ class RightPanel(wx.Panel):
             self.GetSizer().Layout()
             self.parent.GetSizer().Layout()
 
+    def renderSwitchBoxes(self):
+        """Method renders the switch boxes based on their current state."""
+        # Get the current switch
+        switch_text = self.switch_text
+        if switch_text is None:  # This can't ever happen
+            # As this function is only called when the combo box is changed
+            pass
+        switch_state = self.switch_states[switch_text]
+        # Show the buttons
+        self.button_switch_0.Show()
+        self.button_switch_1.Show()
+        # Set the colors of the buttons
+        if switch_state == 0:
+            # Change color of button 0 to green and button 1 to red
+            self.button_switch_0.SetBackgroundColour(self.green)
+            self.button_switch_1.SetBackgroundColour(self.red)
+        else:  # switch_state == 1
+            # Change color of button 0 to red and button 1 to green
+            self.button_switch_0.SetBackgroundColour(self.red)
+            self.button_switch_1.SetBackgroundColour(self.green)
+        self.GetSizer().Layout()
+        self.parent.GetSizer().Layout()
+
     def OnComboSwitch(self, event):
         combo_value = self.combo_box_switch.GetValue()
         if combo_value in self.list_switches:
+            self.switch_text = combo_value  # Only change this if valid
+            self.renderSwitchBoxes()
             print("Combo box changed. New_value:", combo_value)
             self.parent.canvas.render(
                 f"Combo box changed. New_value: {combo_value}")
+
         else:
             self.parent.canvas.render("Invalid Selection Made")
+
+    def OnButtonSwitch0(self, event):
+        switch_text = self.switch_text
+        if switch_text is None:
+            pass  # This can't ever happen
+        else:
+            self.switch_states[switch_text] = 0
+            self.renderSwitchBoxes()
+        text = f"Switch {switch_text} is now open."
+        self.parent.canvas.render(text)
+
+    def OnButtonSwitch1(self, event):
+        switch_text = self.switch_text
+        if switch_text is None:
+            pass  # This can't ever happen
+        else:
+            self.switch_states[switch_text] = 1
+            self.renderSwitchBoxes()
+        text = f"Switch {switch_text} is now closed."
+
+        self.parent.canvas.render(text)
 
 
 class Gui(wx.Frame):
