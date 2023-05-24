@@ -60,7 +60,7 @@ class Symbol:
 
     @classmethod
     def is_name(cls, string):
-        """Return True if string is alphanumeric plus underscore.
+        """Return True if string is lowercase alphanumeric plus underscore.
 
         First character must be a lowercase letter and the rest of the string
         must also only contain lowercase letters, underscores and digits.
@@ -86,6 +86,53 @@ class Symbol:
         # Passes the tests of being a lowercase string of alphanumeric chars
         # and _
         return True
+
+    @classmethod
+    def index_not_name(cls, string):
+        """Return index of first character that violates name rules.
+
+        Iterate through string and return the index of the first character that
+        doesn't satisfy the rules for a name. If all characters satisfy the
+        rules, return None.
+
+        Parameters
+        ----------
+        string: str
+
+        Returns
+        -------
+        index: int or None
+
+        Examples
+        --------
+        >>> Symbol.index_not_name("a")
+        >>> Symbol.index_not_name("a1")
+        >>> Symbol.index_not_name("a_1")
+        >>> Symbol.index_not_name("1a")
+        0
+        >>> Symbol.index_not_name("_a")
+        0
+        >>> Symbol.index_not_name("aA")
+        1
+        >>> Symbol.index_not_name("a1A")
+        2
+        >>> Symbol.index_not_name("a_1AB") # Only first error is returned
+        3
+        >>> Symbol.index_not_name("a!a")
+        1
+        """
+        # First character must be a lowercase letter
+        # If either of the conditions in the or statement are true, return 0
+        if (not string[0].isalpha()) or (not string[0] == string[0].lower()):
+            return 0
+        for i, char in enumerate(string[1:], 1):
+            # Subsequent characters must be lowercase letters, digits or _
+            if not char.isalnum() and char != "_":
+                return i
+            # Must be lowercase
+            if not char == char.lower():
+                return i
+        return None
 
     @staticmethod
     def is_number(string):
