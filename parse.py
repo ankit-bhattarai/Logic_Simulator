@@ -590,7 +590,7 @@ class Parser:
                 return False
 
         if not self.network.check_network():
-            self.semantic_error_handler.print_error("Input not connected", [])
+            self.semantic_error_handler.display_input_not_connected_error(connections_list[-1][-1])
             return False
         
         return True
