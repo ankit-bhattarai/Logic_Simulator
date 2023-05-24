@@ -51,16 +51,17 @@ class Parser:
             6: "ValueError: The required number of parameters for a device of the type CLOCK/SWITCH/AND/OR/NAND/NOR is 3. Should also check for incorrect placement or missing punctuations.",
             7: "ValueError: The required number of parameters for a device of the type XOR/DTYPE is 2. Should also check for incorrect placement or missing punctuations.",
             8: "NameError: 1st parameter of a device should be the keyword for that device.",
-            9: "TypeError: Device name should be an alphanumeric string (including '_') starting with a lowercase letter.",
+            9: "TypeError: Device name should be a lowercase alphanumeric string (including '_').",
             10: "ValueError: Clock speed should be an integer.",
             11: "ValueError: Switch state should be either 0 or 1.",
             12: "ValueError: Number of inputs for an AND/NAND/OR/NOR device should be between 1 and 16.",
-            13: "TypeError: Connections should be separated by comma and ended by semi-colon.",
+            13: "TypeError: Connections should be separated by comma and ended by semi-colon. Should also check for excess parameters of a connection.",
             14: "TypeError: Output pins can only be Q or QBAR.",
             15: "TypeError: 2nd parameter of a connection should be '>'.",
             16: "TypeError: 3rd parameter of a connection must be a device name followed by '.input_pin'.",
             17: "NameError: The input pin should be one of the following: I1, I2,...,I16, DATA, CLK, SET, CLEAR.",
-            18: "TypeError: Monitors should be separated by comma and ended by semi-colon."
+            18: "TypeError: Monitors should be separated by comma and ended by semi-colon. Should also check for excess parameters of a monitor.",
+            19: "TypeError: Devices should be separated by comma and ended by semi-colon. Should also check for excess parameters of a device.",
         }
         self.semantic_error_handler = SemanticErrorHandler(self.names, self.devices, self.network, self.monitors, self.scanner)
 
@@ -80,12 +81,259 @@ class Parser:
             self.display_syntax_error(9, self.symbol)
             return False
 
-    def connection(self, con_list):
-        """Parses a single connection, returns errors upon detection
+    def check_clock(self, dev, dev_list):
+        """Check the parameters of a clock device.
 
-        Creates a list of the current connection.
-        Appends this list to the list of connections if no error is detected.
-        Appends None to the list of connections if an error is detected.
+        Update the list of device parameters.
+        Append this list to the list of devicess if no error is detected.
+        Append None to the list of devices if an error is detected.
+
+        Parameters
+        ----------
+        dev: list
+            list of clock device parameters
+        dev_list: list
+            list of devices
+
+        Returns
+        -------
+        bool
+            True if no errors detected, return nothing otherwise
+        """
+        dev.append("CLOCK")
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol.type == "comma":  # Check number of parameters
+            dev_list.append(None)
+            self.display_syntax_error(6, self.symbol)
+            return
+        if self.check_name():
+            dev.append(self.names.get_name_string(self.symbol.id))
+        else:
+            dev_list.append(None)
+            self.symbol = self.scanner.get_symbol()
+            while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
+                self.symbol = self.scanner.get_symbol()
+            return
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol.type == "comma":  # Check number of parameters
+            dev_list.append(None)
+            self.display_syntax_error(6, self.symbol)
+            return
+        if self.symbol.type == "integer":
+            dev.append(self.names.get_name_string(self.symbol.id))
+            dev_list.append(dev)
+            self.symbol = self.scanner.get_symbol()
+            return True
+        else:
+            dev_list.append(None)
+            self.display_syntax_error(10, self.symbol)
+            self.symbol = self.scanner.get_symbol()
+            return
+
+    def check_switch(self, dev, dev_list):
+        """Check the parameters of a switch device.
+
+        Update the list of device parameters.
+        Append this list to the list of devicess if no error is detected.
+        Append None to the list of devices if an error is detected.
+
+        Parameters
+        ----------
+        dev: list
+            list of switch device parameters
+        dev_list: list
+            list of devices
+
+        Returns
+        -------
+        bool
+            True if no errors detected, return nothing otherwise
+        """
+        dev.append("SWITCH")
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol.type == "comma":  # Check number of parameters
+            dev_list.append(None)
+            self.display_syntax_error(6, self.symbol)
+            return
+        if self.check_name():
+            dev.append(self.names.get_name_string(self.symbol.id))
+        else:
+            dev_list.append(None)
+            self.symbol = self.scanner.get_symbol()
+            while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
+                self.symbol = self.scanner.get_symbol()
+            return
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol.type == "comma":  # Check number of parameters
+            dev_list.append(None)
+            self.display_syntax_error(6, self.symbol)
+            return
+        if self.names.get_name_string(self.symbol.id) in {'0', '1'}:
+            dev.append(self.names.get_name_string(self.symbol.id))
+            dev_list.append(dev)
+            self.symbol = self.scanner.get_symbol()
+            return True
+        else:
+            dev_list.append(None)
+            self.display_syntax_error(11, self.symbol)
+            self.symbol = self.scanner.get_symbol()
+            return
+
+    def check_logic_device(self, dev, dev_list):
+        """Check the parameters of a logic device.
+
+        Update the list of device parameters.
+        Append this list to the list of devicess if no error is detected.
+        Append None to the list of devices if an error is detected.
+
+        Parameters
+        ----------
+        dev: list
+            list of logic device parameters
+        dev_list: list
+            list of devices
+
+        Returns
+        -------
+        bool
+            True if no errors detected, return nothing otherwise
+        """
+        dev.append(self.names.get_name_string(self.symbol.id))
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol.type == "comma":  # Check number of parameters
+            dev_list.append(None)
+            self.display_syntax_error(6, self.symbol)
+            return
+        if self.check_name():
+            dev.append(self.names.get_name_string(self.symbol.id))
+        else:
+            dev_list.append(None)
+            self.symbol = self.scanner.get_symbol()
+            while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
+                self.symbol = self.scanner.get_symbol()
+            return
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol.type == "comma":  # Check number of parameters
+            dev_list.append(None)
+            self.display_syntax_error(6, self.symbol)
+            return
+        if self.names.get_name_string(self.symbol.id) in {f"{i}" for i in range(1, 17)}:
+            dev.append(self.names.get_name_string(self.symbol.id))
+            dev_list.append(dev)
+            self.symbol = self.scanner.get_symbol()
+            return True
+        else:
+            dev_list.append(None)
+            self.display_syntax_error(12, self.symbol)
+            self.symbol = self.scanner.get_symbol()
+            return
+
+    def check_dtype_xor(self, dev, dev_list):
+        """Check the parameters of a dtype or xor device.
+
+        Update the list of device parameters.
+        Append this list to the list of devicess if no error is detected.
+        Append None to the list of devices if an error is detected.
+
+        Parameters
+        ----------
+        dev: list
+            list of dtypr or xor device parameters
+        dev_list: list
+            list of devices
+
+        Returns
+        -------
+        bool
+            True if no errors detected, return nothing otherwise
+        """
+        dev.append(self.names.get_name_string(self.symbol.id))
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol.type == "comma":  # Check number of parameters
+            dev_list.append(None)
+            self.display_syntax_error(7, self.symbol)
+            return
+        if self.check_name():
+            dev.append(self.names.get_name_string(self.symbol.id))
+            dev_list.append(dev)
+            self.symbol = self.scanner.get_symbol()
+            return True
+        else:
+            dev_list.append(None)
+            self.symbol = self.scanner.get_symbol()
+            while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
+                self.symbol = self.scanner.get_symbol()
+            return
+
+    def device(self, dev_list):
+        """Parse a single device, return errors upon detection
+
+        Create the list of device parameters.
+        Append this list to the list of devicess if no error is detected.
+        Append None to the list of devices if an error is detected.
+
+        Parameters
+        ----------
+        dev_list: list
+            list of devices
+
+        Returns
+        -------
+        bool
+            True if no errors detected, return nothing otherwise
+        """
+        dev = []
+        if self.names.get_name_string(self.symbol.id) == 'CLOCK':
+            self.check_clock(dev, dev_list)
+        elif self.names.get_name_string(self.symbol.id) == 'SWITCH':
+            self.check_switch(dev, dev_list)
+        elif self.names.get_name_string(self.symbol.id) in {'AND', 'NAND', 'OR', 'NOR'}:
+            self.check_logic_device(dev, dev_list)
+        elif self.names.get_name_string(self.symbol.id) in {'XOR', 'DTYPE'}:
+            self.check_dtype_xor(dev, dev_list)
+        else:
+            dev_list.append(None)
+            self.display_syntax_error(8, self.symbol)
+            while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
+                self.symbol = self.scanner.get_symbol()
+            return
+
+    def device_list(self):
+        """Parse all devices, return errors upon detection
+
+        Returns a list of devices if no error is detected.
+        Returns None if an error is detected.
+
+        Returns
+        -------
+        con_list: list
+            list of devices
+        """
+        dev_list = []
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol.type == "semi-colon":  # No devices
+            self.display_syntax_error(5, self.symbol)
+            return None
+        else:
+            self.device(dev_list)
+        while self.symbol.type == "comma":
+            self.symbol = self.scanner.get_symbol()
+            self.device(dev_list)
+        if self.symbol.type == "semi-colon":
+            if None not in dev_list:
+                return dev_list
+            else:
+                return None
+        else:
+            self.display_syntax_error(19, self.symbol)
+            return
+
+    def connection(self, con_list):
+        """Parse a single connection, return errors upon detection
+
+        Create a list of the current connection.
+        Append this list to the list of connections if no error is detected.
+        Append None to the list of connections if an error is detected.
 
         Parameters
         ----------
@@ -147,7 +395,7 @@ class Parser:
         if self.symbol.type == "input_pin":
             con.append(self.names.get_name_string(self.symbol.id))
             con_list.append(con)
-            self.symbol = self.scanner.get_symbol() # 1
+            self.symbol = self.scanner.get_symbol()
             return True
         else:
             con_list.append(None)
@@ -155,7 +403,10 @@ class Parser:
             return
 
     def connection_list(self):
-        """Parses all connections, returns errors upon detection
+        """Parse all connections, return errors upon detection
+
+        Return a list of all connections if no error is detected.
+        Return None otherwise.
 
         Returns
         -------
@@ -178,14 +429,14 @@ class Parser:
                 return None
         else:
             self.display_syntax_error(13, self.symbol)
-            return
+            return None
 
     def monitor(self, mon_list):
-        """Parses a monitor, returns errors upon detection
+        """Parse a monitor, return errors upon detection
 
-        Creates a list of the current monitor.
-        Appends this list to the list of monitors if no error is detected.
-        Appends None to the list of monitors if an error is detected.
+        Create a list of the current monitor.
+        Append this list to the list of monitors if no error is detected.
+        Append None to the list of monitors if an error is detected.
 
         Parameters
         ----------
@@ -225,8 +476,11 @@ class Parser:
                 return
 
     def monitor_list(self):
-        """Parses all monitors, returns errors upon detection
-        
+        """Parse all monitors, return errors upon detection
+
+        Return a list of all monitors if no error is detected.
+        Return None otherwise.
+
         Returns
         -------
         mon_list: list
@@ -238,8 +492,6 @@ class Parser:
             return mon_list
         else:
             self.monitor(mon_list)
-        while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
-            self.symbol = self.scanner.get_symbol()
         while self.symbol.type == "comma":
             self.symbol = self.scanner.get_symbol()
             self.monitor(mon_list)
@@ -250,7 +502,7 @@ class Parser:
                 return None
         else:
             self.display_syntax_error(18, self.symbol)
-            return
+            return None
 
     def display_syntax_error(self, error_index, symbol, **kwargs):
         """Display the syntax error.
