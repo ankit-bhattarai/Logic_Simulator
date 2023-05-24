@@ -203,6 +203,8 @@ class Parser:
         else:
             mon_list.append(None)
             self.symbol = self.scanner.get_symbol()
+            while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
+                self.symbol = self.scanner.get_symbol()
             return
         self.symbol = self.scanner.get_symbol()
         if self.symbol.type == "comma":
@@ -241,7 +243,6 @@ class Parser:
         while self.symbol.type == "comma":
             self.symbol = self.scanner.get_symbol()
             self.monitor(mon_list)
-            # next?
         if self.symbol.type == "semi-colon":
             if None not in mon_list:
                 return mon_list
