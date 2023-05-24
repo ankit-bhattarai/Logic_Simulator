@@ -102,6 +102,8 @@ class Parser:
             con.append(self.names.get_name_string(self.symbol.id))
         else:
             con_list.append(None)
+            while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
+                self.symbol = self.scanner.get_symbol()
             return
         self.symbol = self.scanner.get_symbol()
         if self.symbol.type == "dot":
@@ -113,17 +115,24 @@ class Parser:
             else:
                 con_list.append(None)
                 self.display_syntax_error(14, self.symbol)
+                while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
+                    self.symbol = self.scanner.get_symbol()
                 return
         if self.symbol.type == "arrow":
             con.append(self.names.get_name_string(self.symbol.id))
         else:
             con_list.append(None)
             self.display_syntax_error(15, self.symbol)
+            while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
+                self.symbol = self.scanner.get_symbol()
             return
         self.symbol = self.scanner.get_symbol()
         if self.check_name():
             con.append(self.names.get_name_string(self.symbol.id))
         else:
+            con_list.append(None)
+            while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
+                self.symbol = self.scanner.get_symbol()
             return
         self.symbol = self.scanner.get_symbol()
         if self.symbol.type == "dot":
@@ -131,11 +140,14 @@ class Parser:
         else:
             con_list.append(None)
             self.display_syntax_error(16, self.symbol)
+            while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
+                self.symbol = self.scanner.get_symbol()
             return
         self.symbol = self.scanner.get_symbol()
         if self.symbol.type == "input_pin":
             con.append(self.names.get_name_string(self.symbol.id))
             con_list.append(con)
+            self.symbol = self.scanner.get_symbol() # 1
             return True
         else:
             con_list.append(None)
@@ -156,12 +168,9 @@ class Parser:
             return con_list
         else:
             self.connection(con_list)
-        while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
-            self.symbol = self.scanner.get_symbol()
         while self.symbol.type == "comma":
             self.symbol = self.scanner.get_symbol()
             self.connection(con_list)
-            self.symbol = self.scanner.get_symbol()
         if self.symbol.type == "semi-colon":
             if None not in con_list:
                 return con_list
