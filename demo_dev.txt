@@ -1,6 +1,0 @@
-SWITCH switch1 1, 
-SWITCH switch2 3, 
-AND [nd1 2,
-OR or1 2, 
-NAND nand1 2,
-xOR xor1;
