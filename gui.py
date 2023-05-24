@@ -233,7 +233,6 @@ class RightPanel(wx.Panel):
 
         main_sizer.Add(top_sizer, 0, wx.ALL, 5)
         main_sizer.Add(middle_sizer, 0, wx.ALL, 5)
-        main_sizer.Add(switch_main_sizer, 0, wx.ALL, 5)
         main_sizer.Add(switch_main_sizer, 0, wx.ALL, 10)
         main_sizer.Add(monitor_main_sizer, 0, wx.ALL, 10)
 
