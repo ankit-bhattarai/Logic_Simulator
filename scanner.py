@@ -107,11 +107,11 @@ class Symbol:
 
         Returns
         -------
-        index: int or None
-            Index of first character that violates name rules, None if no
-            errors
-        code: int or None
-            Code to indicate the type of error, None if no errors
+        error_loc_and_code: tuple of Int or None
+            If no errors, returns None. Otherwise, returns a tuple of integers
+            with first element being the index of the first character that
+            violates the rules and the second element consisting of the error
+            code.
 
         Examples
         --------
@@ -136,14 +136,14 @@ class Symbol:
         # First character must be a lowercase letter
         # If either of the conditions in the or statement are true, return 0
         if (not string[0].isalpha()) or (not string[0] == string[0].lower()):
-            return 0, 1
+            return (0, 1)
         for i, char in enumerate(string[1:], 1):
             # Subsequent characters must be lowercase letters, digits or _
             if not char.isalnum() and char != "_":
-                return i, 2
+                return (i, 2)
             # Must be lowercase
             if not char == char.lower():
-                return i, 3
+                return (i, 3)
         return None
 
     @staticmethod
