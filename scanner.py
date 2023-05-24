@@ -95,6 +95,12 @@ class Symbol:
         doesn't satisfy the rules for a name. If all characters satisfy the
         rules, return None.
 
+        It also returns a code to indicate the type of error:
+        - 1: First character is not a lowercase letter
+        - 2: Specific character is not a letter, digit or underscore
+        - 3: Specific character is not lowercase
+        - None: No errors
+
         Parameters
         ----------
         string: str
@@ -102,6 +108,10 @@ class Symbol:
         Returns
         -------
         index: int or None
+            Index of first character that violates name rules, None if no
+            errors
+        code: int or None
+            Code to indicate the type of error, None if no errors
 
         Examples
         --------
@@ -109,29 +119,31 @@ class Symbol:
         >>> Symbol.index_not_name("a1")
         >>> Symbol.index_not_name("a_1")
         >>> Symbol.index_not_name("1a")
-        0
+        (0, 1)
         >>> Symbol.index_not_name("_a")
-        0
+        (0, 1)
         >>> Symbol.index_not_name("aA")
-        1
+        (1, 3)
         >>> Symbol.index_not_name("a1A")
-        2
+        (2, 3)
         >>> Symbol.index_not_name("a_1AB") # Only first error is returned
-        3
+        (3, 3)
         >>> Symbol.index_not_name("a!a")
-        1
+        (1, 2)
+        >>> Symbol.index_not_name("a1+a")
+        (2, 2)
         """
         # First character must be a lowercase letter
         # If either of the conditions in the or statement are true, return 0
         if (not string[0].isalpha()) or (not string[0] == string[0].lower()):
-            return 0
+            return 0, 1
         for i, char in enumerate(string[1:], 1):
             # Subsequent characters must be lowercase letters, digits or _
             if not char.isalnum() and char != "_":
-                return i
+                return i, 2
             # Must be lowercase
             if not char == char.lower():
-                return i
+                return i, 3
         return None
 
     @staticmethod
