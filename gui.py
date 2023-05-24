@@ -211,16 +211,36 @@ class RightPanel(wx.Panel):
     def __init__(self, parent):
         super().__init__(parent=parent)  # Initialise
         self.parent = parent
+
+        # Creating the lists - currently hard coded
+        self.list_switches = ["switch1", "switch2", "switch3", "switch4",
+                              "switch5", "switch6", "switch7", "switch8",
+                              "switch9", "switch10"]
+
+        self.list_monitors = ["monitor1", "monitor2", "monitor3", "monitor4",
+                              "monitor5", "monitor6", "monitor7", "monitor8",
+                              "monitor9", "monitor10"]
+
         # Creating the sizers
         main_sizer = wx.BoxSizer(wx.VERTICAL)
         top_sizer = wx.BoxSizer(wx.HORIZONTAL)
         middle_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        switch_main_sizer = wx.BoxSizer(wx.HORIZONTAL)
+
         main_sizer.Add(top_sizer, 0, wx.ALL, 5)
         main_sizer.Add(middle_sizer, 0, wx.ALL, 5)
+        main_sizer.Add(switch_main_sizer, 0, wx.ALL, 5)
+        main_sizer.Add(switch_main_sizer, 0, wx.ALL, 5)
+
+        # Adding the smaller sizers to switch sizer
+        switch_select_sizer = wx.BoxSizer(wx.VERTICAL)
+        switch_state_sizer = wx.BoxSizer(wx.VERTICAL)
+        switch_main_sizer.Add(switch_select_sizer, 0, wx.ALL, 5)
+        switch_main_sizer.Add(switch_state_sizer, 0, wx.ALL, 5)
 
         # Add the text on the top
-        self.text = wx.StaticText(self, wx.ID_ANY, "Cycles: ")
-        top_sizer.Add(self.text, 1, wx.EXPAND | wx.ALL, 10)
+        self.cycles_text = wx.StaticText(self, wx.ID_ANY, "Cycles: ")
+        top_sizer.Add(self.cycles_text, 1, wx.EXPAND | wx.ALL, 10)
 
         # Create the spin object
         self.spin = wx.SpinCtrl(self, wx.ID_ANY, "10", size=wx.Size(120, 10))
@@ -243,9 +263,27 @@ class RightPanel(wx.Panel):
         # Add buttons to bottom sizer
         middle_sizer.Add(self.button_run, 1, wx.ALL, 5)
         middle_sizer.Add(self.button_continue, 1, wx.ALL, 5)
-        self.SetSizer(main_sizer)
         # Want to hide this until the run button is pressed!
         self.button_continue.Hide()
+
+        # Text for the switches
+        self.switch_text = wx.StaticText(self, wx.ID_ANY, "Select Switch: ")
+        switch_select_sizer.Add(self.switch_text, 1, wx.EXPAND | wx.ALL, 10)
+
+        # Have to create the combo box for the switches
+        combo_id_switch = wx.NewIdRef()
+        self.combo_box_switch = wx.ComboBox(self, combo_id_switch,
+                                            choices=self.list_switches,
+                                            style=wx.TE_PROCESS_ENTER)
+        # Bind the combo box
+        self.combo_box_switch.Bind(wx.EVT_COMBOBOX, self.OnComboSwitch)
+        # Want it to work for both enter and selection
+        self.combo_box_switch.Bind(wx.EVT_TEXT_ENTER, self.OnComboSwitch)
+        # Add combo box to switch sizer
+        switch_select_sizer.Add(self.combo_box_switch, 1, wx.ALL, 5)
+
+        # Set the sizer for the panel
+        self.SetSizer(main_sizer)
 
     def OnButtonRun(self, event):
         """Handle the event when the user clicks the run button."""
@@ -268,6 +306,15 @@ class RightPanel(wx.Panel):
             self.button_continue.SetLabel(f"Continue for: {spin_value}")
             self.GetSizer().Layout()
             self.parent.GetSizer().Layout()
+
+    def OnComboSwitch(self, event):
+        combo_value = self.combo_box_switch.GetValue()
+        if combo_value in self.list_switches:
+            print("Combo box changed. New_value:", combo_value)
+            self.parent.canvas.render(
+                f"Combo box changed. New_value: {combo_value}")
+        else:
+            self.parent.canvas.render("Invalid Selection Made")
 
 
 class Gui(wx.Frame):
