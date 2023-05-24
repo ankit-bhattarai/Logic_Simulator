@@ -60,7 +60,7 @@ class Symbol:
 
     @classmethod
     def is_name(cls, string):
-        """Return True if string is alphanumeric plus underscore.
+        """Return True if string is lowercase alphanumeric plus underscore.
 
         First character must be a lowercase letter and the rest of the string
         must also only contain lowercase letters, underscores and digits.
@@ -86,6 +86,65 @@ class Symbol:
         # Passes the tests of being a lowercase string of alphanumeric chars
         # and _
         return True
+
+    @classmethod
+    def index_not_name(cls, string):
+        """Return index of first character that violates name rules.
+
+        Iterate through string and return the index of the first character that
+        doesn't satisfy the rules for a name. If all characters satisfy the
+        rules, return None.
+
+        It also returns a code to indicate the type of error:
+        - 1: First character is not a lowercase letter
+        - 2: Specific character is not a letter, digit or underscore
+        - 3: Specific character is not lowercase
+        - None: No errors
+
+        Parameters
+        ----------
+        string: str
+
+        Returns
+        -------
+        error_loc_and_code: tuple of Int or None
+            If no errors, returns None. Otherwise, returns a tuple of integers
+            with first element being the index of the first character that
+            violates the rules and the second element consisting of the error
+            code.
+
+        Examples
+        --------
+        >>> Symbol.index_not_name("a")
+        >>> Symbol.index_not_name("a1")
+        >>> Symbol.index_not_name("a_1")
+        >>> Symbol.index_not_name("1a")
+        (0, 1)
+        >>> Symbol.index_not_name("_a")
+        (0, 1)
+        >>> Symbol.index_not_name("aA")
+        (1, 3)
+        >>> Symbol.index_not_name("a1A")
+        (2, 3)
+        >>> Symbol.index_not_name("a_1AB") # Only first error is returned
+        (3, 3)
+        >>> Symbol.index_not_name("a!a")
+        (1, 2)
+        >>> Symbol.index_not_name("a1+a")
+        (2, 2)
+        """
+        # First character must be a lowercase letter
+        # If either of the conditions in the or statement are true, return 0
+        if (not string[0].isalpha()) or (not string[0] == string[0].lower()):
+            return (0, 1)
+        for i, char in enumerate(string[1:], 1):
+            # Subsequent characters must be lowercase letters, digits or _
+            if not char.isalnum() and char != "_":
+                return (i, 2)
+            # Must be lowercase
+            if not char == char.lower():
+                return (i, 3)
+        return None
 
     @staticmethod
     def is_number(string):
@@ -528,7 +587,7 @@ class Scanner:
             position_of_arrow = column_number + index_of_arrow
             arrow_string = " " * (position_of_arrow - 1) + "^"
             print(message)
-            print(line_string)
+            print(line_string.rstrip())  # Remove trailing newline from end
             print(arrow_string)
             return True
         except Exception:
