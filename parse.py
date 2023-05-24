@@ -55,12 +55,12 @@ class Parser:
             10: "ValueError: Clock speed should be an integer.",
             11: "ValueError: Switch state should be either 0 or 1.",
             12: "ValueError: Number of inputs for an AND/NAND/OR/NOR device should be between 1 and 16.",
-            13: "ValueError: CONNECT section should end with a semicolon",
+            13: "TypeError: Connections should be separated by comma and ended by semi-colon.",
             14: "TypeError: Output pins can only be Q or QBAR.",
             15: "TypeError: 2nd parameter of a connection should be '>'.",
             16: "TypeError: 3rd parameter of a connection must be a device name followed by '.input_pin'.",
             17: "NameError: The input pin should be one of the following: I1, I2,...,I16, DATA, CLK, SET, CLEAR.",
-            18: "ValueError: The required number of parameters for a monitor is 1. Should also check for incorrect placement or missing punctuations."
+            18: "TypeError: Monitors should be separated by comma and ended by semi-colon."
         }
         self.semantic_error_handler = SemanticErrorHandler(self.names, self.devices, self.network, self.monitors)
 
@@ -169,6 +169,63 @@ class Parser:
                 return None
         else:
             self.display_syntax_error(13, self.symbol)
+            return
+
+    def monitor(self, mon_list):
+        """Parses a monitor, returns errors upon detection
+        Parameters
+        ----------
+
+        Returns
+        -------
+        None
+        """
+        mon = []
+        if self.check_name():
+            mon.append(self.names.get_name_string(self.symbol.id))
+        else:
+            mon_list.append(None)
+            self.symbol = self.scanner.get_symbol()
+            return
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol.type == "comma":
+            mon_list.append(mon)
+            return True
+        elif self.symbol.type == "dot":
+            mon.append(self.names.get_name_string(self.symbol.id))
+            self.symbol = self.scanner.get_symbol()
+            if self.symbol.type == "output_pin":
+                mon.append(self.names.get_name_string(self.symbol.id))
+                mon_list.append(mon)
+                self.symbol = self.scanner.get_symbol()
+                return True
+            else:
+                mon_list.append(None)
+                self.display_syntax_error(14, self.symbol)
+                self.symbol = self.scanner.get_symbol()
+                return
+
+    def monitor_list(self):
+        """Parses all monitors, returns errors upon detection"""
+        mon_list = []
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol.type == "semi-colon":  # No monitors
+            return mon_list
+        else:
+            self.monitor(mon_list)
+        while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
+            self.symbol = self.scanner.get_symbol()
+        while self.symbol.type == "comma":
+            self.symbol = self.scanner.get_symbol()
+            self.monitor(mon_list)
+            # next?
+        if self.symbol.type == "semi-colon":
+            if None not in mon_list:
+                return mon_list
+            else:
+                return None
+        else:
+            self.display_syntax_error(18, self.symbol)
             return
 
     def display_syntax_error(self, error_index, symbol, **kwargs):
