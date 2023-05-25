@@ -29,8 +29,9 @@ class SemanticErrorHandler:
         Handles the error code, printing if needed. 
     print_error(self, error_type, symbols, **kwargs) 
         Prints the semantic error directly.
-    print_input_not_connected(self)
-        Prints the input not connected error.
+    print_input_not_connected(self, symbol)
+        Prints the input not connected error at the
+        end of the connections section of the definition file.
     """
     def __init__(self, names, devices, network, monitors, scanner):
         self.names = names
@@ -121,8 +122,9 @@ class SemanticErrorHandler:
         -------
         None
         """
+        device_name = self.names.get_name_string(device_name_symbol.id)
         self.scanner.print_error(device_name_symbol, 0, 
-                                 "Device names are not unique. {} is already the name of a device".format(self.names.get_name_string(device_name_symbol.id)))
+                                 f"Device names are not unique. {device_name} is already the name of a device")
 
     def display_input_input_error(self, symbols):
         """Prints the input input error.
@@ -137,8 +139,7 @@ class SemanticErrorHandler:
         labelled_symbols = self.get_labelled_symbols(symbols)
         first_device, second_device = self.get_devices_strings(labelled_symbols)
         self.scanner.print_error(labelled_symbols["First device"], 0, 
-                                 "Input {} is connected to input {}".format(first_device, second_device)
-                                 + "Connections must be from outputs to inputs.")
+                                 f"Input {first_device} is connected to input {second_device}. Connections must be from outputs to inputs.")
 
     def display_output_output_error(self, symbols):
         """Prints the output output error.
@@ -152,9 +153,8 @@ class SemanticErrorHandler:
         """
         labelled_symbols = self.get_labelled_symbols(symbols)
         first_device, second_device = self.get_devices_strings(labelled_symbols)
-        self.scanner.print_error(labelled_symbols["Second device"], 0,
-                                 "Output {} is connected to output {}".format(first_device, second_device)
-                                 + "Connections must be from outputs to inputs.")
+        self.scanner.print_error(labelled_symbols["Second device"], 0, 
+                                 f"Output {first_device} is connected to output {second_device}.Connections must be from outputs to inputs.")
 
     def display_input_connected_error(self, symbols):
         """Prints the input connected error.
@@ -170,8 +170,8 @@ class SemanticErrorHandler:
         first_device, second_device = self.get_devices_strings(labelled_symbols)
 
         self.scanner.print_error(labelled_symbols["Second device"], 0,
-            "A signal is already connected to input {}".format(second_device)
-            + "Only one signal must be connected to an input.")
+                                f"A signal is already connected to input {second_device}. Only one signal must be connected to an input.")
+        
         #TODO: Decide whether look back to print first device connected as well
         
     def display_port_absent_error(self, symbols):
@@ -188,7 +188,6 @@ class SemanticErrorHandler:
         first_device = self.devices.get_device(labelled_symbols["First device"].id)
         second_device = self.devices.get_device(labelled_symbols["Second device"].id)
 
-        # This assumes first device is always an output - is this enforced in syntax?
         if labelled_symbols['First port'].id not in first_device.outputs:
             self.scanner.print_error(labelled_symbols["First port"], 0, 
                                      "Port {} is not defined for device {}".format(self.names.get_name_string(labelled_symbols["First port"].id), self.names.get_name_string(labelled_symbols["First device"].id)))
