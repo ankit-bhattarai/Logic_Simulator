@@ -303,11 +303,11 @@ class SemanticErrorHandler:
         -------
         True if error is present, False otherwise
         """
-        if unique_error_code not in self.semantic_error_types:
+        if unique_error_code not in self.semantic_error_codes:
             return False # No error
         
-        self.print_error(self.semantic_error_types[unique_error_code], symbols)
-        if self.semantic_error_types[unique_error_code] == 'Monitor present':
+        self.print_error(self.semantic_error_codes[unique_error_code], symbols)
+        if self.semantic_error_codes[unique_error_code] == 'Monitor present':
             return False # Warning
         
         return True # Error
