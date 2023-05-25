@@ -591,7 +591,6 @@ class Gui(wx.Frame):
         # File path for circuit file which can be chosen from the GUI
         self.file_path = None
         guiint = GuiInterface(names, devices, network, monitors)
-        guiint.run_network(5)  # Just to test, remove later
         # Configure the file menu
         fileMenu = wx.Menu()
         helpMenu = wx.Menu()
