@@ -733,8 +733,8 @@ class Parser:
         """
 
         devices_success = self.build_devices(network_dict["DEVICES"])
-        connections_success = self.build_connections(network_dict["CONNECTIONS"])
-        monitors_success = self.build_monitors(network_dict["MONITORS"])
+        connections_success = self.build_connections(network_dict["CONNECT"])
+        monitors_success = self.build_monitors(network_dict["MONITOR"])
         if all([devices_success, connections_success, monitors_success]):
             return True
         return False
