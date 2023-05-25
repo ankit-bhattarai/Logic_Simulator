@@ -18,6 +18,7 @@ from network import Network
 from monitors import Monitors
 from scanner import Scanner
 from parse import Parser
+from guiint import GuiInterface
 
 change_button_cycles = False
 text_min_height = 1
@@ -51,13 +52,14 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                                            operations.
     """
 
-    def __init__(self, parent, devices, monitors):
+    def __init__(self, parent, guiint):
         """Initialise canvas properties and useful variables."""
         super().__init__(parent, -1,
                          attribList=[wxcanvas.WX_GL_RGBA,
                                      wxcanvas.WX_GL_DOUBLEBUFFER,
                                      wxcanvas.WX_GL_DEPTH_SIZE, 16, 0])
         GLUT.glutInit()
+        self.guiint = guiint
         self.init = False
         self.context = wxcanvas.GLContext(self)
 
@@ -165,11 +167,9 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.render_axes(x_start, y_start, len(values), name, width, height)
 
     def render_signals(self):
-        values = [i % 2 for i in range(10)]
-        self.render_signal(20, 100, values, "DEMO SIGNAL")
         height_above_signal = 100
-        for i, (name, values) in enumerate(self.signals.items()):
-            self.render_signal(20, height_above_signal + (i + 1) * height_above_signal,
+        for i, (name, values) in enumerate(self.guiint.get_signals().items()):
+            self.render_signal(20, height_above_signal + i * height_above_signal,
                                values, name)
 
     def render(self, text):
@@ -598,7 +598,8 @@ class Gui(wx.Frame):
 
         # File path for circuit file which can be chosen from the GUI
         self.file_path = None
-
+        guiint = GuiInterface(names, devices, network, monitors)
+        guiint.run_network(5)  # Just to test, remove later
         # Configure the file menu
         fileMenu = wx.Menu()
         helpMenu = wx.Menu()
@@ -614,7 +615,7 @@ class Gui(wx.Frame):
         self.SetMenuBar(menuBar)
 
         # Canvas for drawing signals
-        self.canvas = MyGLCanvas(self, devices, monitors)
+        self.canvas = MyGLCanvas(self, guiint)
 
         # Bind events to widgets
         self.Bind(wx.EVT_MENU, self.on_menu)
