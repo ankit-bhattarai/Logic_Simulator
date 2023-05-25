@@ -93,7 +93,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glTranslated(self.pan_x, self.pan_y, 0.0)
         GL.glScaled(self.zoom, self.zoom, self.zoom)
 
-    def render_axes(self, x_start, y_start, values, width, height):
+    def render_axes(self, x_start, y_start, values, name, width, height):
         axes_offset_x = 5
         axes_offset_y = 5
         GL.glColor3f(0.0, 0.0, 0.0)  # Black
@@ -101,8 +101,10 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         axes_offset_y = 8
         axes_offset_x = 8
         ticker_offset = 3
-        value_offset_down = 15
-        value_offset_left = 5
+        value_offset_down_x = 15
+        value_offset_left_x = 5
+        value_offset_down_y = 5
+        value_offset_left_y = 15
         x_end = x_start + width * values
         GL.glVertex2f(x_start - axes_offset_x, y_start - axes_offset_y)
         GL.glVertex2f(x_end + axes_offset_x, y_start - axes_offset_y)
@@ -121,19 +123,27 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             GL.glVertex2f(x_value, y_start -
                           axes_offset_y + ticker_offset)
             GL.glEnd()
-            self.render_text(str(i), x_value - value_offset_left,
-                             y_start - axes_offset_y - value_offset_down)
+            self.render_text(str(i), x_value - value_offset_left_x,
+                             y_start - axes_offset_y - value_offset_down_x)
 
         # Drawing ticks on y axis
         for i in range(0, 2):
-            x_value = x_start - axes_offset_x - ticker_offset
+            x_value = x_start - axes_offset_x
             y_value = y_start + height * i
             GL.glBegin(GL.GL_LINES)
             GL.glVertex2f(x_value - ticker_offset, y_value)
             GL.glVertex2f(x_value + ticker_offset, y_value)
             GL.glEnd()
+            self.render_text(str(i), x_value - value_offset_left_y,
+                             y_value - value_offset_down_y)
 
-    def render_signal(self, x_start, y_start, values, colour=(0.0, 0.0, 1.0),
+        # Drawing name of the signal on top left corner of the plot
+        name_offset_up = 15
+        name_offset_left = 10
+        self.render_text(name, x_start - name_offset_left,
+                         y_start + height + name_offset_up)
+
+    def render_signal(self, x_start, y_start, values, name, colour=(0.0, 0.0, 1.0),
                       width=20, height=25):
         GL.glColor3f(*colour)
         GL.glBegin(GL.GL_LINE_STRIP)
@@ -152,11 +162,15 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                 GL.glVertex2f(x_next, y)
                 x = x_next
         GL.glEnd()
-        self.render_axes(x_start, y_start, len(values), width, height)
+        self.render_axes(x_start, y_start, len(values), name, width, height)
 
     def render_signals(self):
         values = [i % 2 for i in range(10)]
-        self.render_signal(20, 100, values)
+        self.render_signal(20, 100, values, "DEMO SIGNAL")
+        height_above_signal = 100
+        for i, (name, values) in enumerate(self.signals.items()):
+            self.render_signal(20, height_above_signal + (i + 1) * height_above_signal,
+                               values, name)
 
     def render(self, text):
         """Handle all drawing operations."""
