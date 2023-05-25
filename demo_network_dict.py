@@ -10,11 +10,11 @@ names_1 = Names()
 device_1 = Devices(names_1)
 network_1 = Network(names_1, device_1)
 monitor_1 = Monitors(names_1, device_1, network_1)
-scanner_1 = Scanner("demo_net_dict1.txt", names_1)  # Another file: demo_net_dict2.txt
+scanner_1 = Scanner("demo_net_dict2.txt", names_1)  # Another file: demo_net_dict2.txt
 
 list_of_symbols_1 = scanner_1.get_list_of_symbols()
 
-print("Contents of demo_net_dict1.txt")
+print("Contents of demo_net_dict2.txt")
 for symbol in list_of_symbols_1:
     id = symbol.id
     name = names_1.get_name_string(id)
