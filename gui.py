@@ -76,9 +76,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_PAINT, self.on_paint)
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
-        self.signals = {"and1": [0, 1, 0, 1, 1, 1, 0, 0, 1],
-                        "and2": [0, 1, 0, 1, 1, 1, 0, 1, 1],
-                        "and3": [None, None, None, None, None, None, 1, 1, 0]}
 
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
@@ -278,10 +275,10 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
 
 class RightPanel(wx.Panel):
-    def __init__(self, parent):
+    def __init__(self, parent, guiint):
         super().__init__(parent=parent)  # Initialise
         self.parent = parent
-
+        self.guiint = guiint
         # Switch and Monitor states - currently hardcoded
         # 0 = off, 1 = on
         self.switch_states = {"switch1": 0, "switch2": 1, "switch3": 0,
@@ -439,14 +436,18 @@ class RightPanel(wx.Panel):
     def OnButtonRun(self, event):
         """Handle the event when the user clicks the run button."""
         text = "Run button pressed."
+        self.guiint.run_network(self.spin.GetValue())
         self.parent.canvas.render(text)
         self.button_continue.Show()
+        self.parent.canvas.render_signals()
         self.Layout()
 
     def OnButtonContinue(self, event):
         """Handle the event when the user clicks the continue button."""
         text = "Continue button pressed."
         self.parent.canvas.render(text)
+        self.guiint.continue_network(self.spin.GetValue())
+        self.parent.canvas.render_signals()
 
     def OnSpin(self, event):
         spin_value = self.spin.GetValue()
@@ -625,7 +626,7 @@ class Gui(wx.Frame):
 
         main_sizer.Add(self.canvas, 5, wx.EXPAND | wx.ALL, 5)
 
-        right_panel = RightPanel(self)
+        right_panel = RightPanel(self, guiint)
         main_sizer.Add(right_panel, 1, wx.EXPAND | wx.ALL, 5)
 
         self.SetSizeHints(600, 600)
