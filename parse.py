@@ -42,6 +42,7 @@ class Parser:
         self.monitors = monitors
         self.scanner = scanner
         self.symbol = scanner.list_of_symbols[0]
+        self.num_of_errors = 0
         self.syntax_error_types = {
             1: "NameError: File should start with keyword 'DEVICES'",
             2: "NameError: semi-colon after the last device should be followed by keyword 'CONNECT'.",
@@ -55,13 +56,16 @@ class Parser:
             10: "ValueError: Clock speed should be an integer.",
             11: "ValueError: Switch state should be either 0 or 1.",
             12: "ValueError: Number of inputs for an AND/NAND/OR/NOR device should be between 1 and 16.",
-            13: "TypeError: Connections should be separated by comma and ended by semi-colon. Should also check for excess parameters of a connection.",
+            13: "TypeError: Connections should be separated by comma and ended by semi-colon. Should also check for excessive parameters of a connection.",
             14: "TypeError: Output pins can only be Q or QBAR.",
             15: "TypeError: 2nd parameter of a connection should be '>'.",
             16: "TypeError: 3rd parameter of a connection must be a device name followed by '.input_pin'.",
             17: "NameError: The input pin should be one of the following: I1, I2,...,I16, DATA, CLK, SET, CLEAR.",
-            18: "TypeError: Monitors should be separated by comma and ended by semi-colon. Should also check for excess parameters of a monitor.",
-            19: "TypeError: Devices should be separated by comma and ended by semi-colon. Should also check for excess parameters of a device.",
+            18: "TypeError: Monitors should be separated by comma and ended by semi-colon. Should also check for excessive parameters of a monitor.",
+            19: "TypeError: Devices should be separated by comma and ended by semi-colon. Should also check for excessive parameters of a device.",
+            20: "NameError: DEVICES, CONNECT and MONITOR should be followed by ':'.",
+            21: "NameError: 'END' should be followed by ';'.",
+            22: "TypeError: File ends too early."
         }
         self.semantic_error_handler = SemanticErrorHandler(self.names, self.devices, self.network, self.monitors, self.scanner)
 
@@ -100,14 +104,14 @@ class Parser:
         bool
             True if no errors detected, return nothing otherwise
         """
-        dev.append("CLOCK")
+        dev.append(self.symbol)  # Append symbol
         self.symbol = self.scanner.get_symbol()
-        if self.symbol.type == "comma":  # Check number of parameters
+        if self.symbol.type == "comma":  # !
             dev_list.append(None)
             self.display_syntax_error(6, self.symbol)
             return
         if self.check_name():
-            dev.append(self.names.get_name_string(self.symbol.id))
+            dev.append(self.symbol)  # Append symbol
         else:
             dev_list.append(None)
             self.symbol = self.scanner.get_symbol()
@@ -115,18 +119,25 @@ class Parser:
                 self.symbol = self.scanner.get_symbol()
             return
         self.symbol = self.scanner.get_symbol()
-        if self.symbol.type == "comma":  # Check number of parameters
+        if self.symbol.type == "comma":  # !
             dev_list.append(None)
             self.display_syntax_error(6, self.symbol)
             return
         if self.symbol.type == "integer":
-            dev.append(self.names.get_name_string(self.symbol.id))
-            dev_list.append(dev)
+            dev.append(self.symbol)  # Append symbol
             self.symbol = self.scanner.get_symbol()
-            return True
         else:
             dev_list.append(None)
             self.display_syntax_error(10, self.symbol)
+            while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
+                self.symbol = self.scanner.get_symbol()
+            return
+        if self.symbol.type == "comma" or self.symbol.type == "semi-colon":
+            dev_list.append(dev)
+            return True
+        else:
+            dev_list.append(None)
+            self.display_syntax_error(19, self.symbol)
             self.symbol = self.scanner.get_symbol()
             return
 
@@ -149,14 +160,14 @@ class Parser:
         bool
             True if no errors detected, return nothing otherwise
         """
-        dev.append("SWITCH")
+        dev.append(self.symbol)  # Append symbol
         self.symbol = self.scanner.get_symbol()
-        if self.symbol.type == "comma":  # Check number of parameters
+        if self.symbol.type == "comma":  # !
             dev_list.append(None)
             self.display_syntax_error(6, self.symbol)
             return
         if self.check_name():
-            dev.append(self.names.get_name_string(self.symbol.id))
+            dev.append(self.symbol)  # Append symbol
         else:
             dev_list.append(None)
             self.symbol = self.scanner.get_symbol()
@@ -164,18 +175,25 @@ class Parser:
                 self.symbol = self.scanner.get_symbol()
             return
         self.symbol = self.scanner.get_symbol()
-        if self.symbol.type == "comma":  # Check number of parameters
+        if self.symbol.type == "comma":  # !
             dev_list.append(None)
             self.display_syntax_error(6, self.symbol)
             return
         if self.names.get_name_string(self.symbol.id) in {'0', '1'}:
-            dev.append(self.names.get_name_string(self.symbol.id))
-            dev_list.append(dev)
+            dev.append(self.symbol)  # Append symbol
             self.symbol = self.scanner.get_symbol()
-            return True
         else:
             dev_list.append(None)
             self.display_syntax_error(11, self.symbol)
+            while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
+                self.symbol = self.scanner.get_symbol()
+            return
+        if self.symbol.type == "comma" or self.symbol.type == "semi-colon":
+            dev_list.append(dev)
+            return True
+        else:
+            dev_list.append(None)
+            self.display_syntax_error(19, self.symbol)
             self.symbol = self.scanner.get_symbol()
             return
 
@@ -198,14 +216,14 @@ class Parser:
         bool
             True if no errors detected, return nothing otherwise
         """
-        dev.append(self.names.get_name_string(self.symbol.id))
+        dev.append(self.symbol)  # Append symbol
         self.symbol = self.scanner.get_symbol()
-        if self.symbol.type == "comma":  # Check number of parameters
+        if self.symbol.type == "comma":  # !
             dev_list.append(None)
             self.display_syntax_error(6, self.symbol)
             return
         if self.check_name():
-            dev.append(self.names.get_name_string(self.symbol.id))
+            dev.append(self.symbol)  # Append symbol
         else:
             dev_list.append(None)
             self.symbol = self.scanner.get_symbol()
@@ -213,18 +231,25 @@ class Parser:
                 self.symbol = self.scanner.get_symbol()
             return
         self.symbol = self.scanner.get_symbol()
-        if self.symbol.type == "comma":  # Check number of parameters
+        if self.symbol.type == "comma":  # !
             dev_list.append(None)
             self.display_syntax_error(6, self.symbol)
             return
         if self.names.get_name_string(self.symbol.id) in {f"{i}" for i in range(1, 17)}:
-            dev.append(self.names.get_name_string(self.symbol.id))
-            dev_list.append(dev)
+            dev.append(self.symbol)  # Append symbol
             self.symbol = self.scanner.get_symbol()
-            return True
         else:
             dev_list.append(None)
             self.display_syntax_error(12, self.symbol)
+            while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
+                self.symbol = self.scanner.get_symbol()
+            return
+        if self.symbol.type == "comma" or self.symbol.type == "semi-colon":
+            dev_list.append(dev)
+            return True
+        else:
+            dev_list.append(None)
+            self.display_syntax_error(19, self.symbol)
             self.symbol = self.scanner.get_symbol()
             return
 
@@ -247,22 +272,28 @@ class Parser:
         bool
             True if no errors detected, return nothing otherwise
         """
-        dev.append(self.names.get_name_string(self.symbol.id))
+        dev.append(self.symbol)  # Append symbol
         self.symbol = self.scanner.get_symbol()
-        if self.symbol.type == "comma":  # Check number of parameters
+        if self.symbol.type == "comma":  # !
             dev_list.append(None)
             self.display_syntax_error(7, self.symbol)
             return
         if self.check_name():
-            dev.append(self.names.get_name_string(self.symbol.id))
-            dev_list.append(dev)
+            dev.append(self.symbol)  # Append symbol
             self.symbol = self.scanner.get_symbol()
-            return True
         else:
             dev_list.append(None)
             self.symbol = self.scanner.get_symbol()
             while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
                 self.symbol = self.scanner.get_symbol()
+            return
+        if self.symbol.type == "comma" or self.symbol.type == "semi-colon":
+            dev_list.append(dev)
+            return True
+        else:
+            dev_list.append(None)
+            self.display_syntax_error(19, self.symbol)
+            self.symbol = self.scanner.get_symbol()
             return
 
     def device(self, dev_list):
@@ -313,20 +344,26 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         if self.symbol.type == "semi-colon":  # No devices
             self.display_syntax_error(5, self.symbol)
+            self.symbol = self.scanner.get_symbol()  # !!!
             return None
         else:
             self.device(dev_list)
         while self.symbol.type == "comma":
             self.symbol = self.scanner.get_symbol()
+            if self.names.get_name_string(self.symbol.id) == "CONNECT":
+                break
             self.device(dev_list)
         if self.symbol.type == "semi-colon":
+            self.symbol = self.scanner.get_symbol()
             if None not in dev_list:
                 return dev_list
             else:
                 return None
         else:
             self.display_syntax_error(19, self.symbol)
-            return
+            while self.names.get_name_string(self.symbol.id) != "CONNECT":  # !!!
+                self.symbol = self.scanner.get_symbol()
+            return None
 
     def connection(self, con_list):
         """Parse a single connection, return errors upon detection
@@ -347,7 +384,7 @@ class Parser:
         """
         con = []
         if self.check_name():
-            con.append(self.names.get_name_string(self.symbol.id))
+            con.append(self.symbol)  # Append symbol
         else:
             con_list.append(None)
             while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
@@ -355,10 +392,10 @@ class Parser:
             return
         self.symbol = self.scanner.get_symbol()
         if self.symbol.type == "dot":
-            con.append(self.names.get_name_string(self.symbol.id))
+            con.append(self.symbol)  # Append symbol
             self.symbol = self.scanner.get_symbol()
             if self.symbol.type == "output_pin":
-                con.append(self.names.get_name_string(self.symbol.id))
+                con.append(self.symbol)  # Append symbol
                 self.symbol = self.scanner.get_symbol()
             else:
                 con_list.append(None)
@@ -367,7 +404,7 @@ class Parser:
                     self.symbol = self.scanner.get_symbol()
                 return
         if self.symbol.type == "arrow":
-            con.append(self.names.get_name_string(self.symbol.id))
+            con.append(self.symbol)  # Append symbol
         else:
             con_list.append(None)
             self.display_syntax_error(15, self.symbol)
@@ -376,7 +413,7 @@ class Parser:
             return
         self.symbol = self.scanner.get_symbol()
         if self.check_name():
-            con.append(self.names.get_name_string(self.symbol.id))
+            con.append(self.symbol)  # Append symbol
         else:
             con_list.append(None)
             while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
@@ -384,7 +421,7 @@ class Parser:
             return
         self.symbol = self.scanner.get_symbol()
         if self.symbol.type == "dot":
-            con.append(self.names.get_name_string(self.symbol.id))
+            con.append(self.symbol)  # Append symbol
         else:
             con_list.append(None)
             self.display_syntax_error(16, self.symbol)
@@ -393,13 +430,20 @@ class Parser:
             return
         self.symbol = self.scanner.get_symbol()
         if self.symbol.type == "input_pin":
-            con.append(self.names.get_name_string(self.symbol.id))
-            con_list.append(con)
+            con.append(self.symbol)  # Append symbol
             self.symbol = self.scanner.get_symbol()
-            return True
         else:
             con_list.append(None)
             self.display_syntax_error(17, self.symbol)
+            self.symbol = self.scanner.get_symbol()  # !!!
+            return
+        if self.symbol.type == "comma" or self.symbol.type == "semi-colon":
+            con_list.append(con)
+            return True
+        else:
+            con_list.append(None)
+            self.display_syntax_error(13, self.symbol)
+            self.symbol = self.scanner.get_symbol()
             return
 
     def connection_list(self):
@@ -416,19 +460,25 @@ class Parser:
         con_list = []
         self.symbol = self.scanner.get_symbol()
         if self.symbol.type == "semi-colon":  # No connections
+            self.symbol = self.scanner.get_symbol()  # !!!
             return con_list
         else:
             self.connection(con_list)
         while self.symbol.type == "comma":
             self.symbol = self.scanner.get_symbol()
+            if self.names.get_name_string(self.symbol.id) == "MONITOR":
+                break
             self.connection(con_list)
         if self.symbol.type == "semi-colon":
+            self.symbol = self.scanner.get_symbol()
             if None not in con_list:
                 return con_list
             else:
                 return None
         else:
             self.display_syntax_error(13, self.symbol)
+            while self.names.get_name_string(self.symbol.id) != "MONITOR":  # !!!
+                self.symbol = self.scanner.get_symbol()
             return None
 
     def monitor(self, mon_list):
@@ -450,7 +500,7 @@ class Parser:
         """
         mon = []
         if self.check_name():
-            mon.append(self.names.get_name_string(self.symbol.id))
+            mon.append(self.symbol)  # Append symbol
         else:
             mon_list.append(None)
             self.symbol = self.scanner.get_symbol()
@@ -462,18 +512,25 @@ class Parser:
             mon_list.append(mon)
             return True
         elif self.symbol.type == "dot":
-            mon.append(self.names.get_name_string(self.symbol.id))
+            mon.append(self.symbol)  # Append symbol
             self.symbol = self.scanner.get_symbol()
             if self.symbol.type == "output_pin":
-                mon.append(self.names.get_name_string(self.symbol.id))
-                mon_list.append(mon)
+                mon.append(self.symbol)  # Append symbol
                 self.symbol = self.scanner.get_symbol()
-                return True
             else:
                 mon_list.append(None)
                 self.display_syntax_error(14, self.symbol)
-                self.symbol = self.scanner.get_symbol()
+                while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
+                    self.symbol = self.scanner.get_symbol()
                 return
+        if self.symbol.type == "comma" or self.symbol.type == "semi-colon":
+            mon_list.append(mon)
+            return True
+        else:
+            mon_list.append(None)
+            self.display_syntax_error(18, self.symbol)
+            self.symbol = self.scanner.get_symbol()
+            return
 
     def monitor_list(self):
         """Parse all monitors, return errors upon detection
@@ -489,23 +546,31 @@ class Parser:
         mon_list = []
         self.symbol = self.scanner.get_symbol()
         if self.symbol.type == "semi-colon":  # No monitors
+            self.symbol = self.scanner.get_symbol()  # !!!
             return mon_list
         else:
             self.monitor(mon_list)
         while self.symbol.type == "comma":
             self.symbol = self.scanner.get_symbol()
+            if self.names.get_name_string(self.symbol.id) == "END":
+                break
             self.monitor(mon_list)
         if self.symbol.type == "semi-colon":
+            self.symbol = self.scanner.get_symbol()
             if None not in mon_list:
                 return mon_list
             else:
                 return None
         else:
             self.display_syntax_error(18, self.symbol)
+            while self.names.get_name_string(self.symbol.id) != "END":  # !!!
+                self.symbol = self.scanner.get_symbol()
             return None
 
     def display_syntax_error(self, error_index, symbol, **kwargs):
         """Display the syntax error.
+
+        Keep track of the number of errors.
 
         Parameters
         ----------
@@ -519,19 +584,57 @@ class Parser:
         bool
             True if the syntax error is printed, False otherwise.
         """
+        self.num_of_errors += 1
         error_message = self.syntax_error_types[error_index]
         return self.scanner.print_error(symbol, 0, error_message)
     
     def network_dict(self):
         """Verify the syntax of the circuit definition file and returns a
         dictionary of symbols describing the network.
+
         Returns
         -------
-        dict: Dictionary of list of list of symbols describing the network."""
-        # For now just return True, so that userint and gui can run in the
-        # skeleton code. When complete, should return False when there are
-        # errors in the circuit definition file.
-        return True
+        dict: Dictionary of list of list of symbols describing the network.
+        """
+        network_dict = {}
+        self.symbol = self.scanner.get_symbol()
+        # Parse devices
+        if self.names.get_name_string(self.symbol.id) != "DEVICES":
+            self.display_syntax_error(1, self.symbol)
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol.type != "colon":
+            self.display_syntax_error(20, self.symbol)
+        dev_list = self.device_list()
+        if dev_list is not None:
+            network_dict["DEVICES"] = dev_list
+        # Parse connections
+        if self.names.get_name_string(self.symbol.id) != "CONNECT":
+            self.display_syntax_error(2, self.symbol)
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol.type != "colon":
+            self.display_syntax_error(20, self.symbol)
+        con_list = self.connection_list()
+        if con_list is not None:
+            network_dict["CONNECT"] = con_list
+        # Parse monitors
+        if self.names.get_name_string(self.symbol.id) != "MONITOR":
+            self.display_syntax_error(3, self.symbol)
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol.type != "colon":
+            self.display_syntax_error(20, self.symbol)
+        mon_list = self.monitor_list()
+        if mon_list is not None:
+            network_dict["MONITOR"] = mon_list
+        # Parse end
+        if self.names.get_name_string(self.symbol.id) != "END":
+            self.display_syntax_error(4, self.symbol)
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol.type != "semi-colon":
+            self.display_syntax_error(20, self.symbol)
+        if self.num_of_errors == 0:
+            return network_dict
+        else:
+            return False
 
     def build_devices(self, devices_list):
         """Build the devices.
