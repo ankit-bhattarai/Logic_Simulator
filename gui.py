@@ -93,13 +93,17 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glTranslated(self.pan_x, self.pan_y, 0.0)
         GL.glScaled(self.zoom, self.zoom, self.zoom)
 
-    def render_axes(self, x_start, x_end, y_start, width, height):
+    def render_axes(self, x_start, y_start, values, width, height):
         axes_offset_x = 5
         axes_offset_y = 5
         GL.glColor3f(0.0, 0.0, 0.0)  # Black
         GL.glBegin(GL.GL_LINES)
-        axes_offset_y = 5
-        axes_offset_x = 5
+        axes_offset_y = 8
+        axes_offset_x = 8
+        ticker_offset = 3
+        value_offset_down = 15
+        value_offset_left = 5
+        x_end = x_start + width * values
         GL.glVertex2f(x_start - axes_offset_x, y_start - axes_offset_y)
         GL.glVertex2f(x_end + axes_offset_x, y_start - axes_offset_y)
         GL.glEnd()
@@ -108,6 +112,26 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glVertex2f(x_start - axes_offset_x,
                       y_start + height + axes_offset_y)
         GL.glEnd()
+        # Drawing ticks on x axis
+        for i in range(1, values + 1):
+            GL.glBegin(GL.GL_LINES)
+            x_value = x_start + width * i
+            GL.glVertex2f(x_value, y_start -
+                          axes_offset_y - ticker_offset)
+            GL.glVertex2f(x_value, y_start -
+                          axes_offset_y + ticker_offset)
+            GL.glEnd()
+            self.render_text(str(i), x_value - value_offset_left,
+                             y_start - axes_offset_y - value_offset_down)
+
+        # Drawing ticks on y axis
+        for i in range(0, 2):
+            x_value = x_start - axes_offset_x - ticker_offset
+            y_value = y_start + height * i
+            GL.glBegin(GL.GL_LINES)
+            GL.glVertex2f(x_value - ticker_offset, y_value)
+            GL.glVertex2f(x_value + ticker_offset, y_value)
+            GL.glEnd()
 
     def render_signal(self, x_start, y_start, values, colour=(0.0, 0.0, 1.0),
                       width=20, height=25):
@@ -128,7 +152,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                 GL.glVertex2f(x_next, y)
                 x = x_next
         GL.glEnd()
-        self.render_axes(x_start, x, y_start, width, height)
+        self.render_axes(x_start, y_start, len(values), width, height)
 
     def render_signals(self):
         values = [i % 2 for i in range(10)]
