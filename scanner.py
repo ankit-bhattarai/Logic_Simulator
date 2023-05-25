@@ -584,10 +584,14 @@ class Scanner:
             line_number = symbol.line_number
             line_string = self.get_line(line_number)
             column_number = symbol.column_number
-            position_of_arrow = column_number + index_of_arrow
+            line_number_string = "Line " + str(line_number) + ": "
+            position_of_arrow = len(line_number_string) + \
+                column_number + index_of_arrow
+
             arrow_string = " " * (position_of_arrow - 1) + "^"
             print(message)
-            print(line_string.rstrip())  # Remove trailing newline from end
+            # Remove trailing newline from end
+            print(line_number_string + line_string.rstrip())
             print(arrow_string)
             return True
         except Exception:
