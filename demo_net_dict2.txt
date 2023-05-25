@@ -1,0 +1,4 @@
+DEVICES: SWITCH switch1 1;
+CONNECT: ;
+MONITOR: ;
+END;
