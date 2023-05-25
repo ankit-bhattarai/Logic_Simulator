@@ -357,9 +357,10 @@ class RightPanel(wx.Panel):
 
         # Create the two buttons
         self.switch_button_id_0, self.switch_button_id_1 = wx.NewIdRef(count=2)
-        self.button_switch_0 = wx.Button(self, self.switch_button_id_0, "Open")
+        self.button_switch_0 = wx.Button(
+            self, self.switch_button_id_0, "Closed")
         self.button_switch_1 = wx.Button(
-            self, self.switch_button_id_1, "Closed")
+            self, self.switch_button_id_1, "Open")
 
         # Bind buttons
         self.button_switch_0.Bind(wx.EVT_BUTTON, self.OnButtonSwitch0)
