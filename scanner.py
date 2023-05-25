@@ -257,6 +257,7 @@ class Scanner:
         self.current_column_number = 1
         self.current_char = None
         self.symbol_counter = -1
+        self.get_symbols()
 
     def reset_symbol_counter(self):
         """Reset the symbol counter to -1."""
@@ -526,6 +527,7 @@ class Scanner:
         if next_symbol < len(self.list_of_symbols):  # Within the file
             self.symbol_counter += 1
             return self.list_of_symbols[self.symbol_counter]
+        self.reset_symbol_counter()
         return None  # End of file
 
     def get_list_of_symbols(self):
