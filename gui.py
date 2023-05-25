@@ -279,17 +279,6 @@ class RightPanel(wx.Panel):
         super().__init__(parent=parent)  # Initialise
         self.parent = parent
         self.guiint = guiint
-        # Switch and Monitor states - currently hardcoded
-        # 0 = off, 1 = on
-        self.switch_states = {"switch1": 0, "switch2": 1, "switch3": 0,
-                              "switch4": 1, "switch5": 0, "switch6": 1,
-                              "switch7": 0, "switch8": 1, "switch9": 0,
-                              "switch10": 1}
-        # 0 = not shown, 1 = shown
-        self.monitor_states = {"monitor1": 0, "monitor2": 1, "monitor3": 0,
-                               "monitor4": 1, "monitor5": 0, "monitor6": 1,
-                               "monitor7": 0, "monitor8": 1, "monitor9": 0,
-                               "monitor10": 1}
 
         # Creating the sizers
         main_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -352,7 +341,7 @@ class RightPanel(wx.Panel):
         combo_id_switch = wx.NewIdRef()
         self.combo_box_switch = wx.ComboBox(self, combo_id_switch,
                                             choices=list(
-                                                self.switch_states.keys()),
+                                                self.guiint.list_of_switches()),
                                             style=wx.TE_PROCESS_ENTER)
         # Bind the combo box
         self.combo_box_switch.Bind(wx.EVT_COMBOBOX, self.OnComboSwitch)
@@ -396,7 +385,7 @@ class RightPanel(wx.Panel):
         combo_id_monitor = wx.NewIdRef()
         self.combo_box_monitor = wx.ComboBox(self, combo_id_monitor,
                                              choices=list(
-                                                 self.monitor_states.keys()),
+                                                 self.guiint.list_of_outputs()),
                                              style=wx.TE_PROCESS_ENTER)
         # Bind the combo box
         self.combo_box_monitor.Bind(wx.EVT_COMBOBOX, self.OnComboMonitor)
@@ -466,7 +455,7 @@ class RightPanel(wx.Panel):
         if switch_text is None:  # This can't ever happen
             # As this function is only called when the combo box is changed
             pass
-        switch_state = self.switch_states[switch_text]
+        switch_state = self.guiint.get_switch_state(switch_text)
         # Show the buttons
         self.button_switch_0.Show()
         self.button_switch_1.Show()
@@ -489,7 +478,7 @@ class RightPanel(wx.Panel):
         if monitor_text is None:  # This can't ever happen
             # As this function is only called when the combo box is changed
             pass
-        monitor_state = self.monitor_states[monitor_text]
+        monitor_state = self.guiint.get_output_state(monitor_text)
         # Show the buttons
         self.button_monitor_0.Show()
         self.button_monitor_1.Show()
@@ -507,7 +496,7 @@ class RightPanel(wx.Panel):
 
     def OnComboSwitch(self, event):
         combo_value = self.combo_box_switch.GetValue()
-        if combo_value in self.switch_states:
+        if combo_value in self.guiint.list_of_switches():
             self.switch_text = combo_value  # Only change this if valid
             self.renderSwitchBoxes()
             print("Combo box changed. New_value:", combo_value)
@@ -519,7 +508,7 @@ class RightPanel(wx.Panel):
 
     def OnComboMonitor(self, event):
         combo_value = self.combo_box_monitor.GetValue()
-        if combo_value in self.monitor_states:
+        if combo_value in self.guiint.list_of_outputs():
             self.monitor_text = combo_value  # Only change this if valid
             self.renderMonitorButtons()
             print("Combo box changed. New_value:", combo_value)
@@ -533,7 +522,7 @@ class RightPanel(wx.Panel):
         if switch_text is None:
             pass  # This can't ever happen
         else:
-            self.switch_states[switch_text] = 0
+            self.guiint.set_switch_state(switch_text, 0)
             self.renderSwitchBoxes()
         text = f"Switch {switch_text} is now open."
         self.parent.canvas.render(text)
@@ -543,7 +532,7 @@ class RightPanel(wx.Panel):
         if switch_text is None:
             pass  # This can't ever happen
         else:
-            self.switch_states[switch_text] = 1
+            self.guiint.set_switch_state(switch_text, 1)
             self.renderSwitchBoxes()
         text = f"Switch {switch_text} is now closed."
 
@@ -554,8 +543,9 @@ class RightPanel(wx.Panel):
         if monitor_text is None:
             pass
         else:
-            self.monitor_states[monitor_text] = 0
+            self.guiint.set_output_state(monitor_text, 0)
             self.renderMonitorButtons()
+            self.parent.canvas.render_signals()
         text = f"Monitor {monitor_text} is now off."
         self.parent.canvas.render(text)
 
@@ -564,8 +554,9 @@ class RightPanel(wx.Panel):
         if monitor_text is None:
             pass
         else:
-            self.monitor_states[monitor_text] = 1
+            self.guiint.set_output_state(monitor_text, 1)
             self.renderMonitorButtons()
+            self.parent.canvas.render_signals()
         text = f"Monitor {monitor_text} is now on."
         self.parent.canvas.render(text)
 
