@@ -93,6 +93,30 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glTranslated(self.pan_x, self.pan_y, 0.0)
         GL.glScaled(self.zoom, self.zoom, self.zoom)
 
+    def render_signal(self, x_start, y_start, values, colour=(0.0, 0.0, 1.0),
+                      width=20, height=25):
+        GL.glColor3f(*colour)
+        GL.glBegin(GL.GL_LINE_STRIP)
+        x = x_start
+        y = y_start
+        for i, value in enumerate(values):
+            if value is None:
+                x += width
+            else:
+                if value == 0:
+                    y = y_start
+                else:
+                    y = y_start + height
+                x_next = x + width
+                GL.glVertex2f(x, y)
+                GL.glVertex2f(x_next, y)
+                x = x_next
+        GL.glEnd()
+
+    def render_signals(self):
+        values = [i % 2 for i in range(10)]
+        self.render_signal(20, 20, values)
+
     def render(self, text):
         """Handle all drawing operations."""
         self.SetCurrent(self.context)
@@ -107,21 +131,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         # Draw specified text at position (10, 10)
         self.render_text(text, 10, 10)
         # Draw the signal traces
-        start = (30, 10)
-        # self.render_text("and1", start[0], start[1])
-        # Draw a sample signal trace
-        GL.glColor3f(0.0, 0.0, 1.0)  # signal trace is blue
-        GL.glBegin(GL.GL_LINE_STRIP)
-        for i in range(10):
-            x = (i * 20) + 10
-            x_next = (i * 20) + 30
-            if i % 2 == 0:
-                y = 75
-            else:
-                y = 100
-            GL.glVertex2f(x, y)
-            GL.glVertex2f(x_next, y)
-        GL.glEnd()
+        self.render_signals()
 
         # We have been drawing to the back buffer, flush the graphics pipeline
         # and swap the back buffer to the front
