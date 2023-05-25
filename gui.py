@@ -165,8 +165,10 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
     def render_signals(self):
         height_above_signal = 100
+        base_x = 40
+        base_y = 80
         for i, (name, values) in enumerate(self.guiint.get_signals().items()):
-            self.render_signal(20, height_above_signal + i * height_above_signal,
+            self.render_signal(base_x, base_y + i * height_above_signal,
                                values, name)
 
     def render(self, text):
