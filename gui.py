@@ -74,6 +74,9 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_PAINT, self.on_paint)
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
+        self.signals = {"and1": [0, 1, 0, 1, 1, 1, 0, 0, 1],
+                        "and2": [0, 1, 0, 1, 1, 1, 0, 1, 1],
+                        "and3": [None, None, None, None, None, None, 1, 1, 0]}
 
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
@@ -103,7 +106,9 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         # Draw specified text at position (10, 10)
         self.render_text(text, 10, 10)
-
+        # Draw the signal traces
+        start = (30, 10)
+        # self.render_text("and1", start[0], start[1])
         # Draw a sample signal trace
         GL.glColor3f(0.0, 0.0, 1.0)  # signal trace is blue
         GL.glBegin(GL.GL_LINE_STRIP)
