@@ -448,7 +448,7 @@ class Parser:
             else:
                 return None
         else:
-            self.display_syntax_error(19, self.symbol)
+            self.display_syntax_error(19, self.scanner.list_of_symbols[self.scanner.list_of_symbols.index(self.symbol)-1])
             while self.names.get_name_string(self.symbol.id) != "CONNECT":  # !!!
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
@@ -630,8 +630,8 @@ class Parser:
             else:
                 return None
         else:
-            self.display_syntax_error(13, self.symbol)
-            while self.names.get_name_string(self.symbol.id) != "MONITOR":  # !!!
+            self.display_syntax_error(13, self.scanner.list_of_symbols[self.scanner.list_of_symbols.index(self.symbol)-1])
+            while self.names.get_name_string(self.symbol.id) != "MONITOR":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
                     self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
@@ -754,7 +754,7 @@ class Parser:
             else:
                 return None
         else:
-            self.display_syntax_error(18, self.symbol)
+            self.display_syntax_error(18, self.scanner.list_of_symbols[self.scanner.list_of_symbols.index(self.symbol)-1])
             while self.names.get_name_string(self.symbol.id) != "END":  # !!!
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
@@ -779,8 +779,16 @@ class Parser:
         bool
             True if the syntax error is printed, False otherwise.
         """
+        name_error = ['First character is not a lowercase letter',
+                      'Specific character is not a letter, digit or underscore',
+                      'Specific character is not lowercase']
         self.num_of_errors += 1
         error_message = self.syntax_error_types[error_index]
+        if error_index == 9:
+            name_string = self.names.get_name_string(self.symbol.id)
+            index_of_arrow = self.symbol.index_not_name(name_string)[0]
+            exact_error_message = name_error[self.symbol.index_not_name(name_string)[1]-1]
+            return self.scanner.print_error(symbol, index_of_arrow, error_message+exact_error_message)
         return self.scanner.print_error(symbol, 0, error_message)
 
     def network_dict(self):
