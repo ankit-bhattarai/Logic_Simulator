@@ -130,7 +130,7 @@ class GuiInterface():
         """
         split_name = output_name.split(".")
         device_id = self.names.query(split_name[0])
-        port_id = self.names.query(split_name[2]) if len(split_name) == 3 else None
+        port_id = self.names.query(split_name[1]) if len(split_name) == 2 else None
         if output_state:
             self.monitors.make_monitor(device_id, port_id)
         else:
