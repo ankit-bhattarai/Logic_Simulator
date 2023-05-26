@@ -437,9 +437,10 @@ class RightPanel(wx.Panel):
     def OnButtonContinue(self, event):
         """Handle the event when the user clicks the continue button."""
         text = "Continue button pressed."
-        self.parent.canvas.render(text)
         self.guiint.continue_network(self.spin.GetValue())
+        self.parent.canvas.render(text)
         self.parent.canvas.render_signals()
+        self.Layout()
 
     def OnSpin(self, event):
         spin_value = self.spin.GetValue()
