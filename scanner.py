@@ -255,7 +255,7 @@ class Scanner:
         self.list_of_symbols = []
         self.file = None
         self.current_line_number = 1
-        self.current_column_number = 1
+        self.current_column_number = 0
         self.current_char = None
         self.symbol_counter = -1
         self.get_symbols()
@@ -475,8 +475,8 @@ class Scanner:
         """
         self.open_file()
         self.list_of_symbols = []
-        self.line_number = 1
-        self.column_number = 1
+        self.current_line_number = 1
+        self.current_column_number = 0
         character = self.get_next_char()  # Only need to do this at the start
         while True:
             column_number = self.current_column_number
@@ -598,6 +598,8 @@ class Scanner:
 
             arrow_string = " " * (position_of_arrow - 1) + "^"
             print(message)
+            print(line_number, column_number,
+                  index_of_arrow, position_of_arrow)
             # Remove trailing newline from end
             print(line_number_string + line_string.rstrip())
             print(arrow_string)
