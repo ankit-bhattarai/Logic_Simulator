@@ -6,9 +6,9 @@
 Classes:
 --------
 SemanticErrorHandler - class used to handle semantic errors in devices,
-                       network or monitors.  
-
+                       network or monitors.
 """
+
 
 class SemanticErrorHandler:
     """ Class used to report semantic errors in devices, network or monitors.
@@ -26,13 +26,14 @@ class SemanticErrorHandler:
     Public methods:
     ---------------
     handle_error(self, unique_error_code, symbols)
-        Handles the error code, printing if needed. 
-    print_error(self, error_type, symbols, **kwargs) 
+        Handles the error code, printing if needed.
+    print_error(self, error_type, symbols, **kwargs)
         Prints the semantic error directly.
     print_input_not_connected(self, symbol)
         Prints the input not connected error at the
         end of the connections section of the definition file.
     """
+
     def __init__(self, names, devices, network, monitors, scanner):
         self.names = names
         self.devices = devices
@@ -41,20 +42,20 @@ class SemanticErrorHandler:
         self.scanner = scanner
 
         self.semantic_error_codes = {
-            devices.INVALID_QUALIFIER: "Invalid qualifier", # Shouldn't occur   
-            devices.NO_QUALIFIER: "No qualifier", # Shouldn't occur
-            devices.BAD_DEVICE: "Bad device", # Shouldn't occur
-            devices.QUALIFIER_PRESENT: "Qualifier present", # Shouldn't occur
-            devices.DEVICE_PRESENT: "Device present", 
+            devices.INVALID_QUALIFIER: "Invalid qualifier",  # Shouldn't occur
+            devices.NO_QUALIFIER: "No qualifier",  # Shouldn't occur
+            devices.BAD_DEVICE: "Bad device",  # Shouldn't occur
+            devices.QUALIFIER_PRESENT: "Qualifier present",  # Shouldn't occur
+            devices.DEVICE_PRESENT: "Device present",
             network.INPUT_TO_INPUT: "Input to input",
             network.OUTPUT_TO_OUTPUT: "Output to output",
             network.INPUT_CONNECTED: "Input connected",
             network.PORT_ABSENT: "Port absent",
             network.DEVICE_ABSENT: "Device absent",
             monitors.NOT_OUTPUT: "Not output",
-            monitors.MONITOR_PRESENT: "Monitor present", # Warning only
+            monitors.MONITOR_PRESENT: "Monitor present",  # Warning only
         }
-    
+
     def get_labelled_symbols(self, symbols):
         """
         Returns the symbols labelled with description.
@@ -98,8 +99,10 @@ class SemanticErrorHandler:
         second_device: str
             String associated for second device + port
         """
-        first_device = self.names.get_name_string(labelled_symbols["First device"].id)
-        second_device = self.names.get_name_string(labelled_symbols["Second device"].id)
+        first_device = self.names.get_name_string(
+            labelled_symbols["First device"].id)
+        second_device = self.names.get_name_string(
+            labelled_symbols["Second device"].id)
 
         if labelled_symbols["First port"]:
             first_device += "." + self.names.get_name_string(
@@ -111,7 +114,7 @@ class SemanticErrorHandler:
             )
 
         return first_device, second_device
-    
+
     def display_device_present_error(self, device_name_symbol):
         """Prints the device present error.
         Parameters
@@ -123,8 +126,10 @@ class SemanticErrorHandler:
         None
         """
         device_name = self.names.get_name_string(device_name_symbol.id)
-        self.scanner.print_error(device_name_symbol, 0, 
-                                 f"Device names are not unique. {device_name} is already the name of a device")
+        self.scanner.print_error(
+            device_name_symbol,
+            0,
+            f"Device names are not unique. {device_name} is already the name of a device")
 
     def display_input_input_error(self, symbols):
         """Prints the input input error.
@@ -137,9 +142,12 @@ class SemanticErrorHandler:
         None
         """
         labelled_symbols = self.get_labelled_symbols(symbols)
-        first_device, second_device = self.get_devices_strings(labelled_symbols)
-        self.scanner.print_error(labelled_symbols["First device"], 0, 
-                                 f"Input {first_device} is connected to input {second_device}. Connections must be from outputs to inputs.")
+        first_device, second_device = self.get_devices_strings(
+            labelled_symbols)
+        self.scanner.print_error(
+            labelled_symbols["First device"],
+            0,
+            f"Input {first_device} is connected to input {second_device}. Connections must be from outputs to inputs.")
 
     def display_output_output_error(self, symbols):
         """Prints the output output error.
@@ -152,9 +160,12 @@ class SemanticErrorHandler:
         None
         """
         labelled_symbols = self.get_labelled_symbols(symbols)
-        first_device, second_device = self.get_devices_strings(labelled_symbols)
-        self.scanner.print_error(labelled_symbols["Second device"], 0, 
-                                 f"Output {first_device} is connected to output {second_device}.Connections must be from outputs to inputs.")
+        first_device, second_device = self.get_devices_strings(
+            labelled_symbols)
+        self.scanner.print_error(
+            labelled_symbols["Second device"],
+            0,
+            f"Output {first_device} is connected to output {second_device}.Connections must be from outputs to inputs.")
 
     def display_input_connected_error(self, symbols):
         """Prints the input connected error.
@@ -167,13 +178,15 @@ class SemanticErrorHandler:
         None
         """
         labelled_symbols = self.get_labelled_symbols(symbols)
-        first_device, second_device = self.get_devices_strings(labelled_symbols)
+        first_device, second_device = self.get_devices_strings(
+            labelled_symbols)
 
-        self.scanner.print_error(labelled_symbols["Second device"], 0,
-                                f"A signal is already connected to input {second_device}. Only one signal must be connected to an input.")
-        
-        #TODO: Decide whether look back to print first device connected as well
-        
+        self.scanner.print_error(
+            labelled_symbols["Second device"],
+            0,
+            f"A signal is already connected to input {second_device}. Only one signal must be connected to an input.")
+
+
     def display_port_absent_error(self, symbols):
         """Prints the port absent error.
         Parameters
@@ -185,16 +198,27 @@ class SemanticErrorHandler:
         None
         """
         labelled_symbols = self.get_labelled_symbols(symbols)
-        first_device = self.devices.get_device(labelled_symbols["First device"].id)
-        second_device = self.devices.get_device(labelled_symbols["Second device"].id)
+        first_device = self.devices.get_device(
+            labelled_symbols["First device"].id)
+        second_device = self.devices.get_device(
+            labelled_symbols["Second device"].id)
 
         if labelled_symbols['First port'].id not in first_device.outputs:
-            self.scanner.print_error(labelled_symbols["First port"], 0, 
-                                     "Port {} is not defined for device {}".format(self.names.get_name_string(labelled_symbols["First port"].id), self.names.get_name_string(labelled_symbols["First device"].id)))
+            self.scanner.print_error(
+                labelled_symbols["First port"], 0, "Port {} is not defined for device {}".format(
+                    self.names.get_name_string(
+                        labelled_symbols["First port"].id), self.names.get_name_string(
+                        labelled_symbols["First device"].id)))
         if labelled_symbols["Second port"].id not in second_device.inputs:
-            self.scanner.print_error(labelled_symbols["Second port"], 0, 
-                                     "Port {} is not defined for device {}".format(self.names.get_name_string(labelled_symbols["Second port"].id), self.names.get_name_string(labelled_symbols["Second device"].id)))
-    
+            self.scanner.print_error(
+                labelled_symbols["Second port"],
+                0,
+                "Port {} is not defined for device {}".format(
+                    self.names.get_name_string(
+                        labelled_symbols["Second port"].id),
+                    self.names.get_name_string(
+                        labelled_symbols["Second device"].id)))
+
     def display_device_absent_error(self, symbols):
         """Prints the device absent error.
         Parameters
@@ -206,17 +230,33 @@ class SemanticErrorHandler:
         None
         """
         # Identfy whether a monitor or network error
-        if (len(symbols) == 3 and symbols[1].type == "dot") or len(symbols) == 1: # Monitor error
-            self.scanner.print_error(symbols[0], 0, "Device {} is not defined".format(self.names.get_name_string(symbols[0].id)))
-        else: # Network error
+        if (len(symbols) == 3 and symbols[1].type == "dot") or len(
+                symbols) == 1:  # Monitor error
+            self.scanner.print_error(
+                symbols[0], 0, "Device {} is not defined".format(
+                    self.names.get_name_string(
+                        symbols[0].id)))
+        else:  # Network error
             labelled_symbols = self.get_labelled_symbols(symbols)
-            first_device = self.devices.get_device(labelled_symbols["First device"].id)
-            second_device = self.devices.get_device(labelled_symbols["Second device"].id)
-            
+            first_device = self.devices.get_device(
+                labelled_symbols["First device"].id)
+            second_device = self.devices.get_device(
+                labelled_symbols["Second device"].id)
+
             if first_device is None:
-                self.scanner.print_error(labelled_symbols["First device"], 0, "Device {} is not defined".format(self.names.get_name_string(labelled_symbols["First device"].id)))
+                self.scanner.print_error(
+                    labelled_symbols["First device"],
+                    0,
+                    "Device {} is not defined".format(
+                        self.names.get_name_string(
+                            labelled_symbols["First device"].id)))
             if second_device is None:
-                self.scanner.print_error(labelled_symbols["Second device"], 0, "Device {} is not defined".format(self.names.get_name_string(labelled_symbols["Second device"].id)))
+                self.scanner.print_error(
+                    labelled_symbols["Second device"],
+                    0,
+                    "Device {} is not defined".format(
+                        self.names.get_name_string(
+                            labelled_symbols["Second device"].id)))
 
     def display_not_output_error(self, symbol):
         """Prints the not output error.
@@ -228,25 +268,30 @@ class SemanticErrorHandler:
         -------
         None
         """
-        self.scanner.print_error(symbol, 0, "This not an output. Only outputs can be monitored.")
-    
+        self.scanner.print_error(
+            symbol, 0, "This not an output. Only outputs can be monitored.")
+
     def display_input_not_connected_error(self, symbol):
         """Prints the input not connected error.
         Parameters
         ----------
         symbol: Symbol
-            Symbol associated with last connection 
+            Symbol associated with last connection
         """
         devices = []
 
         for device_id in self.devices.find_devices():
             device = self.devices.get_device(device_id)
             for input_id in device.inputs:
-                if self.network.get_connected_output(device_id, input_id) is None:
+                if self.network.get_connected_output(
+                        device_id, input_id) is None:
                     devices.append(self.names.get_name_string(device_id))
-        
-        self.scanner.print_error(symbol, 0, "One or more inputs are left unconnected for the following devices: {}".format(devices))
-        
+
+        self.scanner.print_error(
+            symbol,
+            0,
+            "One or more inputs are left unconnected for the following devices: {}".format(devices))
+
     def display_monitor_present_error(self, output_symbol):
         """Prints the monitor present error.
         Parameters
@@ -257,7 +302,10 @@ class SemanticErrorHandler:
         -------
         None
         """
-        self.scanner.print_error(output_symbol, 0, "Warning: Monitor exists at this output already.")
+        self.scanner.print_error(
+            output_symbol,
+            0,
+            "Warning: Monitor exists at this output already.")
 
     def print_error(self, error_type, symbols, **kwargs):
         """Prints the semantic error.
@@ -284,19 +332,19 @@ class SemanticErrorHandler:
             self.display_input_connected_error(symbols)
         elif error_type == "Port absent":
             self.display_port_absent_error(symbols)
-        elif error_type == "Device absent": # Can be triggered by monitors or network
+        elif error_type == "Device absent":  # Can be triggered by monitors or network
             self.display_device_absent_error(symbols)
         elif error_type == "Not output":
             self.display_not_output_error(symbols[0])
         elif error_type == "Monitor present":
             self.display_monitor_present_error(symbols[0])
-    
+
     def handle_error(self, unique_error_code, symbols):
         """Prints the error or warning, if present.
         Parameters
         ----------
         unique_error_code: int
-            Unique error code associated with the error
+            Unique error code associated with the error - supplied by existing modules
         symbols: list of Symbols
             Symbols associated with the error
         Returns
@@ -304,10 +352,11 @@ class SemanticErrorHandler:
         True if error is present, False otherwise
         """
         if unique_error_code not in self.semantic_error_codes:
-            return False # No error
-        
+            return False  # No error
+
         self.print_error(self.semantic_error_codes[unique_error_code], symbols)
+
         if self.semantic_error_codes[unique_error_code] == 'Monitor present':
-            return False # Warning
-        
-        return True # Error
+            return False  # Warning
+
+        return True  # Error
