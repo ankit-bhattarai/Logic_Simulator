@@ -15,6 +15,7 @@ dtype_input_pins = {"DATA", "SET", "CLEAR", "CLK"}
 gate_pins = {f"I{i}" for i in range(1, max_number_of_input_pins + 1)}
 input_pins = gate_pins.union(dtype_input_pins)
 output_pins = {"Q", "QBAR"}
+terminate_name_scan_characters = {";", ":", ",", ".", ""}
 punctuation = {";": "semi-colon", ":": "colon", ",": "comma", ".": "dot",
                ">": "arrow"}
 single_line_comment = "#"
@@ -327,11 +328,17 @@ class Scanner:
             # normal numbers as well as the end of the file
 
     def get_next_name(self, first_letter):
-        """Seek any name characters after first_letter and return them.
+        """Seek any characters after first_letter and return them.
 
         get_symbol() has already found a letter. This method will find any
-        subsequent alphanumeric characters and underscores and return them
-        along with the  next non-alpha_numeric character
+        subsequent characters that aren't whitespace or these characters:
+        - semi-colon (;)
+        - colon (:)
+        - comma (,)
+        - dot (.)
+        and return them together as a string. The next character after the
+        name will also be returned. The above characters are stored in
+        terminate_name_scan_characters.
 
         If this is at the end of the file, the next character will be "".
         Here it should return (first_letter, "")
@@ -346,17 +353,16 @@ class Scanner:
         name: string
             The name that was found
         next_character: string
-            The next non alpha_numeric or '_' character after the name
+            The next non-white space or non (semi-colon, colon, comma, dot)
+            character after the name
         """
         met_name_characters = first_letter
         while True:
             character = self.get_next_char()
-            if character.isalnum() or character == "_":
-                met_name_characters += character
-            else:  # Current character is not an alpha_numeric or '_'
-                # character but have encountered them until now
+            if character.isspace() or character in terminate_name_scan_characters:
                 return (met_name_characters, character)
-            # This automatically handles the end of the flie case
+            else:  # Current character is not a space or a terminating character
+                met_name_characters += character
 
     def skip_spaces(self):
         """Skip over spaces and tabs and return the next non-space character.
