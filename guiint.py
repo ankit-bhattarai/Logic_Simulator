@@ -33,12 +33,16 @@ class GuiInterface():
 
     get_signals(self): returns dictionary of all monitered signal states for each monitored output
     
+    TODO:
+    get_definition_file(self): returns definition file as a string
+    update_network(self, definition_file_path): updates network based on the new definition file
     """
-    def __init__(self, names, devices, network, monitors):
+    def __init__(self, names, devices, network, monitors, scanner):
         self.names = names
         self.devices = devices
         self.network = network
         self.monitors = monitors
+        self.scanner = scanner
     
     def list_of_switches(self):
         """Returns list of switch names (strings)
