@@ -927,7 +927,7 @@ class Parser:
 
         for monitor in monitors_list:
             device_name = monitor[0].id
-            port_name = monitor[3].id if len(monitor) == 3 else None
+            port_name = monitor[2].id if len(monitor) == 3 else None
             error_code = self.monitors.make_monitor(device_name, port_name)
 
             if self.semantic_error_handler.handle_error(error_code, monitor):
