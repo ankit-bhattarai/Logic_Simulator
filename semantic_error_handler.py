@@ -242,7 +242,7 @@ class SemanticErrorHandler:
         for device_id in self.devices.find_devices():
             device = self.devices.get_device(device_id)
             for input_id in device.inputs:
-                if self.get_connected_output(device_id, input_id) is None:
+                if self.network.get_connected_output(device_id, input_id) is None:
                     devices.append(self.names.get_name_string(device_id))
         
         self.scanner.print_error(symbol, 0, "One or more inputs are left unconnected for the following devices: {}".format(devices))
