@@ -588,13 +588,13 @@ class Gui(wx.Frame):
     on_text_box(self, event): Event handler for when the user enters text.
     """
 
-    def __init__(self, title, path, names, devices, network, monitors):
+    def __init__(self, title, path, names, devices, network, monitors, scanner):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(800, 600))
 
         # File path for circuit file which can be chosen from the GUI
         self.file_path = None
-        guiint = GuiInterface(names, devices, network, monitors)
+        guiint = GuiInterface(names, devices, network, monitors, scanner)
         # Configure the file menu
         fileMenu = wx.Menu()
         helpMenu = wx.Menu()
