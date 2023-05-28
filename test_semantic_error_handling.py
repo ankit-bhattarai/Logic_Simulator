@@ -6,6 +6,7 @@ from devices import Devices
 from network import Network
 from monitors import Monitors
 from scanner import Scanner, Symbol
+from parse import Parser
 from semantic_error_handler import SemanticErrorHandler
 
 
@@ -39,6 +40,15 @@ def new_scanner(new_names):
     scanner = Scanner("file_for_test_semantic_error_handling.txt", new_names)
     scanner.print_error = MagicMock()
     return scanner
+
+
+@pytest.fixture
+def new_parser(new_names, new_devices, new_network, new_monitors, new_scanner):
+    """Return a new parser instance."""
+    parser = Parser(new_names, new_devices, new_network,
+                    new_monitors, new_scanner)
+    parser.parse_network()  # Important to build the network
+    return parser
 
 
 @pytest.fixture
@@ -104,12 +114,20 @@ def I1_pin():
 @pytest.fixture
 def I3_pin():
     """Return an I3 pin symbol."""
-    return Symbol('I3', 99, 99, 99)
+    id = new_names.lookup(['I3'])[0]
+    return Symbol('I3', id, 99, 99)
 
 
 @pytest.fixture
 def clear_pin():
     return Symbol('CLEAR', 10, 5, 18)
+
+
+@pytest.fixture
+def and1(new_names):
+    """Return an and symbol."""
+    id = new_names.lookup(['and1'])[0]
+    return Symbol('and1', id, 100, 100)
 
 
 @pytest.fixture
@@ -269,3 +287,67 @@ def test_display_input_connected_error(new_semantic_error_handler, list_of_symbo
 #         list_display_port_absent_error_output)
 #     new_scanner.print_error.assert_called_with(I3_pin, 0,
 #                                                "Port I3 is not defined for device nor1.")
+
+
+@pytest.fixture
+def list_display_device_absent_error_monitor_2(and1, dot, I1_pin):
+    """Return a list of symbols which will have a device absent error on the monitor."""
+    return [and1, dot, I1_pin]
+
+
+@pytest.fixture
+def list_display_device_absent_error_connection_input(and1, arrow, xor1, dot,
+                                                      I1_pin):
+    """Return a list of symbols which have a device absent error on the connection from the input."""
+    return [and1, arrow, xor1, dot, I1_pin]
+
+
+@pytest.fixture
+def list_display_device_absent_error_connection_output(xor1, arrow, and1, dot, I1_pin):
+    """Return a list of symbols which will have a device absent error on the connection from the output."""
+    return [xor1, arrow, and1, dot, I1_pin]
+
+
+def test_display_device_absent_error_monitor_1(new_semantic_error_handler,
+                                               new_scanner, and1):
+    """Test the display_device_absent_error method for the monitor."""
+    new_semantic_error_handler.display_device_absent_error(
+        [and1])
+    new_scanner.print_error.assert_called_with(and1, 0,
+                                               "Device and1 is not defined")
+
+
+def test_display_device_absent_error_monitor_2(new_semantic_error_handler,
+                                               list_display_device_absent_error_monitor_2,
+                                               new_scanner, and1):
+    new_semantic_error_handler.display_device_absent_error(
+        list_display_device_absent_error_monitor_2)
+    new_scanner.print_error.assert_called_with(and1, 0,
+                                               "Device and1 is not defined")
+
+
+def test_display_device_absent_error_connection_input(new_semantic_error_handler,
+                                                      list_display_device_absent_error_connection_input,
+                                                      new_scanner, and1, new_parser):
+    """Test the display_device_absent_error method for the input connection."""
+    parser = new_parser
+    # The parser must be initialised for the devices to be built for the
+    # errors which check if a device exists or not to be triggered.
+    new_semantic_error_handler.display_device_absent_error(
+        list_display_device_absent_error_connection_input)
+    new_scanner.print_error.assert_called_with(and1, 0,
+                                               "Device and1 is not defined")
+
+
+def test_display_device_absent_error_connection_otuput(new_semantic_error_handler,
+                                                       list_display_device_absent_error_connection_output,
+                                                       new_scanner, and1, xor1,
+                                                       new_parser):
+    """Test the display_device_absent_error method for the output connection."""
+    parser = new_parser
+    # The parser must be initialised for the devices to be built for the
+    # errors which check if a device exists or not to be triggered.
+    new_semantic_error_handler.display_device_absent_error(
+        list_display_device_absent_error_connection_output)
+    new_scanner.print_error.assert_called_with(and1, 0,
+                                               "Device and1 is not defined")
