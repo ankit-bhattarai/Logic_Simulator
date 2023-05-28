@@ -246,4 +246,26 @@ def test_display_input_connected_error(new_semantic_error_handler, list_of_symbo
                                                "A signal is already connected to input dtype1.CLEAR. Only one signal must be connected to an input.")
 
 
+# @pytest.fixture
+# def list_display_port_absent_error_output(switch1, arrow, nor1, dot, I3_pin):
+#     """Return a list of symbols which will have a port absent error on the output."""
+#     return [switch1, arrow, nor1, dot, I3_pin]
 
+
+# @pytest.fixture
+# def list_display_port_absent_error_input(nor1, dot, qbar_pin, arrow, xor1, I1_pin):
+#     """Return a list of symbols which will have a port absent error on the input."""
+#     return [nor1, dot, qbar_pin, arrow, xor1, dot, I1_pin]
+
+
+# def test_display_port_absent_error(new_semantic_error_handler, list_display_port_absent_error_output,
+#                                    list_display_port_absent_error_input, new_scanner, I3_pin, qbar_pin):
+#     """Test the display_port_absent_error method."""
+#     new_semantic_error_handler.display_port_absent_error(
+#         list_display_port_absent_error_input)
+#     new_scanner.print_error.assert_called_with(qbar_pin, 0,
+#                                                "Port QBAR is not defined for device nor1.")
+#     new_semantic_error_handler.display_port_absent_error(
+#         list_display_port_absent_error_output)
+#     new_scanner.print_error.assert_called_with(I3_pin, 0,
+#                                                "Port I3 is not defined for device nor1.")
