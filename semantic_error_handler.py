@@ -180,8 +180,9 @@ class SemanticErrorHandler:
         input_name = self.get_devices_strings(labelled_symbols)[1]
 
         error_message = f"A signal is already connected to input {input_name}. Only one signal must be connected to an input."
+        # Pointing at the input pin where the error is
         self.scanner.print_error(
-            labelled_symbols["Second device"], 0, error_message)
+            labelled_symbols["Second port"], 0, error_message)
 
     def display_port_absent_error(self, symbols):
         """Prints the port absent error.
