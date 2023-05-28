@@ -130,3 +130,31 @@ def test_get_labelled_symbols(new_semantic_error_handler, list_of_symbols_1, lis
         list_of_symbols_1) == first_labelled_dictionary
     assert error_handler.get_labelled_symbols(
         list_of_symbols_2) == second_labelled_dictionary
+
+
+@pytest.fixture
+def devices_string_first_labelled_dictionary():
+    """Return the string names from the first labelled dictionary."""
+    output = "switch1"
+    input = "dtype1.DATA"
+    return output, input
+
+
+@pytest.fixture
+def devices_string_second_labelled_dictionary():
+    """Return the string names from the second labelled dictionary."""
+    output = "dtype1.QBAR"
+    input = "xor1.I1"
+    return output, input
+
+
+def test_get_devices_strings(devices_string_first_labelled_dictionary,
+                             first_labelled_dictionary,
+                             second_labelled_dictionary,
+                             devices_string_second_labelled_dictionary,
+                             new_semantic_error_handler):
+    """Test the get_devices_string method."""
+    assert new_semantic_error_handler.get_devices_strings(first_labelled_dictionary) == \
+        devices_string_first_labelled_dictionary
+    assert new_semantic_error_handler.get_devices_strings(second_labelled_dictionary) == \
+        devices_string_second_labelled_dictionary
