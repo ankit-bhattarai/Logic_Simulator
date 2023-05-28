@@ -42,6 +42,18 @@ class Symbol:
         self.line_number = line_number
         self.column_number = column_number
 
+    def __eq__(self, other):
+        """Return True if symbols are equal."""
+        if self.id != other.id:
+            return False
+        if self.type != other.type:
+            return False
+        if self.line_number != other.line_number:
+            return False
+        if self.column_number != other.column_number:
+            return False
+        return True
+
     @staticmethod
     def is_string(string):
         """Return True if string is alphanumeric plus underscore.
