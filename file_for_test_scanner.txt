@@ -1,0 +1,6 @@
+DEVICES: SWITCH switch1 1,
+         XOR xor1;
+# This is a comment
+CONNECT: switch1 > xor1.I1;
+MONITOR: switch1;
+END;
