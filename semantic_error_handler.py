@@ -160,8 +160,11 @@ class SemanticErrorHandler:
         output_name, input_name = self.get_devices_strings(labelled_symbols)
 
         error_message = f"Output {output_name} is connected to output {input_name}. Connections must be from outputs to inputs."
+        # Since the syntax rules say that an input pin must have a pin
+        # This function will thus point at the pin where it is an output, but
+        # the system expects an input
         self.scanner.print_error(
-            labelled_symbols["Second device"], 0, error_message)
+            labelled_symbols["Second port"], 0, error_message)
 
     def display_input_connected_error(self, symbols):
         """Prints the input connected error.
