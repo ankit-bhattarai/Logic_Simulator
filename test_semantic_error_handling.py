@@ -90,6 +90,12 @@ def xor1():
 
 
 @pytest.fixture
+def nor1():
+    """Return a nor symbol."""
+    return Symbol('nor1', 24, 2, 14)
+
+
+@pytest.fixture
 def I1_pin():
     """Return an I1 pin symbol."""
     return Symbol('I1', 30, 4, 70)
@@ -119,6 +125,12 @@ def second_labelled_dictionary(dtype1, qbar_pin, xor1, I1_pin):
     """Return the second labelled dictionary."""
     return {"First device": dtype1, "First port": qbar_pin,
             "Second device": xor1, "Second port": I1_pin}
+
+
+@pytest.fixture
+def input_input_error_list(nor1, dot, I1_pin, arrow, xor1):
+    """Return a list of symbols which will have an input-input error."""
+    return [nor1, dot, I1_pin, arrow, xor1, dot, I1_pin]
 
 
 def test_get_labelled_symbols(new_semantic_error_handler, list_of_symbols_1, list_of_symbols_2,
@@ -180,3 +192,12 @@ def test_display_device_present_error(new_semantic_error_handler, switch1,
     new_scanner.print_error.assert_called_with(
         switch1, 0,
         "Device names are not unique. switch1 is already the name of a device")
+
+
+def test_display_input_input_error(new_semantic_error_handler,
+                                   input_input_error_list, new_scanner, nor1):
+    """Test the display_input_input_error method."""
+    new_semantic_error_handler.display_input_input_error(
+        input_input_error_list)
+    new_scanner.print_error.assert_called_with(nor1, 0,
+                                               "Input nor1.I1 is connected to input xor1.I1. Connections must be from outputs to inputs.")
