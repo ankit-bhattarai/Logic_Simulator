@@ -26,7 +26,7 @@ def used_names(name_string_list):
 
 
 def test_unique_error_codes(used_names):
-    """Test if get_string returns the expected string."""
+    """Test if unique_error_codes returns the expected list."""
     assert used_names.unique_error_codes(3) == range(2, 5)
     with pytest.raises(TypeError):
         used_names.get_name_string('hello')
@@ -39,7 +39,7 @@ def test_unique_error_codes(used_names):
     (3, None)
 ])
 def test_get_name_string(used_names, new_names, name_id, expected_string):
-    """Test if get_string returns the expected string."""
+    """Test if get_name_string returns the expected string."""
     # Name is present
     assert used_names.get_name_string(name_id) == expected_string
     # Name is absent
@@ -59,5 +59,5 @@ def test_lookup(used_names, name_string_list):
     (None, "James")
 ])
 def test_query(used_names, name_strs, expected_ids):
-    """Test if lookup returns the expected index."""
+    """Test if query returns the expected ids."""
     assert used_names.query(name_strs) == expected_ids

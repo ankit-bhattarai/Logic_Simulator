@@ -93,5 +93,5 @@ def test_determine_type(new_symbol, string, expected_output):
     ('a!a', (1, 2))
 ])
 def test_index_not_name(new_symbol, string, expected_output):
-    """Test if determine_type returns the expected string."""
+    """Test if index_not_name returns the expected tuple."""
     assert new_symbol.index_not_name(string) == expected_output
