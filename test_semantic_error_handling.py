@@ -102,6 +102,17 @@ def I1_pin():
 
 
 @pytest.fixture
+def I3_pin():
+    """Return an I3 pin symbol."""
+    return Symbol('I3', 99, 99, 99)
+
+
+@pytest.fixture
+def clear_pin():
+    return Symbol('CLEAR', 10, 5, 18)
+
+
+@pytest.fixture
 def list_of_symbols_1(switch1, arrow, dtype1, dot, data_pin):
     """Return the first list of symbols."""
     return [switch1, arrow, dtype1, dot, data_pin]
@@ -218,3 +229,21 @@ def test_output_output_error(new_semantic_error_handler, list_output_output_erro
     # expects to be an input, but is actually an output.
     new_scanner.print_error.assert_called_with(qbar_pin, 0,
                                                "Output xor1 is connected to output dtype1.QBAR. Connections must be from outputs to inputs.")
+
+
+@pytest.fixture
+def list_of_symbols_input_connected_error(switch1, arrow, dtype1, dot, clear_pin):
+    """Return a list of symbols which will have an input connected error."""
+    return [switch1, arrow, dtype1, dot, clear_pin]
+
+
+def test_display_input_connected_error(new_semantic_error_handler, list_of_symbols_input_connected_error,
+                                       new_scanner, clear_pin):
+    """Test the display_input_connected_error method."""
+    new_semantic_error_handler.display_input_connected_error(
+        list_of_symbols_input_connected_error)
+    new_scanner.print_error.assert_called_with(clear_pin, 0,
+                                               "A signal is already connected to input dtype1.CLEAR. Only one signal must be connected to an input.")
+
+
+
