@@ -308,6 +308,13 @@ def list_display_device_absent_error_connection_output(xor1, arrow, and1, dot, I
     return [xor1, arrow, and1, dot, I1_pin]
 
 
+@pytest.fixture
+def list_display_device_absent_error_connection_no_call(dtype1, dot, qbar_pin,
+                                                        arrow, xor1, I1_pin):
+    """Return a list of symbols which will not have a device absent error on the connection."""
+    return [dtype1, dot, qbar_pin, arrow, xor1, dot, I1_pin]
+
+
 def test_display_device_absent_error_monitor_1(new_semantic_error_handler,
                                                new_scanner, and1):
     """Test the display_device_absent_error method for the monitor."""
@@ -351,3 +358,15 @@ def test_display_device_absent_error_connection_otuput(new_semantic_error_handle
         list_display_device_absent_error_connection_output)
     new_scanner.print_error.assert_called_with(and1, 0,
                                                "Device and1 is not defined")
+
+
+def test_display_device_absent_error_no_call(new_semantic_error_handler,
+                                             list_display_device_absent_error_connection_no_call,
+                                             new_scanner, and1, new_parser):
+    """Test the display_device_absent_error method to ensure it does not call print_error."""
+    parser = new_parser
+
+    new_semantic_error_handler.display_device_absent_error(
+        list_display_device_absent_error_connection_no_call)
+    new_scanner.print_error.assert_not_called()
+    # If all the devices do exist, then print_error should not be called.
