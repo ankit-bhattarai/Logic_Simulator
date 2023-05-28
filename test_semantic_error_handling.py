@@ -48,49 +48,49 @@ def new_semantic_error_handler(new_names, new_devices, new_network, new_monitors
 @pytest.fixture
 def switch1():
     """Return a switch symbol."""
-    return Symbol('SWITCH1', 8, 2, 1)
+    return Symbol('switch1', 16, 1, 17)
 
 
 @pytest.fixture
 def arrow():
     """Return an arrow symbol."""
-    return Symbol('>', 9, 2, 15)
+    return Symbol('>', 28, 4, 18)
 
 
 @pytest.fixture
 def dtype1():
     """Return a dtype symbol."""
-    return Symbol('DTYPE1', 10, 3, 1)
+    return Symbol('dtype1', 23, 1, 68)
 
 
 @pytest.fixture
 def dot():
     """Return a dot symbol."""
-    return Symbol('.', 11, 3, 15)
+    return Symbol('.', 29, 4, 26)
 
 
 @pytest.fixture
 def data_pin():
     """Return a data pin symbol."""
-    return Symbol('DATA', 12, 4, 1)
+    return Symbol('DATA', 11, 4, 27)
 
 
 @pytest.fixture
 def qbar_pin():
     """Return a qbar pin symbol."""
-    return Symbol('QBAR', 13, 5, 1)
+    return Symbol('QBAR', 13, 6, 8)
 
 
 @pytest.fixture
 def xor1():
     """Return an xor symbol."""
-    return Symbol('XOR1', 14, 6, 1)
+    return Symbol('xor1', 25, 5, 35)
 
 
 @pytest.fixture
 def I1_pin():
     """Return an I1 pin symbol."""
-    return Symbol('I1', 15, 6, 15)
+    return Symbol('I1', 30, 4, 70)
 
 
 @pytest.fixture
