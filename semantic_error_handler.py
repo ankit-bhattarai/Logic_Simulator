@@ -195,32 +195,33 @@ class SemanticErrorHandler:
         None
         """
         labelled_symbols = self.get_labelled_symbols(symbols)
+
         first_device = self.devices.get_device(
             labelled_symbols["First device"].id)
         second_device = self.devices.get_device(
             labelled_symbols["Second device"].id)
+                        
+        first_port_id = labelled_symbols['First port'].id if labelled_symbols['First port'] else None
+        second_port_id = labelled_symbols["Second port"].id if labelled_symbols["Second port"] else None
 
-        first_port_id = labelled_symbols['First port'].id
-        second_port_id = labelled_symbols["Second port"].id
+        if first_port_id and first_port_id not in first_device.outputs:
+            first_port_name = self.names.get_name_string(first_port_id)
+            first_device_name = self.names.get_name_string(labelled_symbols["First device"].id)
 
-        first_port_name = self.names.get_name_string(first_port_id)
-        second_port_name = self.names.get_name_string(second_port_id)
-        first_device_name = self.names.get_name_string(
-            labelled_symbols["First device"].id)
-        second_device_name = self.names.get_name_string(
-            labelled_symbols["Second device"].id)
-
-        if first_port_id not in first_device.outputs:
             error_message = "Port {} is not defined for device {}".format(
                 first_port_name, first_device_name)
             self.scanner.print_error(
                 labelled_symbols["First port"], 0, error_message)
+        
+        if second_port_id and second_port_id not in second_device.inputs:
+            second_port_name = self.names.get_name_string(second_port_id)
+            second_device_name = self.names.get_name_string(labelled_symbols["Second device"].id)
 
-        if second_port_id not in second_device.inputs:
             error_message = "Port {} is not defined for device {}".format(
                 second_port_name, second_device_name)
             self.scanner.print_error(
                 labelled_symbols["Second port"], 0, error_message)
+            
 
     def display_device_absent_error(self, symbols):
         """Prints the device absent error.
