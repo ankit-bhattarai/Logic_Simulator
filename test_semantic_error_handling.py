@@ -1,6 +1,6 @@
 """Test the semantic_error_handling module."""
 import pytest
-
+from unittest.mock import MagicMock
 from names import Names
 from devices import Devices
 from network import Network
@@ -36,7 +36,9 @@ def new_monitors(new_names, new_devices, new_network):
 @pytest.fixture
 def new_scanner(new_names):
     """Return a new scanner instance."""
-    return Scanner("file_for_test_semantic_error_handling.txt", new_names)
+    scanner = Scanner("file_for_test_semantic_error_handling.txt", new_names)
+    scanner.print_error = MagicMock()
+    return scanner
 
 
 @pytest.fixture
@@ -158,3 +160,23 @@ def test_get_devices_strings(devices_string_first_labelled_dictionary,
         devices_string_first_labelled_dictionary
     assert new_semantic_error_handler.get_devices_strings(second_labelled_dictionary) == \
         devices_string_second_labelled_dictionary
+
+
+def test_display_device_present_error(new_semantic_error_handler, switch1,
+                                      new_scanner):
+    """Test the display_device_present_error method.
+
+    The test file is clean and doesn't contain any duplicate device
+    names, this method just checks that semantic_error_handler's
+    display_device_present_error method calls scanner's print_error
+    with the correct arguments properly as that is all which the method does. 
+    switch1 is the example device name which it is tested with.
+
+    The scanner's print_error method is mocked to check that it is called with
+    the correct arguments. As the scanner method is already tested, it prevents
+    the same test from being repeated here.
+    """
+    new_semantic_error_handler.display_device_present_error(switch1)
+    new_scanner.print_error.assert_called_with(
+        switch1, 0,
+        "Device names are not unique. switch1 is already the name of a device")
