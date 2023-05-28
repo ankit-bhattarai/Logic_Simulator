@@ -201,3 +201,20 @@ def test_display_input_input_error(new_semantic_error_handler,
         input_input_error_list)
     new_scanner.print_error.assert_called_with(nor1, 0,
                                                "Input nor1.I1 is connected to input xor1.I1. Connections must be from outputs to inputs.")
+
+
+@pytest.fixture
+def list_output_output_error(xor1, arrow, dtype1, dot, qbar_pin):
+    """Return a list of symbols which will have an output-output error."""
+    return [xor1, arrow, dtype1, dot, qbar_pin]
+
+
+def test_output_output_error(new_semantic_error_handler, list_output_output_error,
+                             new_scanner, qbar_pin):
+    """Test the display_output_output_error method."""
+    new_semantic_error_handler.display_output_output_error(
+        list_output_output_error)
+    # The method is supposed to point at the second device where the system
+    # expects to be an input, but is actually an output.
+    new_scanner.print_error.assert_called_with(qbar_pin, 0,
+                                               "Output xor1 is connected to output dtype1.QBAR. Connections must be from outputs to inputs.")
