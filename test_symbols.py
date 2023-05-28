@@ -80,3 +80,18 @@ def test_is_integer(new_symbol, string, expected_bool):
 def test_determine_type(new_symbol, string, expected_output):
     """Test if determine_type returns the expected string."""
     assert new_symbol.determine_type(string) == expected_output
+
+
+@pytest.mark.parametrize("string, expected_output", [
+    ('a', None),
+    ('a1', None),
+    ('a_1', None),
+    ('1a', (0, 1)),
+    ('_a', (0, 1)),
+    ('aA', (1, 3)),
+    ('a_1AB', (3, 3)),
+    ('a!a', (1, 2))
+])
+def test_index_not_name(new_symbol, string, expected_output):
+    """Test if determine_type returns the expected string."""
+    assert new_symbol.index_not_name(string) == expected_output
