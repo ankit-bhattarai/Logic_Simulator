@@ -4,7 +4,12 @@ Classes
 -------
 GuiInterface - interface between GUI and devices, names, network, monitors, parser and scanner.
 """
-
+from names import Names
+from devices import Devices
+from network import Network
+from monitors import Monitors
+from scanner import Scanner
+from parse import Parser
 
 class GuiInterface():
     """
@@ -201,6 +206,10 @@ class GuiInterface():
     def update_network(self, definition_file_path):
         """Updates network based on the new definition file.
 
+        Method tries to build the network with the new definition file.
+        If the network is built successfully, the current network is updated.
+        Otherwise, the current network is left unchanged.
+        
         Parameters
         ----------
         definition_file_path: string
@@ -208,7 +217,24 @@ class GuiInterface():
 
         Returns
         -------
-        None
+        success: bool
+            True if the network is updated successfully, False otherwise
         """
+        new_names = Names()
+        new_devices = Devices(new_names)
+        new_network = Network(new_names, new_devices)
+        new_monitors = Monitors(new_names, new_devices, new_network)
+        new_scanner = Scanner(definition_file_path, new_names)
+        new_parser = Parser(new_names, new_devices, new_network, new_monitors, new_scanner)
+        if new_parser.parse_network():
+            # If able to parse the network and build it currently, update the network
+            self.names = new_names
+            self.devices = new_devices
+            self.network = new_network
+            self.monitors = new_monitors
+            self.scanner = new_scanner
+            return True
+        return False # Don't update the network if the new definition file is invalid
+        
         
 

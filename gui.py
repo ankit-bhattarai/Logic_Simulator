@@ -672,6 +672,13 @@ class Gui(wx.Frame):
             # Proceed loading the file chosen by the user
             self.file_path = openFileDialog.GetPath()
             print("Path: ", self.file_path)
+            success = self.guiint.update_network(self.file_path)
+            if success:
+                self.canvas.render("Circuit loaded successfully.")
+                self.canvas.render_signals()
+            else:
+                self.canvas.render("Circuit could not be loaded.")
+
 
         elif Id == self.help_id_1:
             with open("EBNF.txt", "r") as f:
