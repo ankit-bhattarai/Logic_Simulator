@@ -212,7 +212,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         """Handle the canvas resize event."""
         # Forces reconfiguration of the viewport, modelview and projection
         # matrices on the next paint event
-        self.reset_view() # Rest the zoom and pan whenever screen is resized
+        self.reset_view()  # Rest the zoom and pan whenever screen is resized
         self.init = False
 
     def on_mouse(self, event):
@@ -285,12 +285,11 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.pan_y = 0
         self.init = False
 
-
     def reset_zoom(self, event=None):
         """Reset the zoom."""
         self.zoom = 1.0
         self.init = False
-    
+
     def reset_view(self, event=None):
         """Reset the view to the initial view and zoom."""
         self.reset_pan()
@@ -678,19 +677,21 @@ class Gui(wx.Frame):
                 self.canvas.render_signals()
             else:
                 error_display = "Invalid circuit definition file.\n"
-                error_display += "Errors: \n"
+                error_display += "Errors: \n\n"
                 error_display += success
-                #box = wx.MessageDialog(self, error_display, caption="Error Messages", style=wx.NO_BORDER | wx.TE_MULTILINE | wx.TE_DONTWRAP | wx.HSCROLL)
-                box = MyDialog(self, message=error_display)
-
+                box = MyDialog(self, message=error_display,
+                               title="Erros Present")
                 box.ShowModal()
                 box.Destroy()
-                # pop_up = PopUpWindow(self, error_display)
-                # pop_up.Show()
 
         elif Id == self.help_id_1:
             with open("EBNF.txt", "r") as f:
-                wx.MessageBox(f.read(), "EBNF Syntax")
+                # wx.MessageBox(f.read(), "EBNF Syntax")
+                box = MyDialog(self, message=f.read(),
+                               title="EBNF Syntax", allow_wrap=False)
+                box.ShowModal()
+                box.Destroy()
+
         elif Id == self.help_id_2:
             # print("Help: User guide required")
             wx.MessageBox("User Guide", "User Guide")
@@ -699,32 +700,27 @@ class Gui(wx.Frame):
         elif Id == self.def_file_show_id:
             file_path = self.guiint.scanner.path
             with open(file_path, "r") as f:
-                wx.MessageBox(f.read(), "Definition File")
-
-
-class PopUpWindow(wx.PopupWindow):
-    def __init__(self, parent, message):
-        self.parent = parent
-        super().__init__(parent, wx.FRAME_FLOAT_ON_PARENT)
-        self.panel = wx.Panel(self)
-        self.button = wx.Button(self.panel, label="Close", pos=(10,10))
-        self.Bind(wx.EVT_BUTTON, self.OnClose, self.button)
-        self.Bind(wx.EVT_LEFT_DOWN, self.OnClose)
-        self.SetSize((100, 100))
-
-    def OnClose(self, event):
-        self.Show(False)
+                box = MyDialog(self, message=f.read(),
+                               title="Definition File", editable=True)
+                box.ShowModal()
+                box.Destroy()
 
 
 class MyDialog(wx.Dialog):
-    def __init__(self, parent, message):
-        super(MyDialog, self).__init__(parent, title="Error Message", size=(500, 500))
-        self.text = wx.TextCtrl(self, value=message, style=wx.TE_MULTILINE| wx.TE_DONTWRAP | wx.HSCROLL)
-        self.text.SetEditable(False)
+    def __init__(self, parent, message, title, editable=False, allow_wrap=False):
+        super(MyDialog, self).__init__(
+            parent, title=title, size=(500, 500))
+        if allow_wrap:
+            self.text = wx.TextCtrl(self, value=message, style=wx.TE_MULTILINE)
+        else:
+            self.text = wx.TextCtrl(
+                self, value=message, style=wx.TE_MULTILINE | wx.TE_DONTWRAP | wx.HSCROLL)
+        self.text.SetEditable(editable)
         self.text.SetInsertionPoint(0)
 
         # Create a monospaced font and set it for the text control
-        font = wx.Font(10, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        font = wx.Font(10, wx.FONTFAMILY_TELETYPE,
+                       wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
         self.text.SetFont(font)
 
         sizer = wx.BoxSizer(wx.VERTICAL)
