@@ -1,0 +1,1 @@
+DEVICES: SWITCH switch1 1,

@@ -1013,9 +1013,13 @@ class Parser:
         semantically correct, False otherwise.
         """
         network_dict = self.network_dict()
-        if network_dict:
+        if self.num_of_errors == 0:
             build_network = self.build_network(network_dict=network_dict)
         else:
+            last_symbol = self.scanner.list_of_symbols[-1]
+            last_symbol_string = self.names.get_name_string(last_symbol.id)
+            error_message = f"{self.num_of_errors} syntax errors detected before the last symbol"
+            self.scanner.print_error(last_symbol, len(last_symbol_string) - 1, error_message)
             return False
 
         return build_network

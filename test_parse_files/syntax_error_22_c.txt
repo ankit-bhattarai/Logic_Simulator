@@ -1,0 +1,2 @@
+DEVICES: SWITCH switch1 1, SWITCH switch2 0, CLOCK clock1 2, DTYPE dtype1,
+         NOR nor1 2, XOR xor1;

@@ -11,6 +11,7 @@ from parse import Parser
 
 """
 Methods involved in syntax error processing:
+
 - check_name - tested through test_name_error_identification
 - check_clock - tested through test_syntax_error_identification
 - check_switch  - tested through test_syntax_error_identification
@@ -23,7 +24,7 @@ Methods involved in syntax error processing:
 - monitor - tested through test_syntax_error_identification
 - monitor_list - tested through test_syntax_error_identification
 - display_syntax_error - tested through test_syntax_error_identification
-- network_dict - TODO: test this method directly and assert dictionary produced + TOTAL errors reported
+- network_dict - tested through test_build_network
 """
 
 syntax_error_types = {
@@ -36,7 +37,7 @@ syntax_error_types = {
     7: "ValueError: The required number of parameters for a device of the type XOR/DTYPE is 2. Should also check for incorrect placement or missing punctuations.",
     8: "NameError: 1st parameter of a device should be the keyword for that device.",
     9: "TypeError: Device name should be a lowercase alphanumeric string (including '_').",
-    10: "ValueError: Clock speed should be an integer.",  # change error message?
+    10: "ValueError: Clock speed should be a positive integer.",
     11: "ValueError: Switch state should be either 0 or 1.",
     12: "ValueError: Number of inputs for an AND/NAND/OR/NOR device should be between 1 and 16.",
     13: "TypeError: Connections should be separated by ',' and ended by ';'. Should also check for excessive parameters of a connection.",
@@ -49,6 +50,7 @@ syntax_error_types = {
     20: "NameError: DEVICES, CONNECT and MONITOR should be followed by ':'.",
     21: "NameError: 'END' should be followed by ';'.",
     22: "RuntimeError: File ends too early. Should check for missing sections."}
+
 
 name_errors = ['First character is not a lowercase letter',
                'Specific character is not a letter, digit or underscore',
@@ -108,14 +110,35 @@ def test_name_error_identification(definition_file, name_error_indices, error_sy
     new_scanner.print_error.assert_has_calls(expected_calls, any_order=False)
 
 
-@pytest.mark.parametrize("definition_file, error_symbol_index",
-                         [("", 0)])
-def test_early_file_termination_identification(
-        definition_file, error_symbol_index,):
+@pytest.mark.parametrize("definition_file", 
+                         [("test_parse_files/syntax_error_22_a.txt"),
+                         ("test_parse_files/syntax_error_22_b.txt"),
+                         ("test_parse_files/syntax_error_22_c.txt"),
+                         ("test_parse_files/syntax_error_22_d.txt"),
+                         ("test_parse_files/syntax_error_22_e.txt"),
+                         ("test_parse_files/syntax_error_22_f.txt"),
+                         ("test_parse_files/syntax_error_22_g.txt"),
+                         ("test_parse_files/syntax_error_22_h.txt")])
+
+
+def test_early_termination_error_identification(definition_file, new_names, 
+                                                new_devices, new_network, 
+                                                new_monitors):
     """
     Test that the correct syntax error is identified when the file ends too early for several early termination locations.
     """
-    pass
+    new_scanner = Scanner(definition_file, new_names)
+    new_scanner.print_error = MagicMock()
+    new_parser = Parser(new_names,
+                        new_devices,
+                        new_network,
+                        new_monitors,
+                        new_scanner)
+
+    new_parser.network_dict()
+
+    erronous_symbol = new_scanner.list_of_symbols[-1]
+    new_scanner.print_error.assert_called_once_with(erronous_symbol, 0, syntax_error_types[22])
 
 
 @pytest.mark.parametrize("definition_file, error_type, error_symbol_indices",
@@ -140,17 +163,17 @@ def test_early_file_termination_identification(
                           ("test_parse_files/syntax_error_20.txt", 20, [1, 79]),
                           ("test_parse_files/syntax_error_21.txt", 21, [95])])
 
+
 def test_syntax_error_identification(definition_file, error_type, error_symbol_indices,
                                      new_names, new_devices, new_network, new_monitors):
     """Test that the correct syntax error is identified."""
     new_scanner = Scanner(definition_file, new_names)
     new_scanner.print_error = MagicMock()
-    new_parser = Parser(
-        new_names,
-        new_devices,
-        new_network,
-        new_monitors,
-        new_scanner)
+    new_parser = Parser(new_names,
+                        new_devices,
+                        new_network,
+                        new_monitors,
+                        new_scanner)
 
     new_parser.network_dict()
     expected_calls = []
@@ -160,7 +183,43 @@ def test_syntax_error_identification(definition_file, error_type, error_symbol_i
         error_message = syntax_error_types[error_type]
         expected_call = call(erronous_symbol, 0, error_message)
         expected_calls.append(expected_call)
+
     # Assert that the right errors are passed for printings
     new_scanner.print_error.assert_has_calls(expected_calls, any_order=False)
     # Assert that no other errors are passed for printing
     assert new_scanner.print_error.call_count == len(error_symbol_indices)
+
+
+
+def test_build_network_dict_1(new_names, new_devices, new_network, new_monitors):
+    """Test that the network dictionary, used later to check semantics and
+        to build the network, is built correctly."""
+
+
+
+def test_build_network_dict_2(new_names, new_devices, new_network, new_monitors):
+    """Test that the network dictionary, used later to check semantics and
+        to build the network, is built correctly."""
+    
+
+
+def test_build_network_dict_3(new_names, new_devices, new_network, new_monitors):
+    """Test that the network dictionary, used later to check semantics and
+        to build the network, is built correctly."""
+    
+
+
+def test_build_network_dict_4(new_names, new_devices, new_network, new_monitors):
+    """Test that the network dictionary, used later to check semantics and
+        to build the network, is built correctly."""
+
+
+
+def test_build_network_dict_5(new_names, new_devices, new_network, new_monitors):
+    """Test that the network dictionary, used later to check semantics and
+        to build the network, is built correctly."""
+
+
+def test_identify_total_errors(new_names, new_devices, new_network, new_monitors):
+    """Test that the total number of errors is identified correctly."""
+    # 5 clean, 5 unclean
