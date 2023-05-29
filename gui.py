@@ -59,6 +59,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                                      wxcanvas.WX_GL_DOUBLEBUFFER,
                                      wxcanvas.WX_GL_DEPTH_SIZE, 16, 0])
         GLUT.glutInit()
+        self.parent = parent
         self.guiint = guiint
         self.init = False
         self.context = wxcanvas.GLContext(self)
@@ -209,6 +210,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         """Handle the canvas resize event."""
         # Forces reconfiguration of the viewport, modelview and projection
         # matrices on the next paint event
+        self.reset_view() # Rest the zoom and pan whenever screen is resized
         self.init = False
 
     def on_mouse(self, event):
@@ -274,6 +276,13 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                 GL.glRasterPos2f(x_pos, y_pos)
             else:
                 GLUT.glutBitmapCharacter(font, ord(character))
+
+    def reset_view(self):
+        """Reset the view to the initial view and zoom."""
+        self.pan_x = 0
+        self.pan_y = 0
+        self.zoom = 1.0
+        self.init = False
 
 
 class RightPanel(wx.Panel):
@@ -597,15 +606,19 @@ class Gui(wx.Frame):
         guiint = GuiInterface(names, devices, network, monitors, scanner)
         # Configure the file menu
         fileMenu = wx.Menu()
+        viewMenu = wx.Menu()
         helpMenu = wx.Menu()
         menuBar = wx.MenuBar()
         self.open_id, self.help_id_1, self.help_id_2 = wx.NewIdRef(count=3)
+        self.reset_id = wx.NewIdRef(count=1)
         fileMenu.Append(self.open_id, "&Open")
         fileMenu.Append(wx.ID_ABOUT, "&About")
         fileMenu.Append(wx.ID_EXIT, "&Exit")
+        viewMenu.Append(self.reset_id, "&Reset")
         helpMenu.Append(self.help_id_1, "&EBNF Syntax")
         helpMenu.Append(self.help_id_2, "&User Guide")
         menuBar.Append(fileMenu, "&File")
+        menuBar.Append(viewMenu, "&View")
         menuBar.Append(helpMenu, "&Help")
         self.SetMenuBar(menuBar)
 
@@ -650,3 +663,5 @@ class Gui(wx.Frame):
             print("Help: EBNF Syntax required")
         elif Id == self.help_id_2:
             print("Help: User guide required")
+        elif Id == self.reset_id:
+            self.canvas.reset_view()
