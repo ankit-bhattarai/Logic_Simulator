@@ -59,6 +59,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                                      wxcanvas.WX_GL_DOUBLEBUFFER,
                                      wxcanvas.WX_GL_DEPTH_SIZE, 16, 0])
         GLUT.glutInit()
+        self.parent = parent
         self.guiint = guiint
         self.init = False
         self.context = wxcanvas.GLContext(self)
@@ -76,6 +77,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_PAINT, self.on_paint)
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
+        self.Bind(wx.EVT_MIDDLE_DOWN, self.reset_pan)
+        self.Bind(wx.EVT_RIGHT_DOWN, self.reset_view)
 
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
@@ -209,6 +212,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         """Handle the canvas resize event."""
         # Forces reconfiguration of the viewport, modelview and projection
         # matrices on the next paint event
+        self.reset_view() # Rest the zoom and pan whenever screen is resized
         self.init = False
 
     def on_mouse(self, event):
@@ -275,6 +279,23 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             else:
                 GLUT.glutBitmapCharacter(font, ord(character))
 
+    def reset_pan(self, event=None):
+        """Reset the pan."""
+        self.pan_x = 0
+        self.pan_y = 0
+        self.init = False
+
+
+    def reset_zoom(self, event=None):
+        """Reset the zoom."""
+        self.zoom = 1.0
+        self.init = False
+    
+    def reset_view(self, event=None):
+        """Reset the view to the initial view and zoom."""
+        self.reset_pan()
+        self.reset_zoom()
+
 
 class RightPanel(wx.Panel):
     def __init__(self, parent, guiint):
@@ -311,7 +332,7 @@ class RightPanel(wx.Panel):
         top_sizer.Add(self.cycles_text, 1, wx.EXPAND | wx.ALL, 10)
 
         # Create the spin object
-        self.spin = wx.SpinCtrl(self, wx.ID_ANY, "10", size=wx.Size(120, 10))
+        self.spin = wx.SpinCtrl(self, wx.ID_ANY, "2", size=wx.Size(120, 10))
         # Can't have 0 cycles, default max seems to be 100!
         self.spin.SetMin(1)
         # Bind the spin object
@@ -595,17 +616,23 @@ class Gui(wx.Frame):
         # File path for circuit file which can be chosen from the GUI
         self.file_path = None
         guiint = GuiInterface(names, devices, network, monitors, scanner)
+        self.guiint = guiint
         # Configure the file menu
         fileMenu = wx.Menu()
+        viewMenu = wx.Menu()
         helpMenu = wx.Menu()
         menuBar = wx.MenuBar()
         self.open_id, self.help_id_1, self.help_id_2 = wx.NewIdRef(count=3)
+        self.reset_id, self.def_file_show_id = wx.NewIdRef(count=2)
         fileMenu.Append(self.open_id, "&Open")
         fileMenu.Append(wx.ID_ABOUT, "&About")
         fileMenu.Append(wx.ID_EXIT, "&Exit")
+        viewMenu.Append(self.reset_id, "&Reset")
+        viewMenu.Append(self.def_file_show_id, "&Show Definition File")
         helpMenu.Append(self.help_id_1, "&EBNF Syntax")
         helpMenu.Append(self.help_id_2, "&User Guide")
         menuBar.Append(fileMenu, "&File")
+        menuBar.Append(viewMenu, "&View")
         menuBar.Append(helpMenu, "&Help")
         self.SetMenuBar(menuBar)
 
@@ -645,8 +672,24 @@ class Gui(wx.Frame):
             # Proceed loading the file chosen by the user
             self.file_path = openFileDialog.GetPath()
             print("Path: ", self.file_path)
+            success = self.guiint.update_network(self.file_path)
+            if success:
+                self.canvas.render("Circuit loaded successfully.")
+                self.canvas.render_signals()
+            else:
+                self.canvas.render("Circuit could not be loaded.")
+
 
         elif Id == self.help_id_1:
-            print("Help: EBNF Syntax required")
+            with open("EBNF.txt", "r") as f:
+                wx.MessageBox(f.read(), "EBNF Syntax")
         elif Id == self.help_id_2:
-            print("Help: User guide required")
+            # print("Help: User guide required")
+            wx.MessageBox("User Guide", "User Guide")
+        elif Id == self.reset_id:
+            self.canvas.reset_view()
+        elif Id == self.def_file_show_id:
+            file_path = self.guiint.scanner.path
+            with open(file_path, "r") as f:
+                wx.MessageBox(f.read(), "Definition File")
+
