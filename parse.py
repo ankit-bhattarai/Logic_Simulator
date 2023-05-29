@@ -46,9 +46,9 @@ class Parser:
         self.num_of_errors = 0
         self.syntax_error_types = {
             1: "NameError: File should start with keyword 'DEVICES'",
-            2: "NameError: semi-colon after the last device should be followed by keyword 'CONNECT'.",
-            3: "NameError: semi-colon after the last connection should be followed by keyword 'MONITOR'.",
-            4: "NameError: semi-colon after the last monitor should be followed by keyword 'END'.",
+            2: "NameError: ';' after the last device should be followed by keyword 'CONNECT'.",
+            3: "NameError: ';' after the last connection should be followed by keyword 'MONITOR'.",
+            4: "NameError: ';' after the last monitor should be followed by keyword 'END'.",
             5: "ValueError: There should be at least one device.",
             6: "ValueError: The required number of parameters for a device of the type CLOCK/SWITCH/AND/OR/NAND/NOR is 3. Should also check for incorrect placement or missing punctuations.",
             7: "ValueError: The required number of parameters for a device of the type XOR/DTYPE is 2. Should also check for incorrect placement or missing punctuations.",
@@ -57,16 +57,16 @@ class Parser:
             10: "ValueError: Clock speed should be an integer.",
             11: "ValueError: Switch state should be either 0 or 1.",
             12: "ValueError: Number of inputs for an AND/NAND/OR/NOR device should be between 1 and 16.",
-            13: "TypeError: Connections should be separated by comma and ended by semi-colon. Should also check for excessive parameters of a connection.",
+            13: "TypeError: Connections should be separated by ',' and ended by ';'. Should also check for excessive parameters of a connection.",
             14: "TypeError: Output pins can only be Q or QBAR.",
             15: "TypeError: 2nd parameter of a connection should be '>'.",
             16: "TypeError: 3rd parameter of a connection must be a device name followed by '.input_pin'.",
             17: "NameError: The input pin should be one of the following: I1, I2,...,I16, DATA, CLK, SET, CLEAR.",
-            18: "TypeError: Monitors should be separated by comma and ended by semi-colon. Should also check for excessive parameters of a monitor.",
-            19: "TypeError: Devices should be separated by comma and ended by semi-colon. Should also check for excessive parameters of a device.",
+            18: "TypeError: Monitors should be separated by ',' and ended by ';'. Should also check for excessive parameters of a monitor.",
+            19: "TypeError: Devices should be separated by ',' and ended by ';'. Should also check for excessive parameters of a device.",
             20: "NameError: DEVICES, CONNECT and MONITOR should be followed by ':'.",
             21: "NameError: 'END' should be followed by ';'.",
-            22: "File ends too early. Should check for missing sections."}
+            22: "RuntimeError: File ends too early. Should check for missing sections."}
         self.semantic_error_handler = SemanticErrorHandler(
             self.names, self.devices, self.network, self.monitors, self.scanner)
 
@@ -90,7 +90,7 @@ class Parser:
         """Check the parameters of a clock device.
 
         Update the list of device parameters.
-        Append this list to the list of devicess if no error is detected.
+        Append this list to the list of devices if no error is detected.
         Append None to the list of devices if an error is detected.
 
         Parameters
@@ -122,8 +122,7 @@ class Parser:
             while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
-                    self.display_syntax_error(
-                        22, self.scanner.list_of_symbols[-1])
+                    self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
                     return
             return
         self.symbol = self.scanner.get_symbol()
@@ -167,7 +166,7 @@ class Parser:
         """Check the parameters of a switch device.
 
         Update the list of device parameters.
-        Append this list to the list of devicess if no error is detected.
+        Append this list to the list of devices if no error is detected.
         Append None to the list of devices if an error is detected.
 
         Parameters
@@ -244,7 +243,7 @@ class Parser:
         """Check the parameters of a logic device.
 
         Update the list of device parameters.
-        Append this list to the list of devicess if no error is detected.
+        Append this list to the list of devices if no error is detected.
         Append None to the list of devices if an error is detected.
 
         Parameters
@@ -322,7 +321,7 @@ class Parser:
         """Check the parameters of a dtype or xor device.
 
         Update the list of device parameters.
-        Append this list to the list of devicess if no error is detected.
+        Append this list to the list of devices if no error is detected.
         Append None to the list of devices if an error is detected.
 
         Parameters
@@ -378,7 +377,7 @@ class Parser:
         """Parse a single device, return errors upon detection
 
         Create the list of device parameters.
-        Append this list to the list of devicess if no error is detected.
+        Append this list to the list of devices if no error is detected.
         Append None to the list of devices if an error is detected.
 
         Parameters
@@ -414,8 +413,8 @@ class Parser:
     def device_list(self):
         """Parse all devices, return errors upon detection
 
-        Returns a list of devices if no error is detected.
-        Returns None if an error is detected.
+        Return a list of devices if no error is detected.
+        Return None if an error is detected.
 
         Returns
         -------
@@ -813,15 +812,15 @@ class Parser:
         if error_index == 9:
             name_string = self.names.get_name_string(self.symbol.id)
             index_of_arrow = self.symbol.index_not_name(name_string)[0]
-            exact_error_message = name_error[self.symbol.index_not_name(name_string)[
-                1] - 1]
-            return self.scanner.print_error(
-                symbol, index_of_arrow, error_message + exact_error_message)
+            exact_error_message = name_error[self.symbol.index_not_name(name_string)[1] - 1]
+            return self.scanner.print_error(symbol, index_of_arrow, error_message + exact_error_message)
         return self.scanner.print_error(symbol, 0, error_message)
 
     def network_dict(self):
-        """Verify the syntax of the circuit definition file and returns a
+        """Verify the syntax of the circuit definition file and return a
         dictionary of symbols describing the network.
+
+        Return False if errors are detected.
 
         Returns
         -------
