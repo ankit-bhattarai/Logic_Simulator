@@ -270,6 +270,8 @@ class Scanner:
         self.current_column_number = 0
         self.current_char = None
         self.symbol_counter = -1
+        self.error_messages = ""
+        self.print_to_gui = False
         self.get_symbols()
 
     def reset_symbol_counter(self):
@@ -609,10 +611,15 @@ class Scanner:
                 column_number + index_of_arrow
 
             arrow_string = " " * (position_of_arrow - 1) + "^"
-            print(message)
-            # Remove trailing newline from end
-            print(line_number_string + line_string.rstrip())
-            print(arrow_string)
+            if not self.print_to_gui:
+                print(message)
+                # Remove trailing newline from end
+                print(line_number_string + line_string.rstrip())
+                print(arrow_string)
+            else: # Printing to the gui, just store error messages
+                self.error_messages += message + "\n"
+                self.error_messages += line_number_string + line_string.rstrip() + "\n"
+                self.error_messages += arrow_string + "\n"
             return True
         except Exception:
             return False

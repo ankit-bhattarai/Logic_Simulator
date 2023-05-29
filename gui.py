@@ -77,6 +77,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_PAINT, self.on_paint)
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
+        self.Bind(wx.EVT_MIDDLE_DOWN, self.reset_pan)
+        self.Bind(wx.EVT_RIGHT_DOWN, self.reset_view)
 
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
@@ -277,12 +279,22 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             else:
                 GLUT.glutBitmapCharacter(font, ord(character))
 
-    def reset_view(self):
-        """Reset the view to the initial view and zoom."""
+    def reset_pan(self, event=None):
+        """Reset the pan."""
         self.pan_x = 0
         self.pan_y = 0
+        self.init = False
+
+
+    def reset_zoom(self, event=None):
+        """Reset the zoom."""
         self.zoom = 1.0
         self.init = False
+    
+    def reset_view(self, event=None):
+        """Reset the view to the initial view and zoom."""
+        self.reset_pan()
+        self.reset_zoom()
 
 
 class RightPanel(wx.Panel):
@@ -320,7 +332,7 @@ class RightPanel(wx.Panel):
         top_sizer.Add(self.cycles_text, 1, wx.EXPAND | wx.ALL, 10)
 
         # Create the spin object
-        self.spin = wx.SpinCtrl(self, wx.ID_ANY, "10", size=wx.Size(120, 10))
+        self.spin = wx.SpinCtrl(self, wx.ID_ANY, "2", size=wx.Size(120, 10))
         # Can't have 0 cycles, default max seems to be 100!
         self.spin.SetMin(1)
         # Bind the spin object
@@ -604,17 +616,19 @@ class Gui(wx.Frame):
         # File path for circuit file which can be chosen from the GUI
         self.file_path = None
         guiint = GuiInterface(names, devices, network, monitors, scanner)
+        self.guiint = guiint
         # Configure the file menu
         fileMenu = wx.Menu()
         viewMenu = wx.Menu()
         helpMenu = wx.Menu()
         menuBar = wx.MenuBar()
         self.open_id, self.help_id_1, self.help_id_2 = wx.NewIdRef(count=3)
-        self.reset_id = wx.NewIdRef(count=1)
+        self.reset_id, self.def_file_show_id = wx.NewIdRef(count=2)
         fileMenu.Append(self.open_id, "&Open")
         fileMenu.Append(wx.ID_ABOUT, "&About")
         fileMenu.Append(wx.ID_EXIT, "&Exit")
         viewMenu.Append(self.reset_id, "&Reset")
+        viewMenu.Append(self.def_file_show_id, "&Show Definition File")
         helpMenu.Append(self.help_id_1, "&EBNF Syntax")
         helpMenu.Append(self.help_id_2, "&User Guide")
         menuBar.Append(fileMenu, "&File")
@@ -658,10 +672,62 @@ class Gui(wx.Frame):
             # Proceed loading the file chosen by the user
             self.file_path = openFileDialog.GetPath()
             print("Path: ", self.file_path)
+            success = self.guiint.update_network(self.file_path)
+            if success == True:
+                self.canvas.render("Circuit loaded successfully.")
+                self.canvas.render_signals()
+            else:
+                error_display = "Invalid circuit definition file.\n"
+                error_display += "Errors: \n"
+                error_display += success
+                #box = wx.MessageDialog(self, error_display, caption="Error Messages", style=wx.NO_BORDER | wx.TE_MULTILINE | wx.TE_DONTWRAP | wx.HSCROLL)
+                box = MyDialog(self, message=error_display)
+
+                box.ShowModal()
+                box.Destroy()
+                # pop_up = PopUpWindow(self, error_display)
+                # pop_up.Show()
 
         elif Id == self.help_id_1:
-            print("Help: EBNF Syntax required")
+            with open("EBNF.txt", "r") as f:
+                wx.MessageBox(f.read(), "EBNF Syntax")
         elif Id == self.help_id_2:
-            print("Help: User guide required")
+            # print("Help: User guide required")
+            wx.MessageBox("User Guide", "User Guide")
         elif Id == self.reset_id:
             self.canvas.reset_view()
+        elif Id == self.def_file_show_id:
+            file_path = self.guiint.scanner.path
+            with open(file_path, "r") as f:
+                wx.MessageBox(f.read(), "Definition File")
+
+
+class PopUpWindow(wx.PopupWindow):
+    def __init__(self, parent, message):
+        self.parent = parent
+        super().__init__(parent, wx.FRAME_FLOAT_ON_PARENT)
+        self.panel = wx.Panel(self)
+        self.button = wx.Button(self.panel, label="Close", pos=(10,10))
+        self.Bind(wx.EVT_BUTTON, self.OnClose, self.button)
+        self.Bind(wx.EVT_LEFT_DOWN, self.OnClose)
+        self.SetSize((100, 100))
+
+    def OnClose(self, event):
+        self.Show(False)
+
+
+class MyDialog(wx.Dialog):
+    def __init__(self, parent, message):
+        super(MyDialog, self).__init__(parent, title="Error Message", size=(500, 500))
+        self.text = wx.TextCtrl(self, value=message, style=wx.TE_MULTILINE| wx.TE_DONTWRAP | wx.HSCROLL)
+        self.text.SetEditable(False)
+        self.text.SetInsertionPoint(0)
+
+        # Create a monospaced font and set it for the text control
+        font = wx.Font(10, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        self.text.SetFont(font)
+
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(self.text, 1, wx.EXPAND)
+
+        self.SetSizer(sizer)
