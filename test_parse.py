@@ -26,28 +26,29 @@ Methods to test: - first test indirectly by testing network_dict()
 - network_dict 
 """
 
-syntax_error_types = {1: "NameError: File should start with keyword 'DEVICES'",
-                      2: "NameError: semi-colon after the last device should be followed by keyword 'CONNECT'.",
-                      3: "NameError: semi-colon after the last connection should be followed by keyword 'MONITOR'.",
-                      4: "NameError: semi-colon after the last monitor should be followed by keyword 'END'.",
-                      5: "ValueError: There should be at least one device.",
-                      6: "ValueError: The required number of parameters for a device of the type CLOCK/SWITCH/AND/OR/NAND/NOR is 3. Should also check for incorrect placement or missing punctuations.",
-                      7: "ValueError: The required number of parameters for a device of the type XOR/DTYPE is 2. Should also check for incorrect placement or missing punctuations.",
-                      8: "NameError: 1st parameter of a device should be the keyword for that device.",
-                      9: "TypeError: Device name should be a lowercase alphanumeric string (including '_').",
-                      10: "ValueError: Clock speed should be an integer.",
-                      11: "ValueError: Switch state should be either 0 or 1.",
-                      12: "ValueError: Number of inputs for an AND/NAND/OR/NOR device should be between 1 and 16.",
-                      13: "TypeError: Connections should be separated by comma and ended by semi-colon. Should also check for excessive parameters of a connection.",
-                      14: "TypeError: Output pins can only be Q or QBAR.",
-                      15: "TypeError: 2nd parameter of a connection should be '>'.",
-                      16: "TypeError: 3rd parameter of a connection must be a device name followed by '.input_pin'.",
-                      17: "NameError: The input pin should be one of the following: I1, I2,...,I16, DATA, CLK, SET, CLEAR.",
-                      18: "TypeError: Monitors should be separated by comma and ended by semi-colon. Should also check for excessive parameters of a monitor.",
-                      19: "TypeError: Devices should be separated by comma and ended by semi-colon. Should also check for excessive parameters of a device.",
-                      20: "NameError: DEVICES, CONNECT and MONITOR should be followed by ':'.",
-                      21: "NameError: 'END' should be followed by ';'.",
-                      22: "File ends too early. Should check for missing sections."}
+syntax_error_types = {
+    1: "NameError: File should start with keyword 'DEVICES'",
+    2: "NameError: ';' after the last device should be followed by keyword 'CONNECT'.",
+    3: "NameError: ';' after the last connection should be followed by keyword 'MONITOR'.",
+    4: "NameError: ';' after the last monitor should be followed by keyword 'END'.",
+    5: "ValueError: There should be at least one device.",
+    6: "ValueError: The required number of parameters for a device of the type CLOCK/SWITCH/AND/OR/NAND/NOR is 3. Should also check for incorrect placement or missing punctuations.",
+    7: "ValueError: The required number of parameters for a device of the type XOR/DTYPE is 2. Should also check for incorrect placement or missing punctuations.",
+    8: "NameError: 1st parameter of a device should be the keyword for that device.",
+    9: "TypeError: Device name should be a lowercase alphanumeric string (including '_').",
+    10: "ValueError: Clock speed should be an integer.",
+    11: "ValueError: Switch state should be either 0 or 1.",
+    12: "ValueError: Number of inputs for an AND/NAND/OR/NOR device should be between 1 and 16.",
+    13: "TypeError: Connections should be separated by ',' and ended by ';'. Should also check for excessive parameters of a connection.",
+    14: "TypeError: Output pins can only be Q or QBAR.",
+    15: "TypeError: 2nd parameter of a connection should be '>'.",
+    16: "TypeError: 3rd parameter of a connection must be a device name followed by '.input_pin'.",
+    17: "NameError: The input pin should be one of the following: I1, I2,...,I16, DATA, CLK, SET, CLEAR.",
+    18: "TypeError: Monitors should be separated by ',' and ended by ';'. Should also check for excessive parameters of a monitor.",
+    19: "TypeError: Devices should be separated by ',' and ended by ';'. Should also check for excessive parameters of a device.",
+    20: "NameError: DEVICES, CONNECT and MONITOR should be followed by ':'.",
+    21: "NameError: 'END' should be followed by ';'.",
+    22: "RuntimeError: File ends too early. Should check for missing sections."}
 
 @pytest.fixture
 def new_names():
