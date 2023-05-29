@@ -34,8 +34,6 @@ class GuiInterface():
 
     get_signals(self): returns dictionary of all monitered signal states for each monitored output
 
-    TODO:
-    get_definition_file(self): returns definition file as a string
     update_network(self, definition_file_path): updates network based on the new definition file
     """
 
@@ -199,3 +197,18 @@ class GuiInterface():
                 (max_length - len(value)) + value
 
         return signals_dictionary
+
+    def update_network(self, definition_file_path):
+        """Updates network based on the new definition file.
+
+        Parameters
+        ----------
+        definition_file_path: string
+            path to the new definition file
+
+        Returns
+        -------
+        None
+        """
+        
+
