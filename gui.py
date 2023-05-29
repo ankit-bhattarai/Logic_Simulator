@@ -293,7 +293,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
     
     def reset_view(self, event=None):
         """Reset the view to the initial view and zoom."""
-        print("Resetting view")
         self.reset_pan()
         self.reset_zoom()
 
@@ -617,17 +616,19 @@ class Gui(wx.Frame):
         # File path for circuit file which can be chosen from the GUI
         self.file_path = None
         guiint = GuiInterface(names, devices, network, monitors, scanner)
+        self.guiint = guiint
         # Configure the file menu
         fileMenu = wx.Menu()
         viewMenu = wx.Menu()
         helpMenu = wx.Menu()
         menuBar = wx.MenuBar()
         self.open_id, self.help_id_1, self.help_id_2 = wx.NewIdRef(count=3)
-        self.reset_id = wx.NewIdRef(count=1)
+        self.reset_id, self.def_file_show_id = wx.NewIdRef(count=2)
         fileMenu.Append(self.open_id, "&Open")
         fileMenu.Append(wx.ID_ABOUT, "&About")
         fileMenu.Append(wx.ID_EXIT, "&Exit")
         viewMenu.Append(self.reset_id, "&Reset")
+        viewMenu.Append(self.def_file_show_id, "&Show Definition File")
         helpMenu.Append(self.help_id_1, "&EBNF Syntax")
         helpMenu.Append(self.help_id_2, "&User Guide")
         menuBar.Append(fileMenu, "&File")
@@ -673,8 +674,15 @@ class Gui(wx.Frame):
             print("Path: ", self.file_path)
 
         elif Id == self.help_id_1:
-            print("Help: EBNF Syntax required")
+            with open("EBNF.txt", "r") as f:
+                wx.MessageBox(f.read(), "EBNF Syntax")
         elif Id == self.help_id_2:
-            print("Help: User guide required")
+            # print("Help: User guide required")
+            wx.MessageBox("User Guide", "User Guide")
         elif Id == self.reset_id:
             self.canvas.reset_view()
+        elif Id == self.def_file_show_id:
+            file_path = self.guiint.scanner.path
+            with open(file_path, "r") as f:
+                wx.MessageBox(f.read(), "Definition File")
+
