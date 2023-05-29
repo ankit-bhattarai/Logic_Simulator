@@ -603,7 +603,6 @@ class Scanner:
             Returns True if able to successfully print the error message
         """
         try:
-            print(self.names.get_name_string(symbol.id))
             line_number = symbol.line_number
             line_string = self.get_line(line_number)
             column_number = symbol.column_number

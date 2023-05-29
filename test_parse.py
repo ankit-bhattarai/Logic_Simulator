@@ -124,24 +124,21 @@ def test_early_file_termination_identification(
                           ("test_parse_files/syntax_error_3.txt", 3, [78]),
                           ("test_parse_files/syntax_error_4.txt", 4, [94]),
                           ("test_parse_files/syntax_error_5.txt", 5, [2]),
-                          # ("test_parse_files/syntax_error_6.txt", 6, [4, 7, 10, 13, 16, 19]), Likely a bug - fixed index but spurious error present
-                          # ("test_parse_files/syntax_error_7.txt", 7, [4, 8]), Likely a bug
-                          ("test_parse_files/syntax_error_8.txt",
-                           8, [2, 6, 10, 14, 18, 22, 26, 29]),
+                          ("test_parse_files/syntax_error_6.txt", 6, [4, 7, 10, 13, 16, 19]),
+                          ("test_parse_files/syntax_error_7.txt", 19, [4, 8]),
+                          ("test_parse_files/syntax_error_8.txt", 8, [2, 6, 10, 14, 18, 22, 26, 29]),
                           ("test_parse_files/syntax_error_10.txt", 10, [4]),
                           ("test_parse_files/syntax_error_11.txt", 11, [4, 8]),
-                          ("test_parse_files/syntax_error_12.txt",
-                           12, [4, 8, 16]),
-                        #   ("test_parse_files/syntax_error_13.txt", 13, [16]),
+                          ("test_parse_files/syntax_error_12.txt",12, [4, 8, 16]),
+                          ("test_parse_files/syntax_error_13.txt", 13, [16]),
                           ("test_parse_files/syntax_error_14.txt", 14, [16]),
-                          ("test_parse_files/syntax_error_15.txt",
-                           15, [27, 33]),
+                          ("test_parse_files/syntax_error_15.txt", 15, [27, 33]),
                           ("test_parse_files/syntax_error_16.txt", 16, [35]),
-                          ("test_parse_files/syntax_error_17.txt", 17, [30, 36, 42])])
-                        # ("test_parse_files/syntax_error_18.txt", 18, [81, 85, 93])]) Likely a bug
-                        # ("test_parse_files/syntax_error_19.txt", 19, [5, 9, 23])]) Likely a bug
-                        # ("test_parse_files/syntax_error_20.txt", 20, [1, 79]), Likely a bug
-                        # ("test_parse_files/syntax_error_21.txt", 21, [95])]) Likely a bug
+                          ("test_parse_files/syntax_error_17.txt", 17, [30, 36, 42]),
+                          ("test_parse_files/syntax_error_18.txt", 18, [81, 85, 93]),
+                          ("test_parse_files/syntax_error_19.txt", 19, [5, 23]),
+                          ("test_parse_files/syntax_error_20.txt", 20, [1, 79]),
+                          ("test_parse_files/syntax_error_21.txt", 21, [95])])
 
 def test_syntax_error_identification(definition_file, error_type, error_symbol_indices,
                                      new_names, new_devices, new_network, new_monitors):
