@@ -209,7 +209,7 @@ class GuiInterface():
         Method tries to build the network with the new definition file.
         If the network is built successfully, the current network is updated.
         Otherwise, the current network is left unchanged.
-        
+
         Parameters
         ----------
         definition_file_path: string
@@ -217,14 +217,16 @@ class GuiInterface():
 
         Returns
         -------
-        success: bool
-            True if the network is updated successfully, False otherwise
+        success: bool or str
+            True if the network is updated successfully, a string containing
+            error messages otherwise
         """
         new_names = Names()
         new_devices = Devices(new_names)
         new_network = Network(new_names, new_devices)
         new_monitors = Monitors(new_names, new_devices, new_network)
         new_scanner = Scanner(definition_file_path, new_names)
+        new_scanner.print_to_gui = True
         new_parser = Parser(new_names, new_devices, new_network, new_monitors, new_scanner)
         if new_parser.parse_network():
             # If able to parse the network and build it currently, update the network
@@ -234,7 +236,9 @@ class GuiInterface():
             self.monitors = new_monitors
             self.scanner = new_scanner
             return True
-        return False # Don't update the network if the new definition file is invalid
+        else: # Don't update the network if the new definition file is invalid
+            error_messages = new_scanner.error_messages
+            return error_messages
         
         
 

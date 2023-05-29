@@ -673,12 +673,20 @@ class Gui(wx.Frame):
             self.file_path = openFileDialog.GetPath()
             print("Path: ", self.file_path)
             success = self.guiint.update_network(self.file_path)
-            if success:
+            if success == True:
                 self.canvas.render("Circuit loaded successfully.")
                 self.canvas.render_signals()
             else:
-                self.canvas.render("Circuit could not be loaded.")
+                error_display = "Invalid circuit definition file.\n"
+                error_display += "Errors: \n"
+                error_display += success
+                #box = wx.MessageDialog(self, error_display, caption="Error Messages", style=wx.NO_BORDER | wx.TE_MULTILINE | wx.TE_DONTWRAP | wx.HSCROLL)
+                box = MyDialog(self, message=error_display)
 
+                box.ShowModal()
+                box.Destroy()
+                # pop_up = PopUpWindow(self, error_display)
+                # pop_up.Show()
 
         elif Id == self.help_id_1:
             with open("EBNF.txt", "r") as f:
@@ -693,3 +701,33 @@ class Gui(wx.Frame):
             with open(file_path, "r") as f:
                 wx.MessageBox(f.read(), "Definition File")
 
+
+class PopUpWindow(wx.PopupWindow):
+    def __init__(self, parent, message):
+        self.parent = parent
+        super().__init__(parent, wx.FRAME_FLOAT_ON_PARENT)
+        self.panel = wx.Panel(self)
+        self.button = wx.Button(self.panel, label="Close", pos=(10,10))
+        self.Bind(wx.EVT_BUTTON, self.OnClose, self.button)
+        self.Bind(wx.EVT_LEFT_DOWN, self.OnClose)
+        self.SetSize((100, 100))
+
+    def OnClose(self, event):
+        self.Show(False)
+
+
+class MyDialog(wx.Dialog):
+    def __init__(self, parent, message):
+        super(MyDialog, self).__init__(parent, title="Error Message", size=(500, 500))
+        self.text = wx.TextCtrl(self, value=message, style=wx.TE_MULTILINE| wx.TE_DONTWRAP | wx.HSCROLL)
+        self.text.SetEditable(False)
+        self.text.SetInsertionPoint(0)
+
+        # Create a monospaced font and set it for the text control
+        font = wx.Font(10, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        self.text.SetFont(font)
+
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(self.text, 1, wx.EXPAND)
+
+        self.SetSizer(sizer)
