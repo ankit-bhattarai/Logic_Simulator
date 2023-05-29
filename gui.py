@@ -77,6 +77,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_PAINT, self.on_paint)
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
+        self.Bind(wx.EVT_MIDDLE_DOWN, self.reset_pan)
+        self.Bind(wx.EVT_RIGHT_DOWN, self.reset_view)
 
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
@@ -277,12 +279,23 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             else:
                 GLUT.glutBitmapCharacter(font, ord(character))
 
-    def reset_view(self):
-        """Reset the view to the initial view and zoom."""
+    def reset_pan(self, event=None):
+        """Reset the pan."""
         self.pan_x = 0
         self.pan_y = 0
+        self.init = False
+
+
+    def reset_zoom(self, event=None):
+        """Reset the zoom."""
         self.zoom = 1.0
         self.init = False
+    
+    def reset_view(self, event=None):
+        """Reset the view to the initial view and zoom."""
+        print("Resetting view")
+        self.reset_pan()
+        self.reset_zoom()
 
 
 class RightPanel(wx.Panel):
@@ -320,7 +333,7 @@ class RightPanel(wx.Panel):
         top_sizer.Add(self.cycles_text, 1, wx.EXPAND | wx.ALL, 10)
 
         # Create the spin object
-        self.spin = wx.SpinCtrl(self, wx.ID_ANY, "10", size=wx.Size(120, 10))
+        self.spin = wx.SpinCtrl(self, wx.ID_ANY, "2", size=wx.Size(120, 10))
         # Can't have 0 cycles, default max seems to be 100!
         self.spin.SetMin(1)
         # Bind the spin object
