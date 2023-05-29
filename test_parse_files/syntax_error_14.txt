@@ -1,4 +1,4 @@
 DEVICES: SWITCH switch1 1, DTYPE dtype1, XOR xor1;
-CONNECT: switch1.I1 > dtype1.DATA, dtype1.Q > nor1.I2, dtype1.QBAR > xor1.I1
+CONNECT: switch1.I1 > dtype1.DATA, dtype1.Q > nor1.I2, dtype1.QBAR > xor1.I1;
 MONITOR: switch1, dtype1.Q, xor1;
 END;

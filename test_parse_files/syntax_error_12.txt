@@ -1,4 +1,4 @@
-DEVICES: AND and1 6857, NAND nand1 -1, XOR xor1, OR or1 tw£, 
+DEVICES: AND and1 6857, NAND nand1 -1, XOR xor1, OR or1 tw£;
 CONNECT: switch1 > dtype1.DATA, switch1 > dtype1.SET, switch1 > nor1.I1, 
 switch2 > dtype1.CLEAR, switch2 > xor1.I3, dtype1.Q > nor1.I2, 
 dtype1.QBAR > xor1.I1, clock1 > dtype1.CLK;
