@@ -54,7 +54,7 @@ class Parser:
             7: "ValueError: The required number of parameters for a device of the type XOR/DTYPE is 2. Should also check for incorrect placement or missing punctuations.",
             8: "NameError: 1st parameter of a device should be the keyword for that device.",
             9: "TypeError: Device name should be a lowercase alphanumeric string (including '_').",
-            10: "ValueError: Clock speed should be an integer.",
+            10: "ValueError: Clock speed should be a positive integer.",
             11: "ValueError: Switch state should be either 0 or 1.",
             12: "ValueError: Number of inputs for an AND/NAND/OR/NOR device should be between 1 and 16.",
             13: "TypeError: Connections should be separated by ',' and ended by ';'. Should also check for excessive parameters of a connection.",
