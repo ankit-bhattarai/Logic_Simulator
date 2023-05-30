@@ -164,7 +164,7 @@ class GuiInterface():
             if not self.network.execute_network():
                 return "Network oscillating!"
             self.monitors.record_signals()
-        return True 
+        return True
 
     def continue_network(self, n_cycles):
         """Continues running the network for n-cycles
@@ -245,5 +245,5 @@ class GuiInterface():
             passed = True
         else:  # Don't update the network if the new definition file is invalid
             passed = False
-        error_messages = new_scanner.error_messages
+        error_messages = new_scanner.get_error_messages()
         return passed, error_messages
