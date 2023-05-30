@@ -1,6 +1,7 @@
 """Test the parse module."""
 import pytest
 from unittest.mock import MagicMock, call
+import itertools
 
 from names import Names
 from devices import Devices
@@ -171,7 +172,14 @@ def test_early_termination_error_identification(definition_file, new_names,
                           ("test_parse_files/syntax_error_21.txt", 21, [95])])
 def test_syntax_error_identification(definition_file, error_type, error_symbol_indices,
                                      new_names, new_devices, new_network, new_monitors):
-    """Test that the correct syntax error is identified."""
+    """Test that the correct syntax error is identified and subsequently sent to the
+    scanner for printing.
+
+    By using mock functions, it is tested whether the scanner.print_error
+    is being called correctly or not. A benefit of this approach is that the
+    scanner.print_error method can be changed in the future without affecting 
+    these tests at all.
+    """
     new_scanner = Scanner(definition_file, new_names)
     new_scanner.print_error = MagicMock()
     new_parser = Parser(new_names,
@@ -194,36 +202,36 @@ def test_syntax_error_identification(definition_file, error_type, error_symbol_i
     # Assert that no other errors are passed for printing
     assert new_scanner.print_error.call_count == len(error_symbol_indices)
 
+@pytest.fixture
+def network_dict_1(new_names):
+    network_dict = {}
+    network_dict['DEVICES'] = [[Symbol("CLOCK", 5, 1, 10),
+                               Symbol("clock1", 16, 1, 16),
+                               Symbol("10", 17, 1, 23)]]
+    network_dict['CONNECT'] = [[Symbol("clock1", 16, 2, 10), 
+                                Symbol(">", 20, 2, 17), 
+                                Symbol("and1", 21, 2, 19),
+                                Symbol(".", 22, 2, 23),
+                                Symbol("I1", 23, 2, 24)]]
+    network_dict['MONITOR'] = [[Symbol("and1", 21, 3, 10)]]
 
-def test_build_network_dict_1(new_names, new_devices, new_network, new_monitors):
+    return network_dict
+
+def test_build_network_dict_1(new_names, network_dict_1, new_devices, new_network,
+                            new_monitors):
     """Test that the network dictionary, used later to check semantics and
         to build the network, is built correctly."""
+    new_scanner = Scanner("test_parse_files/test_build_network_dict_1.txt", new_names)
+    new_parser = Parser(new_names,
+                        new_devices,
+                        new_network,
+                        new_monitors,
+                        new_scanner)
+    
+    assert new_parser.network_dict() == network_dict_1
 
-
-def test_build_network_dict_2(new_names, new_devices, new_network, new_monitors):
-    """Test that the network dictionary, used later to check semantics and
-        to build the network, is built correctly."""
-
-
-def test_build_network_dict_3(new_names, new_devices, new_network, new_monitors):
-    """Test that the network dictionary, used later to check semantics and
-        to build the network, is built correctly."""
-
-
-def test_build_network_dict_4(new_names, new_devices, new_network, new_monitors):
-    """Test that the network dictionary, used later to check semantics and
-        to build the network, is built correctly."""
-
-
-def test_build_network_dict_5(new_names, new_devices, new_network, new_monitors):
-    """Test that the network dictionary, used later to check semantics and
-        to build the network, is built correctly."""
-
-
-def test_identify_total_errors(new_names, new_devices, new_network, new_monitors):
-    """Test that the total number of errors is identified correctly."""
-    # 5 clean, 5 unclean
-
+### * 5 times the same test, but with different files
+### Test the number of errors too
 
 @pytest.mark.parametrize("definition_file, symbol_details, message, index, success",
                          [("test_parse_files/semantic_error_1.txt", ["switch1", 16, 1, 35],

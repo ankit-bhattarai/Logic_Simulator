@@ -1,4 +1,4 @@
-DEVICES: SWITCH switch1 1, DTYPE dtype1;
-CONNECT: switch1 > dtype1.DATA, switch1 > dtype1.SET;
-MONITOR: dtype1.Q;
+DEVICES: CLOCK clock1 10;
+CONNECT: clock1 > and1.I1;
+MONITOR: and1;
 END;
