@@ -225,6 +225,7 @@ def test_display_device_present_error(new_semantic_error_handler, switch1,
     new_scanner.print_error.assert_called_with(
         switch1, 0,
         "Device names are not unique. switch1 is already the name of a device")
+    assert new_scanner.print_error.call_count == 1
 
 
 def test_display_input_input_error(new_semantic_error_handler,
@@ -234,6 +235,7 @@ def test_display_input_input_error(new_semantic_error_handler,
         input_input_error_list)
     new_scanner.print_error.assert_called_with(nor1, 0,
                                                "Input nor1.I1 is connected to input xor1.I1. Connections must be from outputs to inputs.")
+    assert new_scanner.print_error.call_count == 1
 
 
 @pytest.fixture
@@ -251,6 +253,7 @@ def test_output_output_error(new_semantic_error_handler, list_output_output_erro
     # expects to be an input, but is actually an output.
     new_scanner.print_error.assert_called_with(qbar_pin, 0,
                                                "Output xor1 is connected to output dtype1.QBAR. Connections must be from outputs to inputs.")
+    assert new_scanner.print_error.call_count == 1
 
 
 @pytest.fixture
@@ -267,6 +270,7 @@ def test_display_input_connected_error(new_semantic_error_handler,
         list_of_symbols_input_connected_error)
     new_scanner.print_error.assert_called_with(clear_pin, 0,
                                                "Signal switch2 is already connected to the input pin dtype1.CLEAR. Only one signal must be connected to an input.")
+    assert new_scanner.print_error.call_count == 1
 
 
 @pytest.fixture
@@ -288,10 +292,12 @@ def test_display_port_absent_error(new_semantic_error_handler, list_display_port
         list_display_port_absent_error_input)
     new_scanner.print_error.assert_called_with(qbar_pin, 0,
                                                "Port QBAR is not defined for device nor1")
+    assert new_scanner.print_error.call_count == 1
     new_semantic_error_handler.display_port_absent_error(
         list_display_port_absent_error_output)
     new_scanner.print_error.assert_called_with(I3_pin, 0,
                                                "Port I3 is not defined for device nor1")
+    assert new_scanner.print_error.call_count == 2
 
 
 @pytest.fixture
@@ -327,6 +333,7 @@ def test_display_device_absent_error_monitor_1(new_semantic_error_handler,
         [and1])
     new_scanner.print_error.assert_called_with(and1, 0,
                                                "Device and1 is not defined")
+    assert new_scanner.print_error.call_count == 1
 
 
 def test_display_device_absent_error_monitor_2(new_semantic_error_handler,
@@ -336,6 +343,7 @@ def test_display_device_absent_error_monitor_2(new_semantic_error_handler,
         list_display_device_absent_error_monitor_2)
     new_scanner.print_error.assert_called_with(and1, 0,
                                                "Device and1 is not defined")
+    assert new_scanner.print_error.call_count == 1
 
 
 def test_display_device_absent_error_connection_input(new_semantic_error_handler,
@@ -349,6 +357,7 @@ def test_display_device_absent_error_connection_input(new_semantic_error_handler
         list_display_device_absent_error_connection_input)
     new_scanner.print_error.assert_called_with(and1, 0,
                                                "Device and1 is not defined")
+    assert new_scanner.print_error.call_count == 1
 
 
 def test_display_device_absent_error_connection_otuput(new_semantic_error_handler,
@@ -363,6 +372,7 @@ def test_display_device_absent_error_connection_otuput(new_semantic_error_handle
         list_display_device_absent_error_connection_output)
     new_scanner.print_error.assert_called_with(and1, 0,
                                                "Device and1 is not defined")
+    assert new_scanner.print_error.call_count == 1
 
 
 def test_display_device_absent_error_no_call(new_semantic_error_handler,
