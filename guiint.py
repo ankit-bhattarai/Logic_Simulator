@@ -11,6 +11,7 @@ from monitors import Monitors
 from scanner import Scanner
 from parse import Parser
 
+
 class GuiInterface():
     """
     parameters
@@ -217,9 +218,10 @@ class GuiInterface():
 
         Returns
         -------
-        success: bool or str
-            True if the network is updated successfully, a string containing
-            error messages otherwise
+        success: bool
+            True if the network is updated successfully, False otherwise
+        error_messages: string
+            Any error or warning messages that occurred during parsing
         """
         new_names = Names()
         new_devices = Devices(new_names)
@@ -227,7 +229,8 @@ class GuiInterface():
         new_monitors = Monitors(new_names, new_devices, new_network)
         new_scanner = Scanner(definition_file_path, new_names)
         new_scanner.print_to_gui = True
-        new_parser = Parser(new_names, new_devices, new_network, new_monitors, new_scanner)
+        new_parser = Parser(new_names, new_devices,
+                            new_network, new_monitors, new_scanner)
         if new_parser.parse_network():
             # If able to parse the network and build it currently, update the network
             self.names = new_names
@@ -235,10 +238,8 @@ class GuiInterface():
             self.network = new_network
             self.monitors = new_monitors
             self.scanner = new_scanner
-            return True
-        else: # Don't update the network if the new definition file is invalid
-            error_messages = new_scanner.error_messages
-            return error_messages
-        
-        
-
+            passed = True
+        else:  # Don't update the network if the new definition file is invalid
+            passed = False
+        error_messages = new_scanner.error_messages
+        return passed, error_messages

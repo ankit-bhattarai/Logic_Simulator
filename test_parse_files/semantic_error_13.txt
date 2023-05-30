@@ -3,6 +3,5 @@ DEVICES: SWITCH switch1 1, SWITCH switch2 0, CLOCK clock1 2, DTYPE dtype1,
 CONNECT: switch1 > dtype1.DATA, switch1 > dtype1.SET, switch1 > nor1.I1, 
 switch2 > dtype1.CLEAR, switch2 > xor1.I2, dtype1.Q > nor1.I2, 
 dtype1.QBAR > xor1.I1, clock1 > dtype1.CLK;
-MONITOR: switch1, clock1, switch2, dtype1.Q, nor1, xor1.QBAR;
-# The pin QBAR doesnt exist on xor1, so it wil raise an error.
+MONITOR: switch1, clock1, switch2, dtype1, nor1, xor1;
 END;
