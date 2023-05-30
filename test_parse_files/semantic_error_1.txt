@@ -1,0 +1,9 @@
+DEVICES: SWITCH switch1 1, SWITCH switch1 0, CLOCK clock1 2, DTYPE dtype1,
+         NOR nor1 2, XOR xor1;
+CONNECT: switch1 > dtype1.DATA, switch1 > dtype1.SET, switch1 > nor1.I1, 
+switch1 > dtype1.CLEAR, switch1 > xor1.I2, dtype1.Q > nor1.I2, 
+dtype1.QBAR > xor1.I1, clock1 > dtype1.CLK;
+MONITOR: switch1, clock1, dtype1.Q, nor1, xor1;
+END;
+! This file has the same device name repeated twice. This should be flagged as a 
+semantic error!
