@@ -258,6 +258,53 @@ class Scanner:
     -------------
     get_symbol(self): Translates the next sequence of characters into a symbol
                       and returns the symbol.
+
+    reset_symbol_counter(self): Resets the symbol counter to -1.
+
+    open_file(self): Opens the file.
+
+    close_file(self): Closes the file.
+
+    get_next_char(self): Gets the next character from the file.
+
+    get_next_number(self, first_number): When a digit character is encountered,
+                                        this method is called to get the
+                                        entire number from the file.
+
+    get_next_name(self, first_letter): When a letter character is encountered,
+                                        this method is called to get the entire
+                                        name from the file.
+
+    skip_spaces(self): Skips over spaces, tabs and returns the next non-space
+                        character.
+
+    skip_comments(self, comment_character): Skips over comments and returns
+                                            the next non-comment character.
+
+    create_symbol(self, string, line_number, 
+                  column_number): Creates a symbol object from the given 
+                                  quantities and returns it.
+
+    get_symbols(self): Gets all the symbols from the file and stores them in
+                        the object's list_of_symbols attribute.
+
+    verify_file_scanned(self): Verifies that the entire file has been scanned,
+                                scanning it if it hasn't.
+
+    get_symbol(self): Returns the next symbol from the list_of_symbols.
+
+    get_list_of_symbols(self): Returns the list_of_symbols.
+
+    get_line(self, line_number): Reads the specified line from the file and
+                                returns it.
+
+    print_error(self, symbol, index_of_arrow,
+                message): Gets the appropriate line from the file and either
+                            prints the error message to the console or adds it
+                            to the error_messages attribute to be shown in the
+                            GUI.
+
+    get_error_messages(self): Returns the error_messages attribute.
     """
 
     def __init__(self, path, names):
@@ -585,7 +632,9 @@ class Scanner:
         """Print an error message as well as the line where the error occured.
 
         Prints an error message along with the line in the definition file
-        where the error occured and an arrow pointing to the exact location
+        where the error occured and an arrow pointing to the exact location.
+        If print_to_gui is True, it will store all the error messages in a
+        string from the parser and return it to the GUIInterface when needed.
 
         Parameters
         ----------
@@ -616,10 +665,20 @@ class Scanner:
                 # Remove trailing newline from end
                 print(line_number_string + line_string.rstrip())
                 print(arrow_string)
-            else: # Printing to the gui, just store error messages
+            else:  # Printing to the gui, just store error messages
                 self.error_messages += message + "\n"
                 self.error_messages += line_number_string + line_string.rstrip() + "\n"
                 self.error_messages += arrow_string + "\n"
             return True
         except Exception:
             return False
+
+    def get_error_messages(self):
+        """Return the error messages to the GUIInterface.
+
+        Returns
+        -------
+        error_messages: str
+            The error messages from the parser
+        """
+        return self.error_messages
