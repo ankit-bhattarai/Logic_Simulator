@@ -671,14 +671,26 @@ class Gui(wx.Frame):
             # Proceed loading the file chosen by the user
             self.file_path = openFileDialog.GetPath()
             print("Path: ", self.file_path)
-            success = self.guiint.update_network(self.file_path)
-            if success == True:
-                self.canvas.render("Circuit loaded successfully.")
-                self.canvas.render_signals()
+            success, message = self.guiint.update_network(self.file_path)
+            print("Success: ", success)
+            print("Message: ", message)
+            if success:
+                if message == "":
+                    self.canvas.render("Circuit loaded successfully.")
+                    self.canvas.render_signals()
+                else:  # There is a message to  be printed, but overall the
+                    # circuit is valid. It is only a warning
+                    error_display = "Circuit loaded with warnings.\n"
+                    error_display += "Warnings: \n\n"
+                    error_display += message
+                    box = MyDialog(self, message=error_display,
+                                   title="Warnings Present")
+                    box.ShowModal()
+                    box.Destroy()
             else:
                 error_display = "Invalid circuit definition file.\n"
                 error_display += "Errors: \n\n"
-                error_display += success
+                error_display += message
                 box = MyDialog(self, message=error_display,
                                title="Erros Present")
                 box.ShowModal()
