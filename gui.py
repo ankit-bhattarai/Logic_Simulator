@@ -868,7 +868,7 @@ class Gui(wx.Frame):
                 error_display += "Errors: \n\n"
                 error_display += message
                 box = MyDialog(self, message=error_display,
-                               title="Erros Present")
+                               title="Errors Present")
                 box.ShowModal()
                 box.Destroy()
 
