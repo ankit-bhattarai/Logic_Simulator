@@ -1,0 +1,12 @@
+DEVICES: SWITCH switch1 1, SWITCH switch2 0, CLOCK clock1 2, DTYPE dtype1,
+         NOR nor1 2, XOR xor1;
+# nor1 only has two inputs so the line below will have a port absent error
+CONNECT: switch1 > dtype1.DATA, switch1 > dtype1.SET, switch1 > nor1.I3, 
+switch2 > dtype1.I1, switch2 > xor1.I2, dtype1.Q > nor1.I2, 
+! Dtype can't have an input pin I1, this passes the syntax checks 
+but would have failed the semantic checks, because nor.I3 causes an error,
+this error wouldn't be caught until that semantic error is fixed and the program
+rerrun!
+dtype1.QBAR > xor1.I1, clock1 > dtype1.CLK;
+MONITOR: switch1, clock1, switch2, dtype1.Q, nor1, xor1;
+END;
