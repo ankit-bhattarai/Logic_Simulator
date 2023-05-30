@@ -998,12 +998,13 @@ class Parser:
         False otherwise.
         """
 
-        devices_success = self.build_devices(network_dict["DEVICES"])
-        connections_success = self.build_connections(network_dict["CONNECT"])
-        monitors_success = self.build_monitors(network_dict["MONITOR"])
-        if all([devices_success, connections_success, monitors_success]):
-            return True
-        return False
+        if not self.build_devices(network_dict["DEVICES"]):
+            return False
+        if not self.build_connections(network_dict["CONNECT"]):
+            return False
+        if not self.build_monitors(network_dict["MONITOR"]):
+            return False
+        return True
 
     def parse_network(self):
         """Parse the circuit definition file.
@@ -1013,12 +1014,16 @@ class Parser:
         semantically correct, False otherwise.
         """
         network_dict = self.network_dict()
-        if self.num_of_errors == 0:
+
+        if self.num_of_errors == 0 and network_dict:
             build_network = self.build_network(network_dict=network_dict)
         else:
             last_symbol = self.scanner.list_of_symbols[-1]
             last_symbol_string = self.names.get_name_string(last_symbol.id)
-            error_message = f"{self.num_of_errors} syntax errors detected before the last symbol"
+            if self.num_of_errors == 1:
+                error_message = f"{self.num_of_errors} syntax error detected before the last symbol"
+            else:
+                error_message = f"{self.num_of_errors} syntax errors detected before the last symbol"
             self.scanner.print_error(last_symbol, len(last_symbol_string) - 1, error_message)
             return False
 

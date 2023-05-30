@@ -195,24 +195,19 @@ def test_build_network_dict_1(new_names, new_devices, new_network, new_monitors)
     """Test that the network dictionary, used later to check semantics and
         to build the network, is built correctly."""
 
-
-
 def test_build_network_dict_2(new_names, new_devices, new_network, new_monitors):
     """Test that the network dictionary, used later to check semantics and
         to build the network, is built correctly."""
     
 
-
 def test_build_network_dict_3(new_names, new_devices, new_network, new_monitors):
     """Test that the network dictionary, used later to check semantics and
         to build the network, is built correctly."""
-    
 
 
 def test_build_network_dict_4(new_names, new_devices, new_network, new_monitors):
     """Test that the network dictionary, used later to check semantics and
         to build the network, is built correctly."""
-
 
 
 def test_build_network_dict_5(new_names, new_devices, new_network, new_monitors):
