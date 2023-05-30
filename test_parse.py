@@ -6,7 +6,7 @@ from names import Names
 from devices import Devices
 from network import Network
 from monitors import Monitors
-from scanner import Scanner
+from scanner import Scanner, Symbol
 from parse import Parser
 
 """
@@ -110,19 +110,17 @@ def test_name_error_identification(definition_file, name_error_indices, error_sy
     new_scanner.print_error.assert_has_calls(expected_calls, any_order=False)
 
 
-@pytest.mark.parametrize("definition_file", 
+@pytest.mark.parametrize("definition_file",
                          [("test_parse_files/syntax_error_22_a.txt"),
-                         ("test_parse_files/syntax_error_22_b.txt"),
-                         ("test_parse_files/syntax_error_22_c.txt"),
-                         ("test_parse_files/syntax_error_22_d.txt"),
-                         ("test_parse_files/syntax_error_22_e.txt"),
-                         ("test_parse_files/syntax_error_22_f.txt"),
-                         ("test_parse_files/syntax_error_22_g.txt"),
-                         ("test_parse_files/syntax_error_22_h.txt")])
-
-
-def test_early_termination_error_identification(definition_file, new_names, 
-                                                new_devices, new_network, 
+                          ("test_parse_files/syntax_error_22_b.txt"),
+                          ("test_parse_files/syntax_error_22_c.txt"),
+                          ("test_parse_files/syntax_error_22_d.txt"),
+                          ("test_parse_files/syntax_error_22_e.txt"),
+                          ("test_parse_files/syntax_error_22_f.txt"),
+                          ("test_parse_files/syntax_error_22_g.txt"),
+                          ("test_parse_files/syntax_error_22_h.txt")])
+def test_early_termination_error_identification(definition_file, new_names,
+                                                new_devices, new_network,
                                                 new_monitors):
     """
     Test that the correct syntax error is identified when the file ends too early for several early termination locations.
@@ -138,7 +136,8 @@ def test_early_termination_error_identification(definition_file, new_names,
     new_parser.network_dict()
 
     erronous_symbol = new_scanner.list_of_symbols[-1]
-    new_scanner.print_error.assert_called_once_with(erronous_symbol, 0, syntax_error_types[22])
+    new_scanner.print_error.assert_called_once_with(
+        erronous_symbol, 0, syntax_error_types[22])
 
 
 @pytest.mark.parametrize("definition_file, error_type, error_symbol_indices",
@@ -147,23 +146,29 @@ def test_early_termination_error_identification(definition_file, new_names,
                           ("test_parse_files/syntax_error_3.txt", 3, [78]),
                           ("test_parse_files/syntax_error_4.txt", 4, [94]),
                           ("test_parse_files/syntax_error_5.txt", 5, [2]),
-                          ("test_parse_files/syntax_error_6.txt", 6, [4, 7, 10, 13, 16, 19]),
+                          ("test_parse_files/syntax_error_6.txt",
+                           6, [4, 7, 10, 13, 16, 19]),
                           ("test_parse_files/syntax_error_7.txt", 19, [4, 8]),
-                          ("test_parse_files/syntax_error_8.txt", 8, [2, 6, 10, 14, 18, 22, 26, 29]),
+                          ("test_parse_files/syntax_error_8.txt",
+                           8, [2, 6, 10, 14, 18, 22, 26, 29]),
                           ("test_parse_files/syntax_error_10.txt", 10, [4]),
                           ("test_parse_files/syntax_error_11.txt", 11, [4, 8]),
-                          ("test_parse_files/syntax_error_12.txt",12, [4, 8, 16]),
+                          ("test_parse_files/syntax_error_12.txt",
+                           12, [4, 8, 16]),
                           ("test_parse_files/syntax_error_13.txt", 13, [16]),
                           ("test_parse_files/syntax_error_14.txt", 14, [16]),
-                          ("test_parse_files/syntax_error_15.txt", 15, [27, 33]),
+                          ("test_parse_files/syntax_error_15.txt",
+                           15, [27, 33]),
                           ("test_parse_files/syntax_error_16.txt", 16, [35]),
-                          ("test_parse_files/syntax_error_17.txt", 17, [30, 36, 42]),
-                          ("test_parse_files/syntax_error_18.txt", 18, [81, 85, 93]),
-                          ("test_parse_files/syntax_error_19.txt", 19, [5, 23]),
-                          ("test_parse_files/syntax_error_20.txt", 20, [1, 79]),
+                          ("test_parse_files/syntax_error_17.txt",
+                           17, [30, 36, 42]),
+                          ("test_parse_files/syntax_error_18.txt",
+                           18, [81, 85, 93]),
+                          ("test_parse_files/syntax_error_19.txt",
+                           19, [5, 23]),
+                          ("test_parse_files/syntax_error_20.txt",
+                           20, [1, 79]),
                           ("test_parse_files/syntax_error_21.txt", 21, [95])])
-
-
 def test_syntax_error_identification(definition_file, error_type, error_symbol_indices,
                                      new_names, new_devices, new_network, new_monitors):
     """Test that the correct syntax error is identified."""
@@ -190,15 +195,15 @@ def test_syntax_error_identification(definition_file, error_type, error_symbol_i
     assert new_scanner.print_error.call_count == len(error_symbol_indices)
 
 
-
 def test_build_network_dict_1(new_names, new_devices, new_network, new_monitors):
     """Test that the network dictionary, used later to check semantics and
         to build the network, is built correctly."""
 
+
 def test_build_network_dict_2(new_names, new_devices, new_network, new_monitors):
     """Test that the network dictionary, used later to check semantics and
         to build the network, is built correctly."""
-    
+
 
 def test_build_network_dict_3(new_names, new_devices, new_network, new_monitors):
     """Test that the network dictionary, used later to check semantics and
@@ -218,3 +223,51 @@ def test_build_network_dict_5(new_names, new_devices, new_network, new_monitors)
 def test_identify_total_errors(new_names, new_devices, new_network, new_monitors):
     """Test that the total number of errors is identified correctly."""
     # 5 clean, 5 unclean
+
+
+@pytest.mark.parametrize("definition_file, symbol_details, message, index",
+                         [("test_parse_files/semantic_error_1.txt", ["switch1", 16, 1, 35],
+                           "Device names are not unique. switch1 is already the name of a device", 0),
+                          ("test_parse_files/semantic_error_2.txt", ["switch3", 30, 4, 33],
+                          "Device switch3 is not defined", 0),
+                          ("test_parse_files/semantic_error_3.txt", ["I3", 30, 4, 70],
+                           "Port I3 is not defined for device nor1", 0),
+                          ("test_parse_files/semantic_error_4.txt", ["I1", 30, 4, 18],
+                           "Port I1 is not defined for device dtype1", 0),
+                          ("test_parse_files/semantic_error_5.txt", ["DATA", 11, 5, 62],
+                           "Signal switch1 is already connected to the input pin dtype1.DATA. Only one signal must be connected to an input.", 0),
+                          ("test_parse_files/semantic_error_6.txt", ["DATA", 11, 5, 62],
+                           "Signal switch1 is already connected to the input pin dtype1.DATA. Only one signal must be connected to an input.", 0),
+                          ("test_parse_files/semantic_error_7.txt", ["I1", 30, 5, 20],
+                           "The following input pins are not connected to a device: ['dtype1.CLK']", 2),
+                          ("test_parse_files/semantic_error_8.txt", ["dtype1", 23, 4, 44],
+                           "Port is missing for device dtype1", 0),
+                          ("test_parse_files/semantic_error_9.txt", ["QBAR", 13, 5, 50],
+                           "Port QBAR is not defined for device xor1", 0)]
+
+                         )
+def test_semantic_error_identification(definition_file, symbol_details,
+                                       message, index, new_names, new_devices,
+                                       new_network, new_monitors):
+    """Test that the correct semantic error is identified.
+
+    This method tests that the correct semantic errors are identified and sent
+    to the print_error method of the scanner.
+
+    By using mock functions, it is tested whether the scanner.print_error
+    is being called correctly or not. A benefit of this approach is that the
+    scanner.print_error method can be changed in the future without affecting 
+    these tests at all. Were this test to do a print assert check, if 
+    print_error was changed for aesthetic or functionality reasons, all of
+    these tests will have to be rewritten to suit the new style in which
+    the mesaages are printed.
+    """
+    new_scanner = Scanner(definition_file, new_names)
+    new_scanner.print_error = MagicMock()
+    new_parser = Parser(new_names, new_devices, new_network, new_monitors,
+                        new_scanner)
+    success = new_parser.parse_network()
+    assert not success
+    symbol = Symbol(*symbol_details)
+    new_scanner.print_error.assert_called_once_with(symbol, index, message)
+    assert new_scanner.print_error.call_count == 1
