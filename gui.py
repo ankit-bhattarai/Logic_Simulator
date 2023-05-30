@@ -32,6 +32,17 @@ class MyGLCanvas(wxcanvas.GLCanvas):
     --------------
     init_gl(self): Configures the OpenGL context.
 
+    render_axes(self, x_start, y_start,
+                values, name, width,
+                height): Draws axes around signal on the canvas.
+
+    render_signal(self, x_start, y_start,
+                    values, name, colour,
+                    width, height): Draws a signal on the canvas based on 
+                                    the signal's values.
+
+    render_signals(self): Renders all signals on the canvas.
+
     render(self, text): Handles all drawing operations.
 
     on_paint(self, event): Handles the paint event.
@@ -43,7 +54,11 @@ class MyGLCanvas(wxcanvas.GLCanvas):
     render_text(self, text, x_pos, y_pos): Handles text drawing
                                            operations.
 
-    render_signals(self): Renders all signals on the canvas.
+    reset_pan(self, event): Resets the pan.
+
+    reset_zoom(self, event): Resets the zoom.
+
+    reset_view(self, event): Resets the pan and zoom.    
     """
 
     def __init__(self, parent, guiint):
@@ -156,9 +171,9 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.render_text(name, x_start - name_offset_left,
                          y_start + height + name_offset_up)
 
-    def _render_signal(self, x_start, y_start, values, name,
-                       colour=(0.0, 0.0, 1.0),
-                       width=20, height=25):
+    def render_signal(self, x_start, y_start, values, name,
+                      colour=(0.0, 0.0, 1.0),
+                      width=20, height=25):
         """Method to render a single signal based on the values provided.
 
         Parameters
@@ -311,18 +326,18 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             else:
                 GLUT.glutBitmapCharacter(font, ord(character))
 
-    def _reset_pan(self, event=None):
+    def reset_pan(self, event=None):
         """Reset the pan."""
         self.pan_x = 0
         self.pan_y = 0
         self.init = False
 
-    def _reset_zoom(self, event=None):
+    def reset_zoom(self, event=None):
         """Reset the zoom."""
         self.zoom = 1.0
         self.init = False
 
-    def _reset_view(self, event=None):
+    def reset_view(self, event=None):
         """Reset the view to the initial view and zoom."""
         self._reset_pan()
         self._reset_zoom()
@@ -342,7 +357,10 @@ class SwitchPanel(wx.Panel):
 
     Public Methods
     --------------
-    None
+    renderSwitchBoxes(self): Renders the switch boxes based on their state.
+
+    OnComboSwitch(self, event): Handles the event when a switch is selected in
+                                the combo box.
     """
 
     def __init__(self, parent, guiint):
@@ -409,7 +427,7 @@ class SwitchPanel(wx.Panel):
 
         self.SetSizer(self.main_sizer)
 
-    def _renderSwitchBoxes(self):
+    def renderSwitchBoxes(self):
         """Method renders the switch boxes based on their current state."""
         # Get the current switch
         switch_text = self.switch_text
@@ -433,7 +451,7 @@ class SwitchPanel(wx.Panel):
         self.parent.GetSizer().Layout()
         self.grand_parent.GetSizer().Layout()
 
-    def _OnComboSwitch(self, event):
+    def OnComboSwitch(self, event):
         """Method called when the combo box is changed.
 
         This method will change the switch text and render the switch boxes.
