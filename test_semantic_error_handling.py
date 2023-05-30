@@ -385,3 +385,29 @@ def test_display_device_absent_error_no_call(new_semantic_error_handler,
         list_display_device_absent_error_connection_no_call)
     new_scanner.print_error.assert_not_called()
     # If all the devices do exist, then print_error should not be called.
+
+
+def test_display_not_output_error(new_semantic_error_handler, new_scanner,
+                                  qbar_pin, dtype1):
+    """Test the display_not_output_error method."""
+    new_semantic_error_handler.display_not_output_error(dtype1)
+    new_scanner.print_error.assert_called_with(dtype1, 0,
+                                               "This is not an output. Only outputs can be monitored.")
+    assert new_scanner.print_error.call_count == 1
+    # Harder to show the functionality of display_not_output_error here
+    # but if it was given say a port such as xor1.QBAR, it would return
+    # an error message like this saying that the specific port is not an
+    # output.
+    new_semantic_error_handler.display_not_output_error(qbar_pin)
+    new_scanner.print_error.assert_called_with(qbar_pin, 0,
+                                               "This is not an output. Only outputs can be monitored.")
+    assert new_scanner.print_error.call_count == 2
+
+
+def test_display_monitor_present_error(new_semantic_error_handler, new_scanner,
+                                       and1):
+    """Test the display_monitor_present_error method."""
+    new_semantic_error_handler.display_monitor_present_error(and1)
+    new_scanner.print_error.assert_called_with(and1, 0,
+                                               "Warning: Monitor exists at this output already.")
+    assert new_scanner.print_error.call_count == 1
