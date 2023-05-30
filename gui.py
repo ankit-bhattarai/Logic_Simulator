@@ -448,7 +448,9 @@ class RightPanel(wx.Panel):
     def OnButtonRun(self, event):
         """Handle the event when the user clicks the run button."""
         text = "Run button pressed."
-        self.guiint.run_network(self.spin.GetValue())
+        success = self.guiint.run_network(self.spin.GetValue())
+        if isinstance(success, str):
+            wx.MessageBox(success, "Message", wx.OK | wx.ICON_ERROR)
         self.parent.canvas.render(text)
         self.button_continue.Show()
         self.parent.canvas.render_signals()
@@ -457,7 +459,9 @@ class RightPanel(wx.Panel):
     def OnButtonContinue(self, event):
         """Handle the event when the user clicks the continue button."""
         text = "Continue button pressed."
-        self.guiint.continue_network(self.spin.GetValue())
+        successs = self.guiint.continue_network(self.spin.GetValue())
+        if isinstance(successs, str):
+            wx.MessageBox(successs, "Message", wx.OK | wx.ICON_ERROR)
         self.parent.canvas.render(text)
         self.parent.canvas.render_signals()
         self.Layout()
