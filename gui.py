@@ -11,13 +11,6 @@ Gui - configures the main window and all the widgets.
 import wx
 import wx.glcanvas as wxcanvas
 from OpenGL import GL, GLUT
-
-from names import Names
-from devices import Devices
-from network import Network
-from monitors import Monitors
-from scanner import Scanner
-from parse import Parser
 from guiint import GuiInterface
 
 change_button_cycles = False
@@ -376,9 +369,9 @@ class SwitchPanel(wx.Panel):
         self.left_sizer.Add(self.switch_text, 1, wx.EXPAND | wx.ALL, 10)
 
         combo_id_switch = wx.NewIdRef()
+        combo_choices = list(self.guiint.list_of_switches())
         self.combo_box_switch = wx.ComboBox(self, combo_id_switch,
-                                            choices=list(
-                                                self.guiint.list_of_switches()),
+                                            choices=combo_choices,
                                             style=wx.TE_PROCESS_ENTER)
         # Bind the combo box
         self.combo_box_switch.Bind(wx.EVT_COMBOBOX, self._OnComboSwitch)
@@ -524,9 +517,9 @@ class MonitorPanel(wx.Panel):
 
         # Have to create the combo box for the monitors
         combo_id_monitor = wx.NewIdRef()
+        combo_choices = list(self.guiint.list_of_outputs())
         self.combo_box_monitor = wx.ComboBox(self, combo_id_monitor,
-                                             choices=list(
-                                                 self.guiint.list_of_outputs()),
+                                             choices=combo_choices,
                                              style=wx.TE_PROCESS_ENTER)
         # Bind the combo box
         self.combo_box_monitor.Bind(wx.EVT_COMBOBOX, self._OnComboMonitor)
@@ -638,7 +631,7 @@ class MonitorPanel(wx.Panel):
 class RunPanel(wx.Panel):
     """ Panel for the run button and the cycles text box.
 
-    This panel is used for containing the run and continue buttons as well as 
+    This panel is used for containing the run and continue buttons as well as
     a spin control object for the user to enter the number of cycles to run.
 
     Parameters
@@ -793,7 +786,8 @@ class Gui(wx.Frame):
     on_text_box(self, event): Event handler for when the user enters text.
     """
 
-    def __init__(self, title, path, names, devices, network, monitors, scanner):
+    def __init__(self, title, path, names, devices, network, monitors,
+                 scanner):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(800, 600))
 
