@@ -296,70 +296,29 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.reset_zoom()
 
 
-class RightPanel(wx.Panel):
+class SwitchPanel(wx.Panel):
     def __init__(self, parent, guiint):
         super().__init__(parent=parent)  # Initialise
         self.parent = parent
+        self.grand_parent = parent.parent
         self.guiint = guiint
 
         # Creating the sizers
-        main_sizer = wx.BoxSizer(wx.VERTICAL)
-        top_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        middle_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        switch_main_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        monitor_main_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        main_sizer.Add(top_sizer, 0, wx.ALL, 5)
-        main_sizer.Add(middle_sizer, 0, wx.ALL, 5)
-        main_sizer.Add(switch_main_sizer, 0, wx.ALL, 10)
-        main_sizer.Add(monitor_main_sizer, 0, wx.ALL, 10)
+        self.main_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.left_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.right_sizer = wx.BoxSizer(wx.VERTICAL)
 
-        # Creating and Adding the smaller sizers to switch sizer
-        switch_select_sizer = wx.BoxSizer(wx.VERTICAL)
-        switch_state_sizer = wx.BoxSizer(wx.VERTICAL)
-        switch_main_sizer.Add(switch_select_sizer, 0, wx.ALL, 5)
-        switch_main_sizer.Add(switch_state_sizer, 0, wx.ALL, 5)
+        self.main_sizer.Add(self.left_sizer, 0, wx.ALL, 5)
+        self.main_sizer.Add(self.right_sizer, 0, wx.ALL, 5)
 
-        # Creating and Adding the smaller sizers to monitor sizer
-        monitor_select_sizer = wx.BoxSizer(wx.VERTICAL)
-        monitor_state_sizer = wx.BoxSizer(wx.VERTICAL)
-        monitor_main_sizer.Add(monitor_select_sizer, 0, wx.ALL, 5)
-        monitor_main_sizer.Add(monitor_state_sizer, 0, wx.ALL, 5)
-
-        # Add the text on the top
-        self.cycles_text = wx.StaticText(self, wx.ID_ANY, "Cycles: ")
-        top_sizer.Add(self.cycles_text, 1, wx.EXPAND | wx.ALL, 10)
-
-        # Create the spin object
-        self.spin = wx.SpinCtrl(self, wx.ID_ANY, "2", size=wx.Size(120, 10))
-        # Can't have 0 cycles, default max seems to be 100!
-        self.spin.SetMin(1)
-        # Bind the spin object
-        self.spin.Bind(wx.EVT_SPINCTRL, self.OnSpin)
-        # Add spin to top sizer
-        # self.spin.SetMinSize((wx.DefaultCoord, text_min_height))
-        top_sizer.Add(self.spin, 1, wx.EXPAND | wx.ALL, 5)
-
-        # Create the two buttons
-        self.run_button_id, self.continue_button_id = wx.NewIdRef(count=2)
-        self.button_run = wx.Button(self, self.run_button_id, "Run")
-        self.button_continue = wx.Button(self, self.continue_button_id,
-                                         "Continue")
-        # Bind buttons
-        self.button_run.Bind(wx.EVT_BUTTON, self.OnButtonRun)
-        self.button_continue.Bind(wx.EVT_BUTTON, self.OnButtonContinue)
-        # Add buttons to bottom sizer
-        middle_sizer.Add(self.button_run, 1, wx.ALL, 5)
-        middle_sizer.Add(self.button_continue, 1, wx.ALL, 5)
-        # Want to hide this until the run button is pressed!
-        self.button_continue.Hide()
+        # Creating the widgets
 
         # Text for the switches
         self.switch_text = wx.StaticText(
             self, wx.ID_ANY, "Select Switch and state: ")
-        switch_select_sizer.Add(self.switch_text, 1, wx.EXPAND | wx.ALL, 10)
+        self.left_sizer.Add(self.switch_text, 1, wx.EXPAND | wx.ALL, 10)
 
-        # Have to create the combo box for the switches
         combo_id_switch = wx.NewIdRef()
         self.combo_box_switch = wx.ComboBox(self, combo_id_switch,
                                             choices=list(
@@ -370,7 +329,7 @@ class RightPanel(wx.Panel):
         # Want it to work for both enter and selection
         self.combo_box_switch.Bind(wx.EVT_TEXT_ENTER, self.OnComboSwitch)
         # Add combo box to switch sizer
-        switch_select_sizer.Add(self.combo_box_switch, 1, wx.ALL, 5)
+        self.left_sizer.Add(self.combo_box_switch, 1, wx.ALL, 5)
         self.switch_text = None  # The option chosen on the combo box
 
         # For representing the state of the switch, will have two buttons
@@ -389,8 +348,8 @@ class RightPanel(wx.Panel):
         self.button_switch_1.Bind(wx.EVT_BUTTON, self.OnButtonSwitch1)
 
         # Add buttons to switch state sizer
-        switch_state_sizer.Add(self.button_switch_0, 1, wx.ALL, 5)
-        switch_state_sizer.Add(self.button_switch_1, 1, wx.ALL, 5)
+        self.right_sizer.Add(self.button_switch_0, 1, wx.ALL, 5)
+        self.right_sizer.Add(self.button_switch_1, 1, wx.ALL, 5)
         # Initially hide the buttons
         self.button_switch_0.Hide()
         self.button_switch_1.Hide()
@@ -399,82 +358,7 @@ class RightPanel(wx.Panel):
         self.red = wx.Colour(226, 126, 126, 255)
         self.green = wx.Colour(0, 255, 0, 255)
 
-        # Text for the monitors
-        self.monitor_text = wx.StaticText(
-            self, wx.ID_ANY, "Select Monitor: ")
-        monitor_select_sizer.Add(self.monitor_text, 1, wx.EXPAND | wx.ALL, 10)
-
-        # Have to create the combo box for the monitors
-        combo_id_monitor = wx.NewIdRef()
-        self.combo_box_monitor = wx.ComboBox(self, combo_id_monitor,
-                                             choices=list(
-                                                 self.guiint.list_of_outputs()),
-                                             style=wx.TE_PROCESS_ENTER)
-        # Bind the combo box
-        self.combo_box_monitor.Bind(wx.EVT_COMBOBOX, self.OnComboMonitor)
-        # Want it to work for both enter and selection
-        self.combo_box_monitor.Bind(wx.EVT_TEXT_ENTER, self.OnComboMonitor)
-
-        # Add combo box to monitor sizer
-        monitor_select_sizer.Add(self.combo_box_monitor, 1, wx.ALL, 5)
-        self.monitor_text = None  # The option chosen on the combo box
-
-        # For representing the state of the monitor, will have two buttons
-        # The button corresponding to the current state of the monitor
-        # will be green and the other one will be red
-
-        # Create the two buttons
-        self.monitor_button_id_0, self.monitor_button_id_1 = wx.NewIdRef(
-            count=2)
-        self.button_monitor_0 = wx.Button(
-            self, self.monitor_button_id_0, "Hide")
-        self.button_monitor_1 = wx.Button(
-            self, self.monitor_button_id_1, "Show")
-
-        # Bind buttons
-        self.button_monitor_0.Bind(wx.EVT_BUTTON, self.OnButtonMonitor0)
-        self.button_monitor_1.Bind(wx.EVT_BUTTON, self.OnButtonMonitor1)
-
-        # Add buttons to monitor state sizer
-        monitor_state_sizer.Add(self.button_monitor_0, 1, wx.ALL, 5)
-        monitor_state_sizer.Add(self.button_monitor_1, 1, wx.ALL, 5)
-        # Initially hide the buttons
-        self.button_monitor_0.Hide()
-        self.button_monitor_1.Hide()
-
-        # Set the sizer for the panel
-        self.SetSizer(main_sizer)
-
-    def OnButtonRun(self, event):
-        """Handle the event when the user clicks the run button."""
-        text = "Run button pressed."
-        success = self.guiint.run_network(self.spin.GetValue())
-        if isinstance(success, str):
-            wx.MessageBox(success, "Message", wx.OK | wx.ICON_ERROR)
-        self.parent.canvas.render(text)
-        self.button_continue.Show()
-        self.parent.canvas.render_signals()
-        self.Layout()
-
-    def OnButtonContinue(self, event):
-        """Handle the event when the user clicks the continue button."""
-        text = "Continue button pressed."
-        successs = self.guiint.continue_network(self.spin.GetValue())
-        if isinstance(successs, str):
-            wx.MessageBox(successs, "Message", wx.OK | wx.ICON_ERROR)
-        self.parent.canvas.render(text)
-        self.parent.canvas.render_signals()
-        self.Layout()
-
-    def OnSpin(self, event):
-        spin_value = self.spin.GetValue()
-        self.parent.canvas.render(f"Spin value: {spin_value}")
-        # Can modify the text of the buttons to this
-        if change_button_cycles:
-            self.button_run.SetLabel(f"Run for: {spin_value}")
-            self.button_continue.SetLabel(f"Continue for: {spin_value}")
-            self.GetSizer().Layout()
-            self.parent.GetSizer().Layout()
+        self.SetSizer(self.main_sizer)
 
     def renderSwitchBoxes(self):
         """Method renders the switch boxes based on their current state."""
@@ -496,8 +380,105 @@ class RightPanel(wx.Panel):
             # Change color of button 0 to red and button 1 to green
             self.button_switch_0.SetBackgroundColour(self.red)
             self.button_switch_1.SetBackgroundColour(self.green)
-        self.GetSizer().Layout()
+        self.main_sizer.Layout()
         self.parent.GetSizer().Layout()
+        self.grand_parent.GetSizer().Layout()
+
+    def OnComboSwitch(self, event):
+        combo_value = self.combo_box_switch.GetValue()
+        if combo_value in self.guiint.list_of_switches():
+            self.switch_text = combo_value  # Only change this if valid
+            self.renderSwitchBoxes()
+            print("Combo box changed. New_value:", combo_value)
+            self.grand_parent.canvas.render(
+                f"Combo box changed. New_value: {combo_value}")
+
+        else:
+            self.grand_parent.canvas.render("Invalid Selection Made")
+
+    def OnButtonSwitch0(self, event):
+        switch_text = self.switch_text
+        if switch_text is None:
+            pass  # This can't ever happen
+        else:
+            self.guiint.set_switch_state(switch_text, 0)
+            self.renderSwitchBoxes()
+        text = f"Switch {switch_text} is now open."
+        self.grand_parent.canvas.render(text)
+
+    def OnButtonSwitch1(self, event):
+        switch_text = self.switch_text
+        if switch_text is None:
+            pass  # This can't ever happen
+        else:
+            self.guiint.set_switch_state(switch_text, 1)
+            self.renderSwitchBoxes()
+        text = f"Switch {switch_text} is now closed."
+
+        self.grand_parent.canvas.render(text)
+
+
+class MonitorPanel(wx.Panel):
+    def __init__(self, parent, guiint):
+        super().__init__(parent=parent)  # Initialise
+        self.parent = parent
+        self.grand_parent = self.parent.parent
+        self.guiint = guiint
+        self.main_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.left_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.right_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.main_sizer.Add(self.left_sizer, 0, wx.EXPAND | wx.ALL, 10)
+        self.main_sizer.Add(self.right_sizer, 0, wx.EXPAND | wx.ALL, 10)
+
+        # # Specify the colors for the buttons
+        self.red = wx.Colour(226, 126, 126, 255)
+        self.green = wx.Colour(0, 255, 0, 255)
+
+        # Text for the monitors
+        self.monitor_text = wx.StaticText(
+            self, wx.ID_ANY, "Select Monitor: ")
+        self.left_sizer.Add(self.monitor_text, 1, wx.EXPAND | wx.ALL, 10)
+
+        # Have to create the combo box for the monitors
+        combo_id_monitor = wx.NewIdRef()
+        self.combo_box_monitor = wx.ComboBox(self, combo_id_monitor,
+                                             choices=list(
+                                                 self.guiint.list_of_outputs()),
+                                             style=wx.TE_PROCESS_ENTER)
+        # Bind the combo box
+        self.combo_box_monitor.Bind(wx.EVT_COMBOBOX, self.OnComboMonitor)
+        # Want it to work for both enter and selection
+        self.combo_box_monitor.Bind(wx.EVT_TEXT_ENTER, self.OnComboMonitor)
+
+        # Add combo box to monitor sizer
+        self.left_sizer.Add(self.combo_box_monitor, 1, wx.ALL, 5)
+        self.monitor_text = None  # The option chosen on the combo box
+
+        # For representing the state of the monitor, will have two buttons
+        # The button corresponding to the current state of the monitor
+        # will be green and the other one will be red
+
+        # Create the two buttons
+        self.monitor_button_id_0, self.monitor_button_id_1 = wx.NewIdRef(
+            count=2)
+        self.button_monitor_0 = wx.Button(
+            self, self.monitor_button_id_0, "Hide")
+        self.button_monitor_1 = wx.Button(
+            self, self.monitor_button_id_1, "Show")
+
+        # Bind buttons
+        self.button_monitor_0.Bind(wx.EVT_BUTTON, self.OnButtonMonitor0)
+        self.button_monitor_1.Bind(wx.EVT_BUTTON, self.OnButtonMonitor1)
+
+        # Add buttons to monitor state sizer
+        self.right_sizer.Add(self.button_monitor_0, 1, wx.ALL, 5)
+        self.right_sizer.Add(self.button_monitor_1, 1, wx.ALL, 5)
+        # Initially hide the buttons
+        self.button_monitor_0.Hide()
+        self.button_monitor_1.Hide()
+
+        # Add the sizer to the panel
+        self.SetSizer(self.main_sizer)
 
     def renderMonitorButtons(self):
         """Method renders the monitor buttons based on their current state."""
@@ -519,20 +500,9 @@ class RightPanel(wx.Panel):
             # Change color of button 0 to red and button 1 to green
             self.button_monitor_0.SetBackgroundColour(self.red)
             self.button_monitor_1.SetBackgroundColour(self.green)
-        self.GetSizer().Layout()
+        self.main_sizer.Layout()
         self.parent.GetSizer().Layout()
-
-    def OnComboSwitch(self, event):
-        combo_value = self.combo_box_switch.GetValue()
-        if combo_value in self.guiint.list_of_switches():
-            self.switch_text = combo_value  # Only change this if valid
-            self.renderSwitchBoxes()
-            print("Combo box changed. New_value:", combo_value)
-            self.parent.canvas.render(
-                f"Combo box changed. New_value: {combo_value}")
-
-        else:
-            self.parent.canvas.render("Invalid Selection Made")
+        self.grand_parent.GetSizer().Layout()
 
     def OnComboMonitor(self, event):
         combo_value = self.combo_box_monitor.GetValue()
@@ -540,31 +510,10 @@ class RightPanel(wx.Panel):
             self.monitor_text = combo_value  # Only change this if valid
             self.renderMonitorButtons()
             print("Combo box changed. New_value:", combo_value)
-            self.parent.canvas.render(
+            self.grand_parent.canvas.render(
                 f"Combo box changed. New_value: {combo_value}")
         else:
-            self.parent.canvas.render("Invalid Selection Made")
-
-    def OnButtonSwitch0(self, event):
-        switch_text = self.switch_text
-        if switch_text is None:
-            pass  # This can't ever happen
-        else:
-            self.guiint.set_switch_state(switch_text, 0)
-            self.renderSwitchBoxes()
-        text = f"Switch {switch_text} is now open."
-        self.parent.canvas.render(text)
-
-    def OnButtonSwitch1(self, event):
-        switch_text = self.switch_text
-        if switch_text is None:
-            pass  # This can't ever happen
-        else:
-            self.guiint.set_switch_state(switch_text, 1)
-            self.renderSwitchBoxes()
-        text = f"Switch {switch_text} is now closed."
-
-        self.parent.canvas.render(text)
+            self.grand_parent.canvas.render("Invalid Selection Made")
 
     def OnButtonMonitor0(self, event):
         monitor_text = self.monitor_text
@@ -573,9 +522,9 @@ class RightPanel(wx.Panel):
         else:
             self.guiint.set_output_state(monitor_text, 0)
             self.renderMonitorButtons()
-            self.parent.canvas.render_signals()
+            self.grand_parent.canvas.render_signals()
         text = f"Monitor {monitor_text} is now off."
-        self.parent.canvas.render(text)
+        self.grand_parent.canvas.render(text)
 
     def OnButtonMonitor1(self, event):
         monitor_text = self.monitor_text
@@ -584,9 +533,386 @@ class RightPanel(wx.Panel):
         else:
             self.guiint.set_output_state(monitor_text, 1)
             self.renderMonitorButtons()
-            self.parent.canvas.render_signals()
+            self.grand_parent.canvas.render_signals()
         text = f"Monitor {monitor_text} is now on."
-        self.parent.canvas.render(text)
+        self.grand_parent.canvas.render(text)
+
+
+class RunPanel(wx.Panel):
+    def __init__(self, parent, guiint):
+        super().__init__(parent=parent)  # Initialise
+        self.grand_parent = parent
+        self.grand_parent = self.grand_parent.parent
+        self.guiint = guiint
+
+        # Creating the sizers
+        self.main_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.top_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.middle_sizer = wx.BoxSizer(wx.HORIZONTAL)
+
+        # Add the sizers to the main sizer
+        self.main_sizer.Add(self.top_sizer, 0, wx.ALL, 5)
+        self.main_sizer.Add(self.middle_sizer, 0, wx.ALL, 5)
+
+        # Add the text on the top
+        self.cycles_text = wx.StaticText(self, wx.ID_ANY, "Cycles: ")
+        self.top_sizer.Add(self.cycles_text, 1, wx.EXPAND | wx.ALL, 10)
+
+        # Create the spin object
+        self.spin = wx.SpinCtrl(self, wx.ID_ANY, "2", size=wx.Size(120, 10))
+        # Can't have 0 cycles, default max seems to be 100!
+        self.spin.SetMin(1)
+        # Bind the spin object
+        self.spin.Bind(wx.EVT_SPINCTRL, self.OnSpin)
+        # Add spin to top sizer
+        # self.spin.SetMinSize((wx.DefaultCoord, text_min_height))
+        self.top_sizer.Add(self.spin, 1, wx.EXPAND | wx.ALL, 5)
+
+        # Create the two buttons
+        self.run_button_id, self.continue_button_id = wx.NewIdRef(count=2)
+        self.button_run = wx.Button(self, self.run_button_id, "Run")
+        self.button_continue = wx.Button(self, self.continue_button_id,
+                                         "Continue")
+        # Bind buttons
+        self.button_run.Bind(wx.EVT_BUTTON, self.OnButtonRun)
+        self.button_continue.Bind(wx.EVT_BUTTON, self.OnButtonContinue)
+        # Add buttons to bottom sizer
+        self.middle_sizer.Add(self.button_run, 1, wx.ALL, 5)
+        self.middle_sizer.Add(self.button_continue, 1, wx.ALL, 5)
+        # Want to hide this until the run button is pressed!
+        self.button_continue.Hide()
+
+        # Set the sizer
+        self.SetSizer(self.main_sizer)
+
+    def OnButtonRun(self, event):
+        """Handle the event when the user clicks the run button."""
+        text = "Run button pressed."
+        success = self.guiint.run_network(self.spin.GetValue())
+        if isinstance(success, str):
+            wx.MessageBox(success, "Message", wx.OK | wx.ICON_ERROR)
+        self.grand_parent.canvas.render(text)
+        self.button_continue.Show()
+        self.grand_parent.canvas.render_signals()
+        self.main_sizer.Layout()
+
+    def OnButtonContinue(self, event):
+        """Handle the event when the user clicks the continue button."""
+        text = "Continue button pressed."
+        successs = self.guiint.continue_network(self.spin.GetValue())
+        if isinstance(successs, str):
+            wx.MessageBox(successs, "Message", wx.OK | wx.ICON_ERROR)
+        self.grand_parent.canvas.render(text)
+        self.grand_parent.canvas.render_signals()
+        self.Layout()
+
+    def OnSpin(self, event):
+        spin_value = self.spin.GetValue()
+        self.grand_parent.canvas.render(f"Spin value: {spin_value}")
+        # Can modify the text of the buttons to this
+        if change_button_cycles:
+            self.button_run.SetLabel(f"Run for: {spin_value}")
+            self.button_continue.SetLabel(f"Continue for: {spin_value}")
+            self.main_sizer.Layout()
+            self.grand_parent.GetSizer().Layout()
+
+
+class RightPanel(wx.Panel):
+    def __init__(self, parent, guiint):
+        super().__init__(parent=parent)  # Initialise
+        self.parent = parent
+        self.guiint = guiint
+
+        # Creating the sizers
+        main_sizer = wx.BoxSizer(wx.VERTICAL)
+        # top_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        # middle_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        # switch_main_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        # monitor_main_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.run_panel = RunPanel(self, guiint)
+        main_sizer.Add(self.run_panel, 0, wx.ALL, 5)
+        # main_sizer.Add(top_sizer, 0, wx.ALL, 5)
+        # main_sizer.Add(middle_sizer, 0, wx.ALL, 5)
+        self.switch_panel = SwitchPanel(self, guiint)
+        main_sizer.Add(self.switch_panel, 0, wx.ALL, 5)
+        # main_sizer.Add(switch_main_sizer, 0, wx.ALL, 10)
+        self.monitor_panel = MonitorPanel(self, guiint)
+        main_sizer.Add(self.monitor_panel, 0, wx.ALL, 5)
+        # main_sizer.Add(monitor_main_sizer, 0, wx.ALL, 10)
+
+        # Creating and Adding the smaller sizers to switch sizer
+        # switch_select_sizer = wx.BoxSizer(wx.VERTICAL)
+        # switch_state_sizer = wx.BoxSizer(wx.VERTICAL)
+        # switch_main_sizer.Add(switch_select_sizer, 0, wx.ALL, 5)
+        # switch_main_sizer.Add(switch_state_sizer, 0, wx.ALL, 5)
+
+        # Creating and Adding the smaller sizers to monitor sizer
+        # monitor_select_sizer = wx.BoxSizer(wx.VERTICAL)
+        # monitor_state_sizer = wx.BoxSizer(wx.VERTICAL)
+        # monitor_main_sizer.Add(monitor_select_sizer, 0, wx.ALL, 5)
+        # monitor_main_sizer.Add(monitor_state_sizer, 0, wx.ALL, 5)
+
+        # Add the text on the top
+        # self.cycles_text = wx.StaticText(self, wx.ID_ANY, "Cycles: ")
+        # top_sizer.Add(self.cycles_text, 1, wx.EXPAND | wx.ALL, 10)
+
+        # # Create the spin object
+        # self.spin = wx.SpinCtrl(self, wx.ID_ANY, "2", size=wx.Size(120, 10))
+        # # Can't have 0 cycles, default max seems to be 100!
+        # self.spin.SetMin(1)
+        # # Bind the spin object
+        # self.spin.Bind(wx.EVT_SPINCTRL, self.OnSpin)
+        # # Add spin to top sizer
+        # # self.spin.SetMinSize((wx.DefaultCoord, text_min_height))
+        # top_sizer.Add(self.spin, 1, wx.EXPAND | wx.ALL, 5)
+
+        # # Create the two buttons
+        # self.run_button_id, self.continue_button_id = wx.NewIdRef(count=2)
+        # self.button_run = wx.Button(self, self.run_button_id, "Run")
+        # self.button_continue = wx.Button(self, self.continue_button_id,
+        #                                  "Continue")
+        # # Bind buttons
+        # self.button_run.Bind(wx.EVT_BUTTON, self.OnButtonRun)
+        # self.button_continue.Bind(wx.EVT_BUTTON, self.OnButtonContinue)
+        # # Add buttons to bottom sizer
+        # middle_sizer.Add(self.button_run, 1, wx.ALL, 5)
+        # middle_sizer.Add(self.button_continue, 1, wx.ALL, 5)
+        # # Want to hide this until the run button is pressed!
+        # self.button_continue.Hide()
+
+        # # Text for the switches
+        # self.switch_text = wx.StaticText(
+        #     self, wx.ID_ANY, "Select Switch and state: ")
+        # switch_select_sizer.Add(self.switch_text, 1, wx.EXPAND | wx.ALL, 10)
+
+        # # Have to create the combo box for the switches
+        # combo_id_switch = wx.NewIdRef()
+        # self.combo_box_switch = wx.ComboBox(self, combo_id_switch,
+        #                                     choices=list(
+        #                                         self.guiint.list_of_switches()),
+        #                                     style=wx.TE_PROCESS_ENTER)
+        # # Bind the combo box
+        # self.combo_box_switch.Bind(wx.EVT_COMBOBOX, self.OnComboSwitch)
+        # # Want it to work for both enter and selection
+        # self.combo_box_switch.Bind(wx.EVT_TEXT_ENTER, self.OnComboSwitch)
+        # # Add combo box to switch sizer
+        # switch_select_sizer.Add(self.combo_box_switch, 1, wx.ALL, 5)
+        # self.switch_text = None  # The option chosen on the combo box
+
+        # # For representing the state of the switch, will have two buttons
+        # # The button corresponding to the current state of the switch
+        # # will be green and the other one will be red
+
+        # # Create the two buttons
+        # self.switch_button_id_0, self.switch_button_id_1 = wx.NewIdRef(count=2)
+        # self.button_switch_0 = wx.Button(
+        #     self, self.switch_button_id_0, "Open")
+        # self.button_switch_1 = wx.Button(
+        #     self, self.switch_button_id_1, "Wired")
+
+        # # Bind buttons
+        # self.button_switch_0.Bind(wx.EVT_BUTTON, self.OnButtonSwitch0)
+        # self.button_switch_1.Bind(wx.EVT_BUTTON, self.OnButtonSwitch1)
+
+        # # Add buttons to switch state sizer
+        # switch_state_sizer.Add(self.button_switch_0, 1, wx.ALL, 5)
+        # switch_state_sizer.Add(self.button_switch_1, 1, wx.ALL, 5)
+        # # Initially hide the buttons
+        # self.button_switch_0.Hide()
+        # self.button_switch_1.Hide()
+
+        # # # Specify the colors for the buttons
+        # self.red = wx.Colour(226, 126, 126, 255)
+        # self.green = wx.Colour(0, 255, 0, 255)
+
+        # # Text for the monitors
+        # self.monitor_text = wx.StaticText(
+        #     self, wx.ID_ANY, "Select Monitor: ")
+        # monitor_select_sizer.Add(self.monitor_text, 1, wx.EXPAND | wx.ALL, 10)
+
+        # # Have to create the combo box for the monitors
+        # combo_id_monitor = wx.NewIdRef()
+        # self.combo_box_monitor = wx.ComboBox(self, combo_id_monitor,
+        #                                      choices=list(
+        #                                          self.guiint.list_of_outputs()),
+        #                                      style=wx.TE_PROCESS_ENTER)
+        # # Bind the combo box
+        # self.combo_box_monitor.Bind(wx.EVT_COMBOBOX, self.OnComboMonitor)
+        # # Want it to work for both enter and selection
+        # self.combo_box_monitor.Bind(wx.EVT_TEXT_ENTER, self.OnComboMonitor)
+
+        # # Add combo box to monitor sizer
+        # monitor_select_sizer.Add(self.combo_box_monitor, 1, wx.ALL, 5)
+        # self.monitor_text = None  # The option chosen on the combo box
+
+        # # For representing the state of the monitor, will have two buttons
+        # # The button corresponding to the current state of the monitor
+        # # will be green and the other one will be red
+
+        # # Create the two buttons
+        # self.monitor_button_id_0, self.monitor_button_id_1 = wx.NewIdRef(
+        #     count=2)
+        # self.button_monitor_0 = wx.Button(
+        #     self, self.monitor_button_id_0, "Hide")
+        # self.button_monitor_1 = wx.Button(
+        #     self, self.monitor_button_id_1, "Show")
+
+        # # Bind buttons
+        # self.button_monitor_0.Bind(wx.EVT_BUTTON, self.OnButtonMonitor0)
+        # self.button_monitor_1.Bind(wx.EVT_BUTTON, self.OnButtonMonitor1)
+
+        # # Add buttons to monitor state sizer
+        # monitor_state_sizer.Add(self.button_monitor_0, 1, wx.ALL, 5)
+        # monitor_state_sizer.Add(self.button_monitor_1, 1, wx.ALL, 5)
+        # # Initially hide the buttons
+        # self.button_monitor_0.Hide()
+        # self.button_monitor_1.Hide()
+
+        # Set the sizer for the panel
+        self.SetSizer(main_sizer)
+
+    # def OnButtonRun(self, event):
+    #     """Handle the event when the user clicks the run button."""
+    #     text = "Run button pressed."
+    #     success = self.guiint.run_network(self.spin.GetValue())
+    #     if isinstance(success, str):
+    #         wx.MessageBox(success, "Message", wx.OK | wx.ICON_ERROR)
+    #     self.parent.canvas.render(text)
+    #     self.button_continue.Show()
+    #     self.parent.canvas.render_signals()
+    #     self.Layout()
+
+    # def OnButtonContinue(self, event):
+    #     """Handle the event when the user clicks the continue button."""
+    #     text = "Continue button pressed."
+    #     successs = self.guiint.continue_network(self.spin.GetValue())
+    #     if isinstance(successs, str):
+    #         wx.MessageBox(successs, "Message", wx.OK | wx.ICON_ERROR)
+    #     self.parent.canvas.render(text)
+    #     self.parent.canvas.render_signals()
+    #     self.Layout()
+
+    # def OnSpin(self, event):
+    #     spin_value = self.spin.GetValue()
+    #     self.parent.canvas.render(f"Spin value: {spin_value}")
+    #     # Can modify the text of the buttons to this
+    #     if change_button_cycles:
+    #         self.button_run.SetLabel(f"Run for: {spin_value}")
+    #         self.button_continue.SetLabel(f"Continue for: {spin_value}")
+    #         self.GetSizer().Layout()
+    #         self.parent.GetSizer().Layout()
+
+    # def renderSwitchBoxes(self):
+    #     """Method renders the switch boxes based on their current state."""
+    #     # Get the current switch
+    #     switch_text = self.switch_text
+    #     if switch_text is None:  # This can't ever happen
+    #         # As this function is only called when the combo box is changed
+    #         pass
+    #     switch_state = self.guiint.get_switch_state(switch_text)
+    #     # Show the buttons
+    #     self.button_switch_0.Show()
+    #     self.button_switch_1.Show()
+    #     # Set the colors of the buttons
+    #     if switch_state == 0:
+    #         # Change color of button 0 to green and button 1 to red
+    #         self.button_switch_0.SetBackgroundColour(self.green)
+    #         self.button_switch_1.SetBackgroundColour(self.red)
+    #     else:  # switch_state == 1
+    #         # Change color of button 0 to red and button 1 to green
+    #         self.button_switch_0.SetBackgroundColour(self.red)
+    #         self.button_switch_1.SetBackgroundColour(self.green)
+    #     self.GetSizer().Layout()
+    #     self.parent.GetSizer().Layout()
+
+    # def renderMonitorButtons(self):
+    #     """Method renders the monitor buttons based on their current state."""
+    #     # Get the current monitor
+    #     monitor_text = self.monitor_text
+    #     if monitor_text is None:  # This can't ever happen
+    #         # As this function is only called when the combo box is changed
+    #         pass
+    #     monitor_state = self.guiint.get_output_state(monitor_text)
+    #     # Show the buttons
+    #     self.button_monitor_0.Show()
+    #     self.button_monitor_1.Show()
+    #     # Set the colors of the buttons
+    #     if monitor_state == 0:
+    #         # Change color of button 0 to green and button 1 to red
+    #         self.button_monitor_0.SetBackgroundColour(self.green)
+    #         self.button_monitor_1.SetBackgroundColour(self.red)
+    #     else:  # monitor_state == 1
+    #         # Change color of button 0 to red and button 1 to green
+    #         self.button_monitor_0.SetBackgroundColour(self.red)
+    #         self.button_monitor_1.SetBackgroundColour(self.green)
+    #     self.GetSizer().Layout()
+    #     self.parent.GetSizer().Layout()
+
+    # def OnComboSwitch(self, event):
+    #     combo_value = self.combo_box_switch.GetValue()
+    #     if combo_value in self.guiint.list_of_switches():
+    #         self.switch_text = combo_value  # Only change this if valid
+    #         self.renderSwitchBoxes()
+    #         print("Combo box changed. New_value:", combo_value)
+    #         self.parent.canvas.render(
+    #             f"Combo box changed. New_value: {combo_value}")
+
+    #     else:
+    #         self.parent.canvas.render("Invalid Selection Made")
+
+    # def OnComboMonitor(self, event):
+    #     combo_value = self.combo_box_monitor.GetValue()
+    #     if combo_value in self.guiint.list_of_outputs():
+    #         self.monitor_text = combo_value  # Only change this if valid
+    #         self.renderMonitorButtons()
+    #         print("Combo box changed. New_value:", combo_value)
+    #         self.parent.canvas.render(
+    #             f"Combo box changed. New_value: {combo_value}")
+    #     else:
+    #         self.parent.canvas.render("Invalid Selection Made")
+
+    # def OnButtonSwitch0(self, event):
+    #     switch_text = self.switch_text
+    #     if switch_text is None:
+    #         pass  # This can't ever happen
+    #     else:
+    #         self.guiint.set_switch_state(switch_text, 0)
+    #         self.renderSwitchBoxes()
+    #     text = f"Switch {switch_text} is now open."
+    #     self.parent.canvas.render(text)
+
+    # def OnButtonSwitch1(self, event):
+    #     switch_text = self.switch_text
+    #     if switch_text is None:
+    #         pass  # This can't ever happen
+    #     else:
+    #         self.guiint.set_switch_state(switch_text, 1)
+    #         self.renderSwitchBoxes()
+    #     text = f"Switch {switch_text} is now closed."
+
+    #     self.parent.canvas.render(text)
+
+    # def OnButtonMonitor0(self, event):
+    #     monitor_text = self.monitor_text
+    #     if monitor_text is None:
+    #         pass
+    #     else:
+    #         self.guiint.set_output_state(monitor_text, 0)
+    #         self.renderMonitorButtons()
+    #         self.parent.canvas.render_signals()
+    #     text = f"Monitor {monitor_text} is now off."
+    #     self.parent.canvas.render(text)
+
+    # def OnButtonMonitor1(self, event):
+    #     monitor_text = self.monitor_text
+    #     if monitor_text is None:
+    #         pass
+    #     else:
+    #         self.guiint.set_output_state(monitor_text, 1)
+    #         self.renderMonitorButtons()
+    #         self.parent.canvas.render_signals()
+    #     text = f"Monitor {monitor_text} is now on."
+    #     self.parent.canvas.render(text)
 
 
 class Gui(wx.Frame):
