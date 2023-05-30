@@ -225,29 +225,40 @@ def test_identify_total_errors(new_names, new_devices, new_network, new_monitors
     # 5 clean, 5 unclean
 
 
-@pytest.mark.parametrize("definition_file, symbol_details, message, index",
+@pytest.mark.parametrize("definition_file, symbol_details, message, index, success",
                          [("test_parse_files/semantic_error_1.txt", ["switch1", 16, 1, 35],
-                           "Device names are not unique. switch1 is already the name of a device", 0),
+                           "Device names are not unique. switch1 is already the name of a device", 0, False),
                           ("test_parse_files/semantic_error_2.txt", ["switch3", 30, 4, 33],
-                          "Device switch3 is not defined", 0),
+                          "Device switch3 is not defined", 0, False),
                           ("test_parse_files/semantic_error_3.txt", ["I3", 30, 4, 70],
-                           "Port I3 is not defined for device nor1", 0),
+                           "Port I3 is not defined for device nor1", 0, False),
                           ("test_parse_files/semantic_error_4.txt", ["I1", 30, 4, 18],
-                           "Port I1 is not defined for device dtype1", 0),
+                           "Port I1 is not defined for device dtype1", 0, False),
                           ("test_parse_files/semantic_error_5.txt", ["DATA", 11, 5, 62],
-                           "Signal switch1 is already connected to the input pin dtype1.DATA. Only one signal must be connected to an input.", 0),
+                           "Signal switch1 is already connected to the input pin dtype1.DATA. Only one signal must be connected to an input.", 0, False),
                           ("test_parse_files/semantic_error_6.txt", ["DATA", 11, 5, 62],
-                           "Signal switch1 is already connected to the input pin dtype1.DATA. Only one signal must be connected to an input.", 0),
+                           "Signal switch1 is already connected to the input pin dtype1.DATA. Only one signal must be connected to an input.", 0, False),
                           ("test_parse_files/semantic_error_7.txt", ["I1", 30, 5, 20],
-                           "The following input pins are not connected to a device: ['dtype1.CLK']", 2),
+                           "The following input pins are not connected to a device: ['dtype1.CLK']", 2, False),
                           ("test_parse_files/semantic_error_8.txt", ["dtype1", 23, 4, 44],
-                           "Port is missing for device dtype1", 0),
+                           "Port is missing for device dtype1", 0, False),
                           ("test_parse_files/semantic_error_9.txt", ["QBAR", 13, 5, 50],
-                           "Port QBAR is not defined for device xor1", 0)]
+                           "Port QBAR is not defined for device xor1", 0, False),
+                          ("test_parse_files/semantic_error_10.txt", ["I1", 30, 5, 20],
+                           "The following input pins are not connected to a device: ['dtype1.CLK', 'xor1.I2']", 2, False),
+                          ("test_parse_files/semantic_error_11.txt", ["xor2", 33, 6, 52],
+                           "Device xor2 is not defined", 0, False),
+                          ("test_parse_files/semantic_error_12.txt", ["QBAR", 13, 6, 57],
+                             "This is not an output. Only outputs can be monitored.", 0, False),
+                          ("test_parse_files/semantic_error_13.txt", ["dtype1", 23, 6, 36],
+                             "This is not an output. Only outputs can be monitored.", 0, False),
+                             ("test_parse_files/semantic_error_14.txt", ["Q", 12, 6, 59],
+                              "Warning: Monitor exists at this output already.", 0, True)
+                          ]
 
                          )
 def test_semantic_error_identification(definition_file, symbol_details,
-                                       message, index, new_names, new_devices,
+                                       message, index, success, new_names, new_devices,
                                        new_network, new_monitors):
     """Test that the correct semantic error is identified.
 
@@ -260,14 +271,15 @@ def test_semantic_error_identification(definition_file, symbol_details,
     these tests at all. Were this test to do a print assert check, if 
     print_error was changed for aesthetic or functionality reasons, all of
     these tests will have to be rewritten to suit the new style in which
-    the mesaages are printed.
+    the mesaages are printed. The cost for this approach however is that the
+    definition files have to be analysed to get the attributes of the symbol.
     """
     new_scanner = Scanner(definition_file, new_names)
     new_scanner.print_error = MagicMock()
     new_parser = Parser(new_names, new_devices, new_network, new_monitors,
                         new_scanner)
-    success = new_parser.parse_network()
-    assert not success
+    result = new_parser.parse_network()
+    assert result == success
     symbol = Symbol(*symbol_details)
     new_scanner.print_error.assert_called_once_with(symbol, index, message)
     assert new_scanner.print_error.call_count == 1
