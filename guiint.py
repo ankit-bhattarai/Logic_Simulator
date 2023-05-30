@@ -156,14 +156,15 @@ class GuiInterface():
         n_cycles: number of cycles to run (int)
         Returns
         -------
-        No return value
+        Return True if network is running, "Network oscillating!" if network is oscillating
         """
         self.devices.cold_startup()
         self.monitors.reset_monitors()
         for i in range(n_cycles):
             if not self.network.execute_network():
-                print("Network oscillating!")
+                return "Network oscillating!"
             self.monitors.record_signals()
+        return True 
 
     def continue_network(self, n_cycles):
         """Continues running the network for n-cycles
@@ -172,12 +173,13 @@ class GuiInterface():
         n_cycles: number of cycles to run (int)
         Returns
         -------
-        No return value
+        Return True if network is running, "Network oscillating!" if network is oscillating
         """
         for i in range(n_cycles):
             if not self.network.execute_network():
-                print("Network oscillating!")
+                return "Network oscillating!"
             self.monitors.record_signals()
+        return True
 
     def get_signals(self):
         """Returns dictionary of all monitered signal states for each monitored output
