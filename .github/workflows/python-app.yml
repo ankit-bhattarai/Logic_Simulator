@@ -1,13 +1,28 @@
-image: python:3.8
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
-test:
-  script:
-  # Install Python packages required to run code. Add any additional
-  # packages your code needs require here.
-  - pip install dateutils flake8 matplotlib numpy pytest requests
+name: Python application
 
-  # flake8 static code and style testing. Enable for extra testing.
-  # - python -m flake8 .
+on: push
 
-    # Run unit tests
-  - python -m pytest -v .
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.8"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install dateutils flake8 matplotlib numpy pytest requests
+    - name: Test with pytest
+      run: |
+        pytest
