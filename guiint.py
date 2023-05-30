@@ -161,7 +161,8 @@ class GuiInterface():
         self.devices.cold_startup()
         self.monitors.reset_monitors()
         for i in range(n_cycles):
-            self.network.execute_network()
+            if not self.network.execute_network():
+                print("Network oscillating!")
             self.monitors.record_signals()
 
     def continue_network(self, n_cycles):
@@ -174,7 +175,8 @@ class GuiInterface():
         No return value
         """
         for i in range(n_cycles):
-            self.network.execute_network()
+            if not self.network.execute_network():
+                print("Network oscillating!")
             self.monitors.record_signals()
 
     def get_signals(self):
