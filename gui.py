@@ -33,8 +33,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
     Parameters
     ----------
     parent: parent window.
-    devices: instance of the devices.Devices() class.
-    monitors: instance of the monitors.Monitors() class.
+    guiint: instance of the guiint.GuiInterface() class.
 
     Public methods
     --------------
@@ -50,6 +49,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
     render_text(self, text, x_pos, y_pos): Handles text drawing
                                            operations.
+
+    render_signals(self): Renders all signals on the canvas.
     """
 
     def __init__(self, parent, guiint):
@@ -77,8 +78,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_PAINT, self.on_paint)
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
-        self.Bind(wx.EVT_MIDDLE_DOWN, self.reset_pan)
-        self.Bind(wx.EVT_RIGHT_DOWN, self.reset_view)
+        self.Bind(wx.EVT_MIDDLE_DOWN, self._reset_pan)
+        self.Bind(wx.EVT_RIGHT_DOWN, self._reset_view)
 
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
@@ -96,6 +97,23 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glScaled(self.zoom, self.zoom, self.zoom)
 
     def render_axes(self, x_start, y_start, values, name, width, height):
+        """Method to render axes around signal on the canvas.
+
+        Parameters
+        ----------
+        x_start: int
+            x coordinate of the start of the signal on the canvas.
+        y_start: int
+            y coordinate of the start of the signal on the canvas.
+        values: list
+            list of values containing the state of the signal.
+        name: str
+            name of the signal.
+        width: int
+            width of a specific time unit for the signal.
+        height: int
+            height of the signal.
+        """
         axes_offset_x = 5
         axes_offset_y = 5
         GL.glColor3f(0.0, 0.0, 0.0)  # Black
@@ -145,8 +163,28 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.render_text(name, x_start - name_offset_left,
                          y_start + height + name_offset_up)
 
-    def render_signal(self, x_start, y_start, values, name, colour=(0.0, 0.0, 1.0),
-                      width=20, height=25):
+    def _render_signal(self, x_start, y_start, values, name,
+                       colour=(0.0, 0.0, 1.0),
+                       width=20, height=25):
+        """Method to render a single signal based on the values provided.
+
+        Parameters
+        ----------
+        x_start: int
+            x coordinate of the start of the signal on the canvas.
+        y_start: int
+            y coordinate of the start of the signal on the canvas.
+        values: list
+            list of values containing the state of the signal.
+        name: str
+            name of the signal.
+        colour: tuple, optional, default=(0.0, 0.0, 1.0)
+            tuple containing the RGB values of the colour of the signal.
+        width: int, optional, default=20
+            width of a specific time unit for the signal.
+        height: int, optional, default=25
+            height of the signal.
+        """
         GL.glColor3f(*colour)
         GL.glBegin(GL.GL_LINE_STRIP)
         x = x_start
@@ -167,12 +205,13 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.render_axes(x_start, y_start, len(values), name, width, height)
 
     def render_signals(self):
+        """Method to render all signals."""
         height_above_signal = 100
         base_x = 40
         base_y = 80
         for i, (name, values) in enumerate(self.guiint.get_signals().items()):
-            self.render_signal(base_x, base_y + i * height_above_signal,
-                               values, name)
+            self._render_signal(base_x, base_y + i * height_above_signal,
+                                values, name)
 
     def render(self, text):
         """Handle all drawing operations."""
@@ -212,7 +251,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         """Handle the canvas resize event."""
         # Forces reconfiguration of the viewport, modelview and projection
         # matrices on the next paint event
-        self.reset_view()  # Rest the zoom and pan whenever screen is resized
+        self._reset_view()  # Rest the zoom and pan whenever screen is resized
         self.init = False
 
     def on_mouse(self, event):
@@ -279,25 +318,42 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             else:
                 GLUT.glutBitmapCharacter(font, ord(character))
 
-    def reset_pan(self, event=None):
+    def _reset_pan(self, event=None):
         """Reset the pan."""
         self.pan_x = 0
         self.pan_y = 0
         self.init = False
 
-    def reset_zoom(self, event=None):
+    def _reset_zoom(self, event=None):
         """Reset the zoom."""
         self.zoom = 1.0
         self.init = False
 
-    def reset_view(self, event=None):
+    def _reset_view(self, event=None):
         """Reset the view to the initial view and zoom."""
-        self.reset_pan()
-        self.reset_zoom()
+        self._reset_pan()
+        self._reset_zoom()
 
 
 class SwitchPanel(wx.Panel):
+    """
+    Panel for the switches
+
+    This panel will contain the functionality for the showing the switches'
+    state and changing their state.
+
+    Parameters
+    ----------
+    parent : parent Window
+    guiint : instance of the guiint.GuiInterface() class.
+
+    Public Methods
+    --------------
+    None
+    """
+
     def __init__(self, parent, guiint):
+        """Method initalises the panel."""
         super().__init__(parent=parent)  # Initialise
         self.parent = parent
         self.grand_parent = parent.parent
@@ -325,9 +381,9 @@ class SwitchPanel(wx.Panel):
                                                 self.guiint.list_of_switches()),
                                             style=wx.TE_PROCESS_ENTER)
         # Bind the combo box
-        self.combo_box_switch.Bind(wx.EVT_COMBOBOX, self.OnComboSwitch)
+        self.combo_box_switch.Bind(wx.EVT_COMBOBOX, self._OnComboSwitch)
         # Want it to work for both enter and selection
-        self.combo_box_switch.Bind(wx.EVT_TEXT_ENTER, self.OnComboSwitch)
+        self.combo_box_switch.Bind(wx.EVT_TEXT_ENTER, self._OnComboSwitch)
         # Add combo box to switch sizer
         self.left_sizer.Add(self.combo_box_switch, 1, wx.ALL, 5)
         self.switch_text = None  # The option chosen on the combo box
@@ -344,8 +400,8 @@ class SwitchPanel(wx.Panel):
             self, self.switch_button_id_1, "Wired")
 
         # Bind buttons
-        self.button_switch_0.Bind(wx.EVT_BUTTON, self.OnButtonSwitch0)
-        self.button_switch_1.Bind(wx.EVT_BUTTON, self.OnButtonSwitch1)
+        self.button_switch_0.Bind(wx.EVT_BUTTON, self._OnButtonSwitch0)
+        self.button_switch_1.Bind(wx.EVT_BUTTON, self._OnButtonSwitch1)
 
         # Add buttons to switch state sizer
         self.right_sizer.Add(self.button_switch_0, 1, wx.ALL, 5)
@@ -360,7 +416,7 @@ class SwitchPanel(wx.Panel):
 
         self.SetSizer(self.main_sizer)
 
-    def renderSwitchBoxes(self):
+    def _renderSwitchBoxes(self):
         """Method renders the switch boxes based on their current state."""
         # Get the current switch
         switch_text = self.switch_text
@@ -384,42 +440,69 @@ class SwitchPanel(wx.Panel):
         self.parent.GetSizer().Layout()
         self.grand_parent.GetSizer().Layout()
 
-    def OnComboSwitch(self, event):
+    def _OnComboSwitch(self, event):
+        """Method called when the combo box is changed.
+
+        This method will change the switch text and render the switch boxes.
+        It also displays the appropriate message on the canvas."""
         combo_value = self.combo_box_switch.GetValue()
         if combo_value in self.guiint.list_of_switches():
             self.switch_text = combo_value  # Only change this if valid
-            self.renderSwitchBoxes()
-            print("Combo box changed. New_value:", combo_value)
+            self._renderSwitchBoxes()
             self.grand_parent.canvas.render(
                 f"Combo box changed. New_value: {combo_value}")
-
         else:
             self.grand_parent.canvas.render("Invalid Selection Made")
 
-    def OnButtonSwitch0(self, event):
+    def _OnButtonSwitch0(self, event):
+        """Method called when button 0 is pressed.
+
+        This method will change the state of the switch to 0 and render the
+        switch boxes."""
         switch_text = self.switch_text
         if switch_text is None:
             pass  # This can't ever happen
         else:
             self.guiint.set_switch_state(switch_text, 0)
-            self.renderSwitchBoxes()
+            self._renderSwitchBoxes()
         text = f"Switch {switch_text} is now open."
         self.grand_parent.canvas.render(text)
 
-    def OnButtonSwitch1(self, event):
+    def _OnButtonSwitch1(self, event):
+        """Method called when button 1 is pressed.
+
+        This method will change the state of the switch to 1 and render the
+        switch boxes."""
         switch_text = self.switch_text
         if switch_text is None:
             pass  # This can't ever happen
         else:
             self.guiint.set_switch_state(switch_text, 1)
-            self.renderSwitchBoxes()
+            self._renderSwitchBoxes()
         text = f"Switch {switch_text} is now closed."
 
         self.grand_parent.canvas.render(text)
 
 
 class MonitorPanel(wx.Panel):
+    """
+    Panel for the monitors
+
+    This panel will have the functionalities of viewing which outputs are being
+    monitored as well as add or remove outputs to be monitored.
+
+    Parameters
+    ----------
+    parent : parent window
+    guiint: instance of the guiint.GuiInterface() class.
+
+    Public Methods
+    --------------
+    None
+    """
+
     def __init__(self, parent, guiint):
+        """Method initialises the panel."""
         super().__init__(parent=parent)  # Initialise
         self.parent = parent
         self.grand_parent = self.parent.parent
@@ -446,9 +529,9 @@ class MonitorPanel(wx.Panel):
                                                  self.guiint.list_of_outputs()),
                                              style=wx.TE_PROCESS_ENTER)
         # Bind the combo box
-        self.combo_box_monitor.Bind(wx.EVT_COMBOBOX, self.OnComboMonitor)
+        self.combo_box_monitor.Bind(wx.EVT_COMBOBOX, self._OnComboMonitor)
         # Want it to work for both enter and selection
-        self.combo_box_monitor.Bind(wx.EVT_TEXT_ENTER, self.OnComboMonitor)
+        self.combo_box_monitor.Bind(wx.EVT_TEXT_ENTER, self._OnComboMonitor)
 
         # Add combo box to monitor sizer
         self.left_sizer.Add(self.combo_box_monitor, 1, wx.ALL, 5)
@@ -467,8 +550,8 @@ class MonitorPanel(wx.Panel):
             self, self.monitor_button_id_1, "Show")
 
         # Bind buttons
-        self.button_monitor_0.Bind(wx.EVT_BUTTON, self.OnButtonMonitor0)
-        self.button_monitor_1.Bind(wx.EVT_BUTTON, self.OnButtonMonitor1)
+        self.button_monitor_0.Bind(wx.EVT_BUTTON, self._OnButtonMonitor0)
+        self.button_monitor_1.Bind(wx.EVT_BUTTON, self._OnButtonMonitor1)
 
         # Add buttons to monitor state sizer
         self.right_sizer.Add(self.button_monitor_0, 1, wx.ALL, 5)
@@ -480,7 +563,7 @@ class MonitorPanel(wx.Panel):
         # Add the sizer to the panel
         self.SetSizer(self.main_sizer)
 
-    def renderMonitorButtons(self):
+    def _renderMonitorButtons(self):
         """Method renders the monitor buttons based on their current state."""
         # Get the current monitor
         monitor_text = self.monitor_text
@@ -504,42 +587,72 @@ class MonitorPanel(wx.Panel):
         self.parent.GetSizer().Layout()
         self.grand_parent.GetSizer().Layout()
 
-    def OnComboMonitor(self, event):
+    def _OnComboMonitor(self, event):
+        """Method called when the combo box is changed.
+
+        Method changes the monitor text attribute and calls the
+        _renderMonitorButtons() method.
+
+        It also sends the appropriate message to the canvas."""
         combo_value = self.combo_box_monitor.GetValue()
         if combo_value in self.guiint.list_of_outputs():
             self.monitor_text = combo_value  # Only change this if valid
-            self.renderMonitorButtons()
-            print("Combo box changed. New_value:", combo_value)
+            self._renderMonitorButtons()
             self.grand_parent.canvas.render(
                 f"Combo box changed. New_value: {combo_value}")
         else:
             self.grand_parent.canvas.render("Invalid Selection Made")
 
-    def OnButtonMonitor0(self, event):
+    def _OnButtonMonitor0(self, event):
+        """Method called when the monitor button 0 is pressed.
+
+        Method changes the state of the monitor to 0 and calls the
+        _renderMonitorButtons() method.
+        """
         monitor_text = self.monitor_text
         if monitor_text is None:
             pass
         else:
             self.guiint.set_output_state(monitor_text, 0)
-            self.renderMonitorButtons()
+            self._renderMonitorButtons()
             self.grand_parent.canvas.render_signals()
         text = f"Monitor {monitor_text} is now off."
         self.grand_parent.canvas.render(text)
 
-    def OnButtonMonitor1(self, event):
+    def _OnButtonMonitor1(self, event):
+        """Method called when the monitor button 1 is pressed.
+
+        Method changes the state of the monitor to 1 and calls the
+        _renderMonitorButtons() method."""
         monitor_text = self.monitor_text
         if monitor_text is None:
             pass
         else:
             self.guiint.set_output_state(monitor_text, 1)
-            self.renderMonitorButtons()
+            self._renderMonitorButtons()
             self.grand_parent.canvas.render_signals()
         text = f"Monitor {monitor_text} is now on."
         self.grand_parent.canvas.render(text)
 
 
 class RunPanel(wx.Panel):
+    """ Panel for the run button and the cycles text box.
+
+    This panel is used for containing the run and continue buttons as well as 
+    a spin control object for the user to enter the number of cycles to run.
+
+    Parameters
+    ----------
+    parent : parent Frame
+    guiint: instance of the guiint.GuiInterface() class.
+
+    Public Methods
+    --------------
+    None
+    """
+
     def __init__(self, parent, guiint):
+        """Method initalises the panel"""
         super().__init__(parent=parent)  # Initialise
         self.grand_parent = parent
         self.grand_parent = self.grand_parent.parent
@@ -563,7 +676,7 @@ class RunPanel(wx.Panel):
         # Can't have 0 cycles, default max seems to be 100!
         self.spin.SetMin(1)
         # Bind the spin object
-        self.spin.Bind(wx.EVT_SPINCTRL, self.OnSpin)
+        self.spin.Bind(wx.EVT_SPINCTRL, self._OnSpin)
         # Add spin to top sizer
         # self.spin.SetMinSize((wx.DefaultCoord, text_min_height))
         self.top_sizer.Add(self.spin, 1, wx.EXPAND | wx.ALL, 5)
@@ -574,8 +687,8 @@ class RunPanel(wx.Panel):
         self.button_continue = wx.Button(self, self.continue_button_id,
                                          "Continue")
         # Bind buttons
-        self.button_run.Bind(wx.EVT_BUTTON, self.OnButtonRun)
-        self.button_continue.Bind(wx.EVT_BUTTON, self.OnButtonContinue)
+        self.button_run.Bind(wx.EVT_BUTTON, self._OnButtonRun)
+        self.button_continue.Bind(wx.EVT_BUTTON, self._OnButtonContinue)
         # Add buttons to bottom sizer
         self.middle_sizer.Add(self.button_run, 1, wx.ALL, 5)
         self.middle_sizer.Add(self.button_continue, 1, wx.ALL, 5)
@@ -585,7 +698,7 @@ class RunPanel(wx.Panel):
         # Set the sizer
         self.SetSizer(self.main_sizer)
 
-    def OnButtonRun(self, event):
+    def _OnButtonRun(self, event):
         """Handle the event when the user clicks the run button."""
         text = "Run button pressed."
         success = self.guiint.run_network(self.spin.GetValue())
@@ -596,7 +709,7 @@ class RunPanel(wx.Panel):
         self.grand_parent.canvas.render_signals()
         self.main_sizer.Layout()
 
-    def OnButtonContinue(self, event):
+    def _OnButtonContinue(self, event):
         """Handle the event when the user clicks the continue button."""
         text = "Continue button pressed."
         successs = self.guiint.continue_network(self.spin.GetValue())
@@ -606,7 +719,8 @@ class RunPanel(wx.Panel):
         self.grand_parent.canvas.render_signals()
         self.Layout()
 
-    def OnSpin(self, event):
+    def _OnSpin(self, event):
+        """Handle the event when the user changes the spin value."""
         spin_value = self.spin.GetValue()
         self.grand_parent.canvas.render(f"Spin value: {spin_value}")
         # Can modify the text of the buttons to this
@@ -618,7 +732,23 @@ class RunPanel(wx.Panel):
 
 
 class RightPanel(wx.Panel):
+    """ Panel for the run button and the cycles text box.
+
+    This panel is the right panel of the GUI. It contains various sub panels
+    for the run, switch and monitor controls
+
+    Parameters
+    ----------
+    parent : parent Frame
+    guiint: instance of the guiint.GuiInterface() class.
+
+    Public Methods
+    --------------
+    None
+    """
+
     def __init__(self, parent, guiint):
+        """Method initalises the panel"""
         super().__init__(parent=parent)  # Initialise
         self.parent = parent
         self.guiint = guiint
@@ -725,10 +855,7 @@ class Gui(wx.Frame):
                 return  # Cancelled, nothing selected
             # Proceed loading the file chosen by the user
             self.file_path = openFileDialog.GetPath()
-            print("Path: ", self.file_path)
             success, message = self.guiint.update_network(self.file_path)
-            print("Success: ", success)
-            print("Message: ", message)
             if success:
                 if message == "":
                     self.canvas.render("Circuit loaded successfully.")
@@ -760,10 +887,9 @@ class Gui(wx.Frame):
                 box.Destroy()
 
         elif Id == self.help_id_2:
-            # print("Help: User guide required")
             wx.MessageBox("User Guide", "User Guide")
         elif Id == self.reset_id:
-            self.canvas.reset_view()
+            self.canvas._reset_view()
         elif Id == self.def_file_show_id:
             file_path = self.guiint.scanner.path
             with open(file_path, "r") as f:
@@ -774,18 +900,45 @@ class Gui(wx.Frame):
 
 
 class MyDialog(wx.Dialog):
-    def __init__(self, parent, message, title, editable=False, allow_wrap=False):
-        super(MyDialog, self).__init__(
-            parent, title=title, size=(500, 500))
+    """Dialog box for displaying text.
+
+    Class displays text in a dialog box to contain long messages including
+    code, error messages, etc
+
+    Parameters
+    ----------
+    parent : parent window
+    message : string
+        Message to be displayed
+    title : string
+        Title of the dialog box
+    editable : bool
+        Whether the text is editable or not
+    allow_wrap : bool
+        Whether the text can be wrapped or not
+
+    Public Methods
+    --------------
+    None
+    """
+
+    def __init__(self, parent, message, title, editable=False,
+                 allow_wrap=False):
+        """Initialize the dialog box."""
+        super(MyDialog, self).__init__(parent, title=title, size=(500, 500))
         if allow_wrap:
             self.text = wx.TextCtrl(self, value=message, style=wx.TE_MULTILINE)
         else:
             self.text = wx.TextCtrl(
-                self, value=message, style=wx.TE_MULTILINE | wx.TE_DONTWRAP | wx.HSCROLL)
+                self, value=message,
+                style=wx.TE_MULTILINE | wx.TE_DONTWRAP | wx.HSCROLL)
         self.text.SetEditable(editable)
         self.text.SetInsertionPoint(0)
 
         # Create a monospaced font and set it for the text control
+        # This is so that when error messages are displayed with the arrow,
+        # the spacing is appropriate such that the arrow points to the
+        # desired character
         font = wx.Font(10, wx.FONTFAMILY_TELETYPE,
                        wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
         self.text.SetFont(font)
