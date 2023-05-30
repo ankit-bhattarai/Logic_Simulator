@@ -184,8 +184,10 @@ class SemanticErrorHandler:
 
         connected_device_id, connected_port_id = self.network.get_connected_output(
             second_device_id, second_port_id)
-        connected_output_name = self.names.get_name_string(
-            connected_device_id) + self.names.get_name_string(connected_port_id)
+        
+        connected_output_name = self.names.get_name_string(connected_device_id)
+        if connected_port_id:
+            connected_output_name += self.names.get_name_string(connected_port_id)
 
         error_message = f"Signal {connected_output_name} is already connected to the input pin {input_name}. Only one signal must be connected to an input."
         # Pointing at the input pin where the error is
@@ -212,6 +214,7 @@ class SemanticErrorHandler:
         first_port_id = labelled_symbols['First port'].id if labelled_symbols['First port'] else None
         second_port_id = labelled_symbols["Second port"].id if labelled_symbols["Second port"] else None
 
+        # Defined ports are not defined for the device
         if first_port_id and first_port_id not in first_device.outputs:
             first_port_name = self.names.get_name_string(first_port_id)
             first_device_name = self.names.get_name_string(
@@ -231,6 +234,15 @@ class SemanticErrorHandler:
                 second_port_name, second_device_name)
             self.scanner.print_error(
                 labelled_symbols["Second port"], 0, error_message)
+        # Missing ports
+        if not first_port_id and len(first_device.outputs) > 1:
+            first_device_name = self.names.get_name_string(
+                labelled_symbols["First device"].id)
+
+            error_message = "Port is missing for device {}".format(
+                first_device_name)
+            self.scanner.print_error(
+                labelled_symbols["First device"], 0, error_message)
 
     def display_device_absent_error(self, symbols):
         """Prints the device absent error.
@@ -300,7 +312,7 @@ class SemanticErrorHandler:
                 if self.network.get_connected_output(
                         device_id, input_id) is None:
                     unconnected_input = self.names.get_name_string(
-                        device_id) + self.names.get_name_string(input_id)
+                        device_id) + '.' + self.names.get_name_string(input_id)
                     unconnected_inputs.append(unconnected_input)
 
         error_message = "The following input pins are not connected to a device: {}".format(
@@ -366,7 +378,6 @@ class SemanticErrorHandler:
         """
         if unique_error_code not in self.semantic_error_codes:
             return False  # No error
-
         self.print_error(self.semantic_error_codes[unique_error_code], symbols)
 
         if self.semantic_error_codes[unique_error_code] == 'Monitor present':
