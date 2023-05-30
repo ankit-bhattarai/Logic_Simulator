@@ -37,7 +37,9 @@ def new_monitors(new_names, new_devices, new_network):
 @pytest.fixture
 def new_scanner(new_names):
     """Return a new scanner instance."""
-    scanner = Scanner("file_for_test_semantic_error_handling.txt", new_names)
+    scanner = Scanner(
+        "test_parse_files/file_for_test_semantic_error_handling.txt",
+        new_names)
     scanner.print_error = MagicMock()
     return scanner
 
@@ -52,9 +54,11 @@ def new_parser(new_names, new_devices, new_network, new_monitors, new_scanner):
 
 
 @pytest.fixture
-def new_semantic_error_handler(new_names, new_devices, new_network, new_monitors, new_scanner, new_parser):
+def new_semantic_error_handler(new_names, new_devices, new_network,
+                               new_monitors, new_scanner, new_parser):
     """Return a new semantic error handler instance."""
-    return SemanticErrorHandler(new_names, new_devices, new_network, new_monitors, new_scanner)
+    return SemanticErrorHandler(new_names, new_devices, new_network,
+                                new_monitors, new_scanner)
 
 
 @pytest.fixture
@@ -255,13 +259,14 @@ def list_of_symbols_input_connected_error(switch1, arrow, dtype1, dot, clear_pin
     return [switch1, arrow, dtype1, dot, clear_pin]
 
 
-def test_display_input_connected_error(new_semantic_error_handler, list_of_symbols_input_connected_error,
+def test_display_input_connected_error(new_semantic_error_handler,
+                                       list_of_symbols_input_connected_error,
                                        new_scanner, clear_pin):
     """Test the display_input_connected_error method."""
     new_semantic_error_handler.display_input_connected_error(
         list_of_symbols_input_connected_error)
     new_scanner.print_error.assert_called_with(clear_pin, 0,
-                                               "A signal is already connected to input dtype1.CLEAR. Only one signal must be connected to an input.")
+                                               "Signal switch2 is already connected to the input pin dtype1.CLEAR. Only one signal must be connected to an input.")
 
 
 @pytest.fixture
