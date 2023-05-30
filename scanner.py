@@ -28,15 +28,43 @@ class Symbol:
 
     Parameters
     ----------
-    No parameters.
+    string: The string that the symbol represents.
+    id: The id of the symbol.
+    line_number: The line number of the symbol.
+    column_number: The column number of the symbol.
 
     Public methods
     --------------
-    No public methods.
+    is_string(string): Return True if string is alphanumeric plus underscore.
+
+    is_name(cls, string): Return True if string is lowercase alphanumeric plus
+                     underscore and starts with a lowercase letter.
+
+    index_not_name(cls, string): Return the index of the first character in
+                                 the string that violates the name rules.
+
+    is_number(cls, string): Return True if string only has digits.
+
+    is_integet(string): Return True if string only has digits and starts with
+                        a non-zero digit.
+
+    determine_type(cls, string): Return the type of the string.
     """
 
     def __init__(self, string, id, line_number, column_number):
-        """Initialise symbol properties."""
+        """Initialise symbol properties.
+
+        Parameters
+        ----------
+        string: str
+            The string that the symbol represents.
+        id: int
+            The id of the symbol.
+        line_number: int
+            The line number of the symbol.
+        column_number: int
+            The column number of the symbol.
+        """
         self.id = id
         self.type = self.determine_type(string)
         self.line_number = line_number
@@ -281,8 +309,8 @@ class Scanner:
     skip_comments(self, comment_character): Skips over comments and returns
                                             the next non-comment character.
 
-    create_symbol(self, string, line_number, 
-                  column_number): Creates a symbol object from the given 
+    create_symbol(self, string, line_number,
+                  column_number): Creates a symbol object from the given
                                   quantities and returns it.
 
     get_symbols(self): Gets all the symbols from the file and stores them in
@@ -422,7 +450,8 @@ class Scanner:
             character = self.get_next_char()
             if character.isspace() or character in terminate_name_scan_characters:
                 return (met_name_characters, character)
-            else:  # Current character is not a space or a terminating character
+            else:
+                # Current character is not a space or a terminating character
                 met_name_characters += character
 
     def skip_spaces(self):
@@ -667,7 +696,8 @@ class Scanner:
                 print(arrow_string)
             else:  # Printing to the gui, just store error messages
                 self.error_messages += message + "\n"
-                self.error_messages += line_number_string + line_string.rstrip() + "\n"
+                self.error_messages += line_number_string
+                self.error_messages += line_string.rstrip() + "\n"
                 self.error_messages += arrow_string + "\n"
             return True
         except Exception:
