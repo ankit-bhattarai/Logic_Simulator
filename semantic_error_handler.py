@@ -317,7 +317,9 @@ class SemanticErrorHandler:
 
         error_message = "The following input pins are not connected to a device: {}".format(
             unconnected_inputs)
-        self.scanner.print_error(symbol, 0, error_message)
+        symbol_name = self.names.get_name_string(symbol.id)
+        index = len(symbol_name)
+        self.scanner.print_error(symbol, index, error_message)
 
     def display_monitor_present_error(self, output_symbol):
         """Prints the monitor present error.
