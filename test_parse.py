@@ -1,7 +1,6 @@
 """Test the parse module."""
 import pytest
 from unittest.mock import MagicMock, call
-import itertools
 
 from names import Names
 from devices import Devices
@@ -11,21 +10,22 @@ from scanner import Scanner, Symbol
 from parse import Parser
 
 """
-Methods involved in syntax error processing:
+Methods involved in syntax error processing in Parser:
+------------------------------------------------------
 
-- check_name - tested through test_name_error_identification
-- check_clock - tested through test_syntax_error_identification
-- check_switch  - tested through test_syntax_error_identification
-- check_logic_device - tested through test_syntax_error_identification
-- check_dtype_xor - tested through test_syntax_error_identification
-- device - tested through test_syntax_error_identification
-- device_list - tested through test_syntax_error_identification
-- connection - tested through test_syntax_error_identification
-- connection_list - tested through test_syntax_error_identification
-- monitor - tested through test_syntax_error_identification
-- monitor_list - tested through test_syntax_error_identification
-- display_syntax_error - tested through test_syntax_error_identification
-- network_dict - tested through test_build_network
+check_name - tested through test_name_error_identification
+check_clock - tested through test_syntax_error_identification
+check_switch  - tested through test_syntax_error_identification
+check_logic_device - tested through test_syntax_error_identification
+check_dtype_xor - tested through test_syntax_error_identification
+device - tested through test_syntax_error_identification
+device_list - tested through test_syntax_error_identification
+connection - tested through test_syntax_error_identification
+connection_list - tested through test_syntax_error_identification
+monitor - tested through test_syntax_error_identification
+monitor_list - tested through test_syntax_error_identification
+display_syntax_error - tested through test_syntax_error_identification
+network_dict - tested through test_build_network
 """
 
 syntax_error_types = {
@@ -393,3 +393,4 @@ def test_semantic_error_identification(definition_file, symbol_details,
     symbol = Symbol(*symbol_details)
     new_scanner.print_error.assert_called_once_with(symbol, index, message)
     assert new_scanner.print_error.call_count == 1
+
