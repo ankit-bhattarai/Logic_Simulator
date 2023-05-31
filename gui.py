@@ -786,49 +786,57 @@ class Gui(wx.Frame):
     """
 
     def __init__(self, title, path, names, devices, network, monitors,
-                 scanner):
+                 scanner=None, load_graphically=False):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(800, 600))
-
         # File path for circuit file which can be chosen from the GUI
         self.file_path = None
-        guiint = GuiInterface(names, devices, network, monitors, scanner)
-        self.guiint = guiint
-        # Configure the file menu
-        fileMenu = wx.Menu()
-        viewMenu = wx.Menu()
-        helpMenu = wx.Menu()
-        menuBar = wx.MenuBar()
-        self.open_id, self.help_id_1, self.help_id_2 = wx.NewIdRef(count=3)
-        self.reset_id, self.def_file_show_id = wx.NewIdRef(count=2)
-        fileMenu.Append(self.open_id, "&Open")
-        fileMenu.Append(wx.ID_ABOUT, "&About")
-        fileMenu.Append(wx.ID_EXIT, "&Exit")
-        viewMenu.Append(self.reset_id, "&Reset")
-        viewMenu.Append(self.def_file_show_id, "&Show Definition File")
-        helpMenu.Append(self.help_id_1, "&EBNF Syntax")
-        helpMenu.Append(self.help_id_2, "&User Guide")
-        menuBar.Append(fileMenu, "&File")
-        menuBar.Append(viewMenu, "&View")
-        menuBar.Append(helpMenu, "&Help")
-        self.SetMenuBar(menuBar)
+        self.guiint = None
+        
+        if load_graphically:
+            self.start_graphically_control()
+            # Can only reach this stage if a valid circuit file has been loaded
+            # successfully, thus file_path is valid
+        else:
+            guiint = GuiInterface(names, devices, network, monitors, scanner)
+            self.guiint = guiint
+        
+        if self.guiint is not None:
+            # Configure the file menu
+            fileMenu = wx.Menu()
+            viewMenu = wx.Menu()
+            helpMenu = wx.Menu()
+            menuBar = wx.MenuBar()
+            self.open_id, self.help_id_1, self.help_id_2 = wx.NewIdRef(count=3)
+            self.reset_id, self.def_file_show_id = wx.NewIdRef(count=2)
+            fileMenu.Append(self.open_id, "&Open")
+            fileMenu.Append(wx.ID_ABOUT, "&About")
+            fileMenu.Append(wx.ID_EXIT, "&Exit")
+            viewMenu.Append(self.reset_id, "&Reset")
+            viewMenu.Append(self.def_file_show_id, "&Show Definition File")
+            helpMenu.Append(self.help_id_1, "&EBNF Syntax")
+            helpMenu.Append(self.help_id_2, "&User Guide")
+            menuBar.Append(fileMenu, "&File")
+            menuBar.Append(viewMenu, "&View")
+            menuBar.Append(helpMenu, "&Help")
+            self.SetMenuBar(menuBar)
 
-        # Canvas for drawing signals
-        self.canvas = MyGLCanvas(self, guiint)
+            # Canvas for drawing signals
+            self.canvas = MyGLCanvas(self, self.guiint)
 
-        # Bind events to widgets
-        self.Bind(wx.EVT_MENU, self.on_menu)
+            # Bind events to widgets
+            self.Bind(wx.EVT_MENU, self.on_menu)
 
-        # Configure sizers for layout
-        main_sizer = wx.BoxSizer(wx.HORIZONTAL)
+            # Configure sizers for layout
+            main_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        main_sizer.Add(self.canvas, 5, wx.EXPAND | wx.ALL, 5)
+            main_sizer.Add(self.canvas, 5, wx.EXPAND | wx.ALL, 5)
 
-        right_panel = RightPanel(self, guiint)
-        main_sizer.Add(right_panel, 1, wx.EXPAND | wx.ALL, 5)
+            right_panel = RightPanel(self, self.guiint)
+            main_sizer.Add(right_panel, 1, wx.EXPAND | wx.ALL, 5)
 
-        self.SetSizeHints(600, 600)
-        self.SetSizer(main_sizer)
+            self.SetSizeHints(600, 600)
+            self.SetSizer(main_sizer)
 
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
@@ -839,37 +847,7 @@ class Gui(wx.Frame):
             wx.MessageBox("Logic Simulator\nCreated by Ankit Adhi Jessy\n2023",
                           "About Logsim", wx.ICON_INFORMATION | wx.OK)
         elif Id == self.open_id:
-            openFileDialog = wx.FileDialog(self, "Open definition file", "",
-                                           "",
-                                           wildcard="TXT files (*.txt)|*.txt",
-                                           style=wx.FD_OPEN +
-                                           wx.FD_FILE_MUST_EXIST)
-            if openFileDialog.ShowModal() == wx.ID_CANCEL:
-                return  # Cancelled, nothing selected
-            # Proceed loading the file chosen by the user
-            self.file_path = openFileDialog.GetPath()
-            success, message = self.guiint.update_network(self.file_path)
-            if success:
-                if message == "":
-                    self.canvas.render("Circuit loaded successfully.")
-                    self.canvas.render_signals()
-                else:  # There is a message to  be printed, but overall the
-                    # circuit is valid. It is only a warning
-                    error_display = "Circuit loaded with warnings.\n"
-                    error_display += "Warnings: \n\n"
-                    error_display += message
-                    box = MyDialog(self, message=error_display,
-                                   title="Warnings Present")
-                    box.ShowModal()
-                    box.Destroy()
-            else:
-                error_display = "Invalid circuit definition file.\n"
-                error_display += "Errors: \n\n"
-                error_display += message
-                box = MyDialog(self, message=error_display,
-                               title="Errors Present")
-                box.ShowModal()
-                box.Destroy()
+            self.load_graphically()
 
         elif Id == self.help_id_1:
             with open("EBNF.txt", "r") as f:
@@ -890,6 +868,93 @@ class Gui(wx.Frame):
                                title="Definition File", editable=False)
                 box.ShowModal()
                 box.Destroy()
+
+    def start_graphically(self):
+        """Load the circuit definition file directly from the GUI."""
+        openFileDialog = wx.FileDialog(self, "Open definition file", "",
+                                           "",
+                                           wildcard="TXT files (*.txt)|*.txt",
+                                           style=wx.FD_OPEN +
+                                           wx.FD_FILE_MUST_EXIST)
+        if openFileDialog.ShowModal() == wx.ID_CANCEL:
+            # The user has cancelled the dialog, close the program
+            self.Close(True)
+            return None
+        # Proceed loading the file chosen by the user
+        self.file_path = openFileDialog.GetPath()
+        guiint = GuiInterface(None, None, None, None, None) # These don't need to be initialised
+        success, message = guiint.update_network(self.file_path)
+        if success:
+            self.guiint = guiint
+            if message == "":
+                display_message = "Circuit loaded successfully.\n"
+                title="Circuit Loaded"
+            else:  # There is a message to  be printed, but overall the
+                # circuit is valid. It is only a warning
+                display_message = "Circuit loaded with warnings.\n"
+                display_message += "Warnings: \n\n"
+                display_message += message
+                title="Warnings Present"
+            box = MyDialog(self, message=display_message,
+                            title=title)
+            box.ShowModal()
+            box.Destroy()
+            return True
+        else:
+            error_display = "Invalid circuit definition file.\n"
+            error_display += "Errors: \n\n"
+            error_display += message
+            box = MyDialog(self, message=error_display,
+                            title="Errors Present")
+            box.ShowModal()
+            box.Destroy()
+            return False
+
+    def start_graphically_control(self):
+        while True:
+            success = self.start_graphically()
+            if success is None:
+                self.Close(True)
+                return None
+            if success:
+                break
+            else:
+                continue
+
+
+    def load_graphically(self):
+        """Load the circuit definition file directly from the GUI."""
+        openFileDialog = wx.FileDialog(self, "Open definition file", "",
+                                           "",
+                                           wildcard="TXT files (*.txt)|*.txt",
+                                           style=wx.FD_OPEN +
+                                           wx.FD_FILE_MUST_EXIST)
+        if openFileDialog.ShowModal() == wx.ID_CANCEL:
+            return  # Cancelled, nothing selected
+        # Proceed loading the file chosen by the user
+        self.file_path = openFileDialog.GetPath()
+        success, message = self.guiint.update_network(self.file_path)
+        if success:
+            if message == "":
+                self.canvas.render("Circuit loaded successfully.")
+                self.canvas.render_signals()
+            else:  # There is a message to  be printed, but overall the
+                # circuit is valid. It is only a warning
+                error_display = "Circuit loaded with warnings.\n"
+                error_display += "Warnings: \n\n"
+                error_display += message
+                box = MyDialog(self, message=error_display,
+                                title="Warnings Present")
+                box.ShowModal()
+                box.Destroy()
+        else:
+            error_display = "Invalid circuit definition file.\n"
+            error_display += "Errors: \n\n"
+            error_display += message
+            box = MyDialog(self, message=error_display,
+                            title="Errors Present")
+            box.ShowModal()
+            box.Destroy()
 
 
 class MyDialog(wx.Dialog):
@@ -919,6 +984,8 @@ class MyDialog(wx.Dialog):
                  allow_wrap=False):
         """Initialize the dialog box."""
         super(MyDialog, self).__init__(parent, title=title, size=(1000, 800))
+        self.parent = parent
+        sizer = wx.BoxSizer(wx.VERTICAL)
         if allow_wrap:
             self.text = wx.TextCtrl(self, value=message, style=wx.TE_MULTILINE)
         else:
@@ -936,7 +1003,6 @@ class MyDialog(wx.Dialog):
                        wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
         self.text.SetFont(font)
 
-        sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.text, 1, wx.EXPAND)
 
         self.SetSizer(sizer)

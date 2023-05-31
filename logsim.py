@@ -9,6 +9,7 @@ Usage
 Show help: logsim.py -h
 Command line user interface: logsim.py -c <file path>
 Graphical user interface: logsim.py <file path>
+Graphical user interface (load definition file from GUI): logsim.py -g
 """
 import getopt
 import sys
@@ -34,9 +35,10 @@ def main(arg_list):
     usage_message = ("Usage:\n"
                      "Show help: logsim.py -h\n"
                      "Command line user interface: logsim.py -c <file path>\n"
-                     "Graphical user interface: logsim.py <file path>")
+                     "Graphical user interface: logsim.py <file path>\n"
+                     "Graphical user interface (load definition file from GUI): logsim.py -g\n")
     try:
-        options, arguments = getopt.getopt(arg_list, "hc:")
+        options, arguments = getopt.getopt(arg_list, "ghc:")
     except getopt.GetoptError:
         print("Error: invalid command line arguments\n")
         print(usage_message)
@@ -59,6 +61,11 @@ def main(arg_list):
                 # Initialise an instance of the userint.UserInterface() class
                 userint = UserInterface(names, devices, network, monitors)
                 userint.command_interface()
+        elif option == "-g": # Load the definition file from the GUI itself
+            app = wx.App()
+            gui = Gui("Logic Simulator", None, None, None, None, None, None, load_graphically=True)
+            gui.Show(True)
+            app.MainLoop()
 
     if not options:  # no option given, use the graphical user interface
 
