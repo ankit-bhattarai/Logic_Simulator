@@ -482,3 +482,5 @@ def test_build_devices_order_quit_2(new_names, new_devices,
     switch1_dup_call = call(*new_names.lookup(["switch1", "SWITCH"]), 0)
     expected_calls = [switch1_call, switch1_dup_call]
     new_devices.make_device.assert_has_calls(expected_calls, any_order=False)
+
+# TODO: Add tests for build_network and build_monitors
