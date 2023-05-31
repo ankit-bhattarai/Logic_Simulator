@@ -918,7 +918,7 @@ class MyDialog(wx.Dialog):
     def __init__(self, parent, message, title, editable=False,
                  allow_wrap=False):
         """Initialize the dialog box."""
-        super(MyDialog, self).__init__(parent, title=title, size=(500, 500))
+        super(MyDialog, self).__init__(parent, title=title, size=(1000, 800))
         if allow_wrap:
             self.text = wx.TextCtrl(self, value=message, style=wx.TE_MULTILINE)
         else:
