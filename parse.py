@@ -1008,15 +1008,16 @@ class Parser:
         semantically correct, False otherwise.
         """
         network_dict = self.network_dict()
-        for key in network_dict:
-            print(f"Key: {key}")
-            type_list = []
-            for list in network_dict[key]:
-                list_indivual = []
-                for element in list:
-                    list_indivual.append((element.type, element.id, element.line_number, element.column_number))
-                type_list.append(list_indivual)
-            print(f"Value: {type_list}")
+        
+        # for key in network_dict:
+        #     print(f"Key: {key}")
+        #     type_list = []
+        #     for list in network_dict[key]:
+        #         list_indivual = []
+        #         for element in list:
+        #             list_indivual.append((element.type, element.id, element.line_number, element.column_number))
+        #         type_list.append(list_indivual)
+        #     print(f"Value: {type_list}")
 
         if self.num_of_errors == 0 and network_dict:
             build_network = self.build_network(network_dict=network_dict)
