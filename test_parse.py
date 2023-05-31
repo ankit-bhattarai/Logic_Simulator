@@ -394,3 +394,91 @@ def test_semantic_error_identification(definition_file, symbol_details,
     new_scanner.print_error.assert_called_once_with(symbol, index, message)
     assert new_scanner.print_error.call_count == 1
 
+    @pytest.fixture
+def get_def_1_parser(new_names, new_devices, new_monitors, new_network):
+    """Returns a parser for the def1.txt file."""
+    new_scanner = Scanner("test_parse_files/def1.txt", new_names)
+    new_parser = Parser(new_names, new_devices, new_network, new_monitors,
+                        new_scanner)
+    return new_parser
+
+
+def test_build_devices_1(new_names, new_devices, get_def_1_parser):
+    """Tests the build devices method with a valid file and checks it calls make_device correctly."""
+    new_parser = get_def_1_parser
+    network_dict = new_parser.network_dict()
+    new_devices.make_device = Mock()
+    new_parser.build_devices(network_dict["DEVICES"])
+    switch1_call = call(*new_names.lookup(["switch1", "SWITCH"]), 0)
+    switch2_call = call(*new_names.lookup(["switch2", "SWITCH"]), 0)
+    and1_call = call(*new_names.lookup(["and1", "AND"]), 2)
+    or1_call = call(*new_names.lookup(["or1", "OR"]), 2)
+    nand1_call = call(*new_names.lookup(["nand1", "NAND"]), 2)
+    expected_calls = [switch1_call, switch2_call, and1_call, or1_call,
+                      nand1_call]
+    new_devices.make_device.assert_has_calls(expected_calls, any_order=False)
+
+
+def test_build_devices_1_success(get_def_1_parser):
+    """Tests the build devices method with a valid file and checks it returns True."""
+    new_parser = get_def_1_parser
+    network_dict = new_parser.network_dict()
+    result = new_parser.build_devices(network_dict["DEVICES"])
+    assert result
+
+
+@pytest.fixture
+def get_def_2_parser(new_names, new_devices, new_monitors, new_network):
+    """Returns a parser for the def2.txt file."""
+    new_scanner = Scanner("test_parse_files/def2.txt", new_names)
+    new_parser = Parser(new_names, new_devices, new_network, new_monitors,
+                        new_scanner)
+    return new_parser
+
+
+def test_build_devices_2(new_names, new_devices, get_def_2_parser):
+    """Tests the build devices method with a different valid file and checks it calls make_device correctly."""
+    new_parser = get_def_2_parser
+    network_dict = new_parser.network_dict()
+    new_devices.make_device = Mock()
+    new_parser.build_devices(network_dict["DEVICES"])
+    switch1_call = call(*new_names.lookup(["switch1", "SWITCH"]), 1)
+    switch2_call = call(*new_names.lookup(["switch2", "SWITCH"]), 0)
+    clock1_call = call(*new_names.lookup(["clock1", "CLOCK"]), 2)
+    dtype1_call = call(*new_names.lookup(["dtype1", "DTYPE"]), None)
+    nor1_call = call(*new_names.lookup(["nor1", "NOR"]), 2)
+    xor1_call = call(*new_names.lookup(["xor1", "XOR"]), None)
+    expected_calls = [switch1_call, switch2_call, clock1_call, dtype1_call,
+                      nor1_call, xor1_call]
+    new_devices.make_device.assert_has_calls(expected_calls, any_order=False)
+
+
+@pytest.fixture
+def get_semantic_error_1_parser(new_names, new_devices, new_monitors,
+                                new_network):
+    """Returns a parser for the semantic_error_1.txt file."""
+    new_scanner = Scanner("test_parse_files/semantic_error_1.txt", new_names)
+    new_parser = Parser(new_names, new_devices, new_network, new_monitors,
+                        new_scanner)
+    return new_parser
+
+
+def test_build_devices_quit_1(get_semantic_error_1_parser):
+    """Tests the build devices method with a file that has a semantic error and checks it returns False."""
+    new_parser = get_semantic_error_1_parser
+    network_dict = new_parser.network_dict()
+    success = new_parser.build_devices(network_dict["DEVICES"])
+    assert not success
+
+
+def test_build_devices_order_quit_2(new_names, new_devices,
+                                    get_semantic_error_1_parser):
+    """Tests the build devices method with a file that has a semantic error and checks it quits at the first error."""
+    new_parser = get_semantic_error_1_parser
+    network_dict = new_parser.network_dict()
+    new_devices.make_device = Mock()
+    new_parser.build_devices(network_dict["DEVICES"])
+    switch1_call = call(*new_names.lookup(["switch1", "SWITCH"]), 1)
+    switch1_dup_call = call(*new_names.lookup(["switch1", "SWITCH"]), 0)
+    expected_calls = [switch1_call, switch1_dup_call]
+    new_devices.make_device.assert_has_calls(expected_calls, any_order=False)
