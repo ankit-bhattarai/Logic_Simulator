@@ -89,12 +89,11 @@ def test_name_error_identification(definition_file, name_error_indices, error_sy
     """Test that the correct syntax error (name error) is identified at the correct locations."""
     new_scanner = Scanner(definition_file, new_names)
     new_scanner.print_error = MagicMock()
-    new_parser = Parser(
-        new_names,
-        new_devices,
-        new_network,
-        new_monitors,
-        new_scanner)
+    new_parser = Parser(new_names,
+                        new_devices,
+                        new_network,
+                        new_monitors,
+                        new_scanner)
 
     new_parser.network_dict()
     expected_calls = []
@@ -111,7 +110,7 @@ def test_name_error_identification(definition_file, name_error_indices, error_sy
     new_scanner.print_error.assert_has_calls(expected_calls, any_order=False)
 
 
-@pytest.mark.parametrize("definition_file",
+@pytest.mark.parametrize("early_termination_definition_file",
                          [("test_parse_files/syntax_error_22_a.txt"),
                           ("test_parse_files/syntax_error_22_b.txt"),
                           ("test_parse_files/syntax_error_22_c.txt"),
@@ -120,13 +119,14 @@ def test_name_error_identification(definition_file, name_error_indices, error_sy
                           ("test_parse_files/syntax_error_22_f.txt"),
                           ("test_parse_files/syntax_error_22_g.txt"),
                           ("test_parse_files/syntax_error_22_h.txt")])
-def test_early_termination_error_identification(definition_file, new_names,
+
+
+def test_early_termination_error_identification(early_termination_definition_file, new_names,
                                                 new_devices, new_network,
                                                 new_monitors):
-    """
-    Test that the correct syntax error is identified when the file ends too early for several early termination locations.
-    """
-    new_scanner = Scanner(definition_file, new_names)
+    """Test that the correct syntax error is identified when the file ends too early for several 
+    early termination locations."""
+    new_scanner = Scanner(early_termination_definition_file, new_names)
     new_scanner.print_error = MagicMock()
     new_parser = Parser(new_names,
                         new_devices,
@@ -173,6 +173,8 @@ def test_early_termination_error_identification(definition_file, new_names,
                           ("test_parse_files/syntax_error_20.txt",
                            20, [1, 79]),
                           ("test_parse_files/syntax_error_21.txt", 21, [95])])
+
+
 def test_syntax_error_identification(definition_file, error_type, error_symbol_indices,
                                      new_names, new_devices, new_network, new_monitors):
     """Test that the correct syntax error is identified and subsequently sent to the
@@ -200,7 +202,7 @@ def test_syntax_error_identification(definition_file, error_type, error_symbol_i
         expected_call = call(erronous_symbol, 0, error_message)
         expected_calls.append(expected_call)
 
-    # Assert that the right errors are passed for printings
+    # Assert that the right errors are passed for printing
     new_scanner.print_error.assert_has_calls(expected_calls, any_order=False)
     # Assert that no other errors are passed for printing
     assert new_scanner.print_error.call_count == len(error_symbol_indices)
@@ -211,7 +213,7 @@ def test_syntax_error_identification(definition_file, error_type, error_symbol_i
 def network_dict_1():
     """
     Fixture to populate the expected network dictionary 
-    for the first test file.
+    for the test file - "test_parse_files/test_build_network_dict_1.txt"
     """
     network_dict = {}
     network_dict['DEVICES'] = [[Symbol("CLOCK", 5, 1, 10),
@@ -225,6 +227,7 @@ def network_dict_1():
     network_dict['MONITOR'] = [[Symbol("and1", 21, 3, 10)]]
 
     return network_dict
+
 
 def test_build_network_dict_1(new_names, network_dict_1, new_devices, new_network,
                               new_monitors):
@@ -249,11 +252,12 @@ def test_build_network_dict_1(new_names, network_dict_1, new_devices, new_networ
     # Check that no errors have been accumulated
     assert new_parser.num_of_errors == 0
 
+
 @pytest.fixture
 def network_dict_2():
     """
     Fixture to populate the expected network dictionary 
-    for the second test file.
+    for the second test file - "test_parse_files/test_build_network_dict_2.txt"
     """
     network_dict_2 = {}
     network_dict_2["DEVICES"] = [[Symbol("SWITCH", 6, 1, 10), Symbol("switch1", 16, 1, 17), Symbol("0", 17, 1, 25)], 
@@ -275,6 +279,7 @@ def network_dict_2():
 
     return network_dict_2
 
+
 def test_build_network_dict_2(network_dict_2, new_names, new_devices, new_network, new_monitors):
     new_scanner = Scanner("test_parse_files/test_build_network_dict_2.txt", new_names)
     new_parser = Parser(new_names,
@@ -288,11 +293,12 @@ def test_build_network_dict_2(network_dict_2, new_names, new_devices, new_networ
     # Check that no errors have been accumulated
     assert new_parser.num_of_errors == 0
 
+
 @pytest.fixture
 def network_dict_3():
     """
     Fixture to populate the expected network dictionary 
-    for the third test file.
+    for the third test file - "test_parse_files/test_build_network_dict_3.txt"
     """
     network_dict_3 = {}
     network_dict_3['DEVICES'] = [[Symbol("SWITCH", 6, 1, 10), Symbol("switch1", 16, 1, 17), Symbol("1", 17, 1, 25)],
@@ -320,6 +326,7 @@ def network_dict_3():
                                  [Symbol("nor1", 24, 6, 46)], [Symbol("xor1", 25, 6, 52)]]
     
     return network_dict_3
+
 
 def test_build_network_dict_3(network_dict_3, new_names, new_devices, new_network, new_monitors):
     new_scanner = Scanner("test_parse_files/test_build_network_dict_3.txt", new_names)
@@ -365,8 +372,9 @@ def test_build_network_dict_3(network_dict_3, new_names, new_devices, new_networ
                              ("test_parse_files/semantic_error_14.txt", ["Q", 12, 6, 59],
                               "Warning: Monitor exists at this output already.", 0, True)
                           ]
+                        )
 
-                         )
+
 def test_semantic_error_identification(definition_file, symbol_details,
                                        message, index, success, new_names, new_devices,
                                        new_network, new_monitors):
@@ -393,6 +401,7 @@ def test_semantic_error_identification(definition_file, symbol_details,
     symbol = Symbol(*symbol_details)
     new_scanner.print_error.assert_called_once_with(symbol, index, message)
     assert new_scanner.print_error.call_count == 1
+
 
 @pytest.fixture
 def get_def_1_parser(new_names, new_devices, new_monitors, new_network):
@@ -483,4 +492,199 @@ def test_build_devices_order_quit_2(new_names, new_devices,
     expected_calls = [switch1_call, switch1_dup_call]
     new_devices.make_device.assert_has_calls(expected_calls, any_order=False)
 
-# TODO: Add tests for build_network and build_monitors
+
+def test_build_connections_1(new_names, new_devices, get_def_1_parser):
+    """Tests the build connections method with a valid file and checks it calls make_connection correctly."""
+    new_parser = get_def_1_parser
+    network_dict = new_parser.network_dict()
+    new_devices.make_connection = Mock()
+    # Ensure that the build devices method is called first
+    new_parser.build_devices(network_dict["DEVICES"])
+    new_parser.build_connections(network_dict["CONNECT"])
+
+    connection_1 = call(*new_names.lookup(["switch1", None, "and1", "I1"]), 0)
+    connection_2 = call(*new_names.lookup(["switch1", None, "or1", "I1"]), 0)
+    connection_3 = call(*new_names.lookup(["switch2", None, "and1", "I2"]), 0)
+    connection_4 = call(*new_names.lookup(["switch2", None, "or1", "I2"]), 0)
+    connection_5 = call(*new_names.lookup(["and1", None, "nand1", "I1"]), 0)
+    connection_6 = call(*new_names.lookup(["or1", None, "nand1", "I2"]), 0)
+
+    expected_calls = [connection_1, connection_2, connection_3, connection_4,
+                      connection_5, connection_6]
+
+    expected_calls = []
+    new_devices.make_connection.assert_has_calls(expected_calls,
+                                                  any_order=False)
+
+def test_build_connections_1_success(get_def_1_parser):
+    """Tests the build connections method with a valid file and checks it returns True."""
+    new_parser = get_def_1_parser
+    network_dict = new_parser.network_dict()
+    # Ensure that the build devices method is called first
+    new_parser.build_devices(network_dict["DEVICES"])
+    # Check that the build connections method returns True
+    result = new_parser.build_connections(network_dict["CONNECT"])
+    assert result
+
+
+def test_build_connections_2(new_names, new_devices, get_def_2_parser):
+    """Tests the build connections method with a valid file and checks it calls make_connection correctly."""
+    new_parser = get_def_2_parser
+    network_dict = new_parser.network_dict()
+    new_devices.make_connection = Mock()
+    # Ensure that the build devices method is called first
+    new_parser.build_devices(network_dict["DEVICES"])
+    new_parser.build_connections(network_dict["CONNECT"])
+
+    connection_1 = call(*new_names.lookup(["switch1", None, "dtype1", "DATA"]), 0)
+    connection_2 = call(*new_names.lookup(["switch1", None, "dtype1", "SET"]), 0)
+    connection_3 = call(*new_names.lookup(["switch1", None, "nor1", "I1"]), 0)
+    connection_4 = call(*new_names.lookup(["switch2", None, "dtype1", "CLEAR"]), 0)
+    connection_5 = call(*new_names.lookup(["switch2", None, "xor1", "I2"]), 0)
+    connection_6 = call(*new_names.lookup(["dtype1", "Q", "nor1", "I2"]), 0)
+    connection_7 = call(*new_names.lookup(["dtype1", "QBAR", "xor1", "I1"]), 0)
+    connection_8 = call(*new_names.lookup(["clock1", None, "dtype1", "CLK"]), 0)
+    expected_calls = [connection_1, connection_2, connection_3, connection_4,
+                      connection_5, connection_6, connection_7, connection_8]
+
+    expected_calls = []
+    new_devices.make_connection.assert_has_calls(expected_calls,
+                                                  any_order=False)
+
+
+def test_build_connections_2_success(get_def_2_parser):
+    """Tests the build connections method with a valid file and checks it returns True."""
+    new_parser = get_def_2_parser
+    network_dict = new_parser.network_dict()
+    # Ensure that the build devices method is called first
+    new_parser.build_devices(network_dict["DEVICES"])
+    # Check that the build connections method returns True
+    result = new_parser.build_connections(network_dict["CONNECT"])
+    assert result
+
+@pytest.fixture
+def get_semantic_error_5_parser(new_names, new_devices, new_monitors,
+                                new_network):
+    """Returns a parser for the semantic_error_5.txt file."""
+    new_scanner = Scanner("test_parse_files/semantic_error_5.txt", new_names)
+    new_parser = Parser(new_names, new_devices, new_network, new_monitors,
+                        new_scanner)
+    return new_parser
+
+
+def test_build_connections_quit_5(get_semantic_error_5_parser):
+    """Tests the build connections method with a file that has a semantic error in the connections
+    and checks that it returns False"""
+    new_parser = get_semantic_error_5_parser
+    network_dict = new_parser.network_dict()
+    # Ensure that the build devices method is called first
+    new_parser.build_devices(network_dict["DEVICES"])
+    # Check that the build connections method returns True
+    success = new_parser.build_connections(network_dict["CONNECT"])
+    assert not success
+
+
+def test_build_monitors_1(new_names, new_monitors, get_def_1_parser):
+    """Tests the build monitors method with a valid file and checks it calls make_monitors correctly."""
+    new_parser = get_def_1_parser
+    network_dict = new_parser.network_dict()
+    new_monitors.make_monitor = Mock()
+    new_parser.build_devices(network_dict["DEVICES"])
+    new_parser.build_connections(network_dict["CONNECT"])
+    new_parser.build_monitors(network_dict["MONITOR"])
+
+    monitor_1 = call(new_names.query("and1"), None)
+    monitor_2 = call(new_names.query("or1"), None)
+    monitor_3 = call(new_names.query("nand1"), None)
+
+    expected_calls = [monitor_1, monitor_2, monitor_3]
+    new_monitors.make_monitor.assert_has_calls(expected_calls,
+                                                  any_order=False)
+
+
+def test_build_monitors_1_success(get_def_1_parser):
+    """Tests the build monitors method with a valid file and checks it returns True."""
+    new_parser = get_def_1_parser
+    network_dict = new_parser.network_dict()
+
+    new_parser.build_devices(network_dict["DEVICES"])
+    new_parser.build_connections(network_dict["CONNECT"])
+    assert new_parser.build_monitors(network_dict["MONITOR"])
+
+
+def test_build_monitors_2(new_names, new_monitors, get_def_2_parser):
+    """Tests the build monitors method with a valid file and checks it calls make_monitors correctly."""
+    new_parser = get_def_2_parser
+    network_dict = new_parser.network_dict()
+    new_monitors.make_monitor = Mock()
+    new_parser.build_devices(network_dict["DEVICES"])
+    new_parser.build_connections(network_dict["CONNECT"])
+    new_parser.build_monitors(network_dict["MONITOR"])
+
+    monitor_1 = call(new_names.query("switch1"), None)
+    monitor_2 = call(new_names.query("clock1"), None)
+    monitor_3 = call(new_names.query("switch2"), None)
+    monitor_4 = call(new_names.query("dtype1"), new_names.query("Q"))
+    monitor_5 = call(new_names.query("nor1"), None)
+    monitor_6 = call(new_names.query("xor1"), None)
+
+    expected_calls = [monitor_1, monitor_2, monitor_3,
+                      monitor_4, monitor_5, monitor_6]
+    
+    new_monitors.make_monitor.assert_has_calls(expected_calls,
+                                                  any_order=False)
+
+
+def test_build_monitors_2_success(get_def_2_parser):
+    """Tests the build monitors method with a valid file and checks it returns True."""
+    new_parser = get_def_2_parser
+    network_dict = new_parser.network_dict()
+
+    new_parser.build_devices(network_dict["DEVICES"])
+    new_parser.build_connections(network_dict["CONNECT"])
+    assert new_parser.build_monitors(network_dict["MONITOR"])
+
+
+@pytest.fixture
+def get_semantic_error_12_parser(new_names, new_devices, new_monitors, new_network):
+    """Returns a parser for the semantic_error_12.txt file."""
+    new_scanner = Scanner("test_parse_files/semantic_error_12.txt", new_names)
+    new_parser = Parser(new_names, new_devices, new_network, new_monitors,
+                        new_scanner)
+    return new_parser
+
+
+def test_build_monitors_quit_12(get_semantic_error_12_parser):
+    """Tests the build monitors method with a file that has a semantic error in the monitors
+    and checks that it returns False"""
+    new_parser = get_semantic_error_12_parser
+    network_dict = new_parser.network_dict()
+    new_parser.build_devices(network_dict["DEVICES"])
+    new_parser.build_connections(network_dict["CONNECT"])
+    success = new_parser.build_monitors(network_dict["MONITOR"])
+    assert not success
+
+
+def test_build_monitors_order_quit_12(new_names, new_monitors, get_semantic_error_12_parser):
+    """Tests the build monitors method with a file that has a semantic error in the monitors
+    and checks that it adds monitors up until the error by monitoring the make_monitor method"""
+
+    new_parser = get_semantic_error_12_parser
+    network_dict = new_parser.network_dict()
+    new_monitors.make_monitor = Mock()
+    new_parser.build_devices(network_dict["DEVICES"])
+    new_parser.build_connections(network_dict["CONNECT"])
+    new_parser.build_monitors(network_dict["MONITOR"])
+
+
+    monitor_1 = call(new_names.query("switch1"), None)
+    monitor_2 = call(new_names.query("clock1"), None)
+    monitor_3 = call(new_names.query("switch2"), None)
+    monitor_4 = call(new_names.query("dtype1"), new_names.query("Q"))
+    monitor_5 = call(new_names.query("nor1"), None)
+
+    expected_calls = [monitor_1, monitor_2, monitor_3,
+                      monitor_4, monitor_5]
+    
+    new_monitors.make_monitor.assert_has_calls(expected_calls,
+                                               any_order=False)
