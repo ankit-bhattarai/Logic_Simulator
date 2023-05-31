@@ -885,7 +885,7 @@ class Parser:
             self.display_syntax_error(4, self.symbol)
         self.symbol = self.scanner.get_symbol()
         if self.symbol is None:  # *
-            self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+            self.display_syntax_error(21, self.scanner.list_of_symbols[-1])
             return False
         if self.symbol.type != "semi-colon":
             self.display_syntax_error(21, self.symbol)
