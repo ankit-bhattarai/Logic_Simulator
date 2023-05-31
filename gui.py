@@ -928,20 +928,30 @@ class Gui(wx.Frame):
             return False
 
     def start_graphically_control(self):
+        """Ensure that a valid circuit is loaded before GUI starts.
+
+        Method loops until a valid circuit is loaded, or the user cancels
+        the operation."""
         while True:
             success = self.start_graphically()
             if success is None:
                 self.Close(True)
-                return None
+                return
             if success:
                 break
             else:
                 continue
+        return
 
     def load_graphically(self):
-        """Load the circuit definition file directly from the GUI."""
-        openFileDialog = wx.FileDialog(self, "Open definition file", "",
-                                       "",
+        """Load the circuit definition file directly from the GUI.
+
+        This is called when the user selects the "Open" option from the menu.
+        The selected file is sent to the GuiInterface object to be parsed and 
+        checked for errors. If errrors exist, they will be displayed in a
+        dialog box and the current circuit will not be overwritten. If no
+        errors exist, the circuit will be loaded and canvas updated."""
+        openFileDialog = wx.FileDialog(self, "Open definition file", "", "",
                                        wildcard="TXT files (*.txt)|*.txt",
                                        style=wx.FD_OPEN +
                                        wx.FD_FILE_MUST_EXIST)
