@@ -1,0 +1,5 @@
+DEVICES: SWITCH switch1 0, SWITCH switch2 0, AND and1 2, OR or1 2, NAND nand1 2;
+CONNECT: switch1 > and1.I1, switch1 > or1.I1, switch2 > and1.I2, switch2 > or1.I2,
+ and1 > nand1.I1, or1 > nand1.I2;
+MONITOR: and1, or1, nand1;
+END;
