@@ -384,7 +384,7 @@ class SwitchPanel(wx.Panel):
         # Text for the switches
         self.switch_text = wx.StaticText(
             self, wx.ID_ANY, "SELECT SWITCH AND STATE: ")
-        self.left_sizer.Add(self.switch_text, 1, wx.EXPAND | wx.ALL, 10)
+        self.left_sizer.Add(self.switch_text, 1, wx.EXPAND, wx.ALIGN_LEFT| wx.ALL, 10)
 
         combo_id_switch = wx.NewIdRef()
         combo_choices = list(self.guiint.list_of_switches())
@@ -396,11 +396,11 @@ class SwitchPanel(wx.Panel):
         # Want it to work for both enter and selection
         self.combo_box_switch.Bind(wx.EVT_TEXT_ENTER, self.OnComboSwitch)
         # Add combo box to switch sizer
-        self.left_sizer.Add(self.combo_box_switch, 1, wx.ALL, 5)
+        self.left_sizer.Add(self.combo_box_switch, 1, wx.ALIGN_LEFT, wx.ALL, 10)
         self.switch_text = None  # The option chosen on the combo box
 
         self.switch_state_display = wx.StaticText(self, wx.ID_ANY, "")
-        self.right_sizer.Add(self.switch_state_display, 0, wx.EXPAND | wx.ALL, 10)
+        self.right_sizer.Add(self.switch_state_display, 1, wx.EXPAND, wx.ALIGN_RIGHT | wx.ALL, 10)
 
         # Create single button - SWITCHES state from the current state - dynamic
         self.switch_button_id = wx.NewIdRef(count=1)
@@ -411,7 +411,7 @@ class SwitchPanel(wx.Panel):
         self.button_switch.Bind(wx.EVT_BUTTON, self.OnButtonSwitch)
 
         # Add buttons to switch state sizer
-        self.right_sizer.Add(self.button_switch, 1, wx.ALL, 5)
+        self.right_sizer.Add(self.button_switch, 1, wx.ALIGN_RIGHT, wx.ALL, 10)
         # Initially hide the buttons
         self.button_switch.Hide()
         self.switch_state_display.Hide()
@@ -449,7 +449,7 @@ class SwitchPanel(wx.Panel):
             switch_state = self.guiint.get_switch_state(self.switch_text)
 
             self.switch_state_display.Show()
-            switch_state_string = "CLOSED" if switch_state == 1 else "OPEN"
+            switch_state_string = "CLOSED" if switch_state == 1 else "OPENED"
             self.switch_state_display.SetLabel(f'{self.switch_text} : {switch_state_string}')
 
             self.renderSwitchBoxes()
@@ -457,6 +457,10 @@ class SwitchPanel(wx.Panel):
                 f"Combo box changed. New_value: {combo_value}")
         else:
             self.grand_parent.canvas.render("Invalid Selection Made")
+        
+        self.main_sizer.Layout()
+        self.parent.GetSizer().Layout()
+        self.grand_parent.GetSizer().Layout()
 
     def OnButtonSwitch(self, event):
         """Method called when button is pressed.
@@ -477,6 +481,10 @@ class SwitchPanel(wx.Panel):
 
             text = f"Switch {switch_text} is now {switch_state_string}."
             self.grand_parent.canvas.render(text)
+
+            self.main_sizer.Layout()
+            self.parent.GetSizer().Layout()
+            self.grand_parent.GetSizer().Layout()
 
 
 class MonitorPanel(wx.Panel):
@@ -505,13 +513,13 @@ class MonitorPanel(wx.Panel):
         self.main_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.left_sizer = wx.BoxSizer(wx.VERTICAL)
         self.right_sizer = wx.BoxSizer(wx.VERTICAL)
-        self.main_sizer.Add(self.left_sizer, 0, wx.EXPAND | wx.ALL, 10)
-        self.main_sizer.Add(self.right_sizer, 0, wx.EXPAND | wx.ALL, 10)
+        self.main_sizer.Add(self.left_sizer, 1, wx.EXPAND | wx.ALL, 10)
+        self.main_sizer.Add(self.right_sizer, 1, wx.EXPAND | wx.ALL, 10)
 
         # Text for the monitors
         self.monitor_text = wx.StaticText(
             self, wx.ID_ANY, "SELECT MONITOR: ")
-        self.left_sizer.Add(self.monitor_text, 1, wx.EXPAND | wx.ALL, 10)
+        self.left_sizer.Add(self.monitor_text, 1, wx.EXPAND, wx.ALIGN_LEFT | wx.ALL, 10)
 
         # Have to create the combo box for the monitors
         combo_id_monitor = wx.NewIdRef()
@@ -524,10 +532,10 @@ class MonitorPanel(wx.Panel):
         # Want it to work for both enter and selection
         self.combo_box_monitor.Bind(wx.EVT_TEXT_ENTER, self.OnComboMonitor)
         self.monitor_state_display = wx.StaticText(self, wx.ID_ANY, "")
-        self.right_sizer.Add(self.monitor_state_display, 0, wx.EXPAND | wx.ALL, 10)
+        self.right_sizer.Add(self.monitor_state_display, 1, wx.EXPAND, wx.ALIGN_RIGHT | wx.ALL, 10)
 
         # Add combo box to monitor sizer
-        self.left_sizer.Add(self.combo_box_monitor, 1, wx.ALL, 5)
+        self.left_sizer.Add(self.combo_box_monitor, 1, wx.ALIGN_LEFT, wx.ALL, 10)
         self.monitor_text = None  # The option chosen on the combo box
 
         # For representing the state of the monitor, will have two buttons
@@ -543,7 +551,7 @@ class MonitorPanel(wx.Panel):
         self.button_monitor.Bind(wx.EVT_BUTTON, self.OnButtonMonitor)
 
         # Add buttons to monitor state sizer
-        self.right_sizer.Add(self.button_monitor, 1, wx.ALL, 5)
+        self.right_sizer.Add(self.button_monitor, 1, wx.ALIGN_RIGHT, wx.ALL, 10)
         # Initially hide the buttons
         self.button_monitor.Hide()
 
@@ -588,6 +596,10 @@ class MonitorPanel(wx.Panel):
 
             self.grand_parent.canvas.render(
                 f"Combo box changed. New_value: {combo_value}")
+            self.main_sizer.Layout()
+            self.parent.GetSizer().Layout()
+            self.grand_parent.GetSizer().Layout()
+
         else:
             self.grand_parent.canvas.render("Invalid Selection Made")
 
@@ -611,7 +623,9 @@ class MonitorPanel(wx.Panel):
 
             text = f"Switch {monitor_text} is now {monitor_state_string}."
             self.grand_parent.canvas.render(text)
-
+            self.main_sizer.Layout()
+            self.parent.GetSizer().Layout()
+            self.grand_parent.GetSizer().Layout()
 
 class RunPanel(wx.Panel):
     """ Panel for the run button and the cycles text box.

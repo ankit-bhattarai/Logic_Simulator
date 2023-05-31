@@ -1,5 +1,6 @@
 DEVICES: SWITCH switch1 1, SWITCH switch2 0, CLOCK clock1 2, DTYPE dtype1,
          NOR nor1 2, XOR xor1;
+# This is a circuit with 2 switches, a clock, a dtype and a nor and xor gates
 CONNECT: switch1 > dtype1.DATA, switch1 > dtype1.SET, switch1 > nor1.I1, 
 switch2 > dtype1.CLEAR, switch2 > xor1.I2, dtype1.Q > nor1.I2, 
 dtype1.QBAR > xor1.I1, clock1 > dtype1.CLK;
