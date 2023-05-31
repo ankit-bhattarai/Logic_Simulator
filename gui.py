@@ -906,7 +906,7 @@ class Gui(wx.Frame):
             file_path = self.guiint.scanner.path
             with open(file_path, "r") as f:
                 box = MyDialog(self, message=f.read(),
-                               title="Definition File", editable=True)
+                               title="Definition File", editable=False)
                 box.ShowModal()
                 box.Destroy()
 
