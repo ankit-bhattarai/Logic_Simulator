@@ -209,6 +209,10 @@ def test_syntax_error_identification(definition_file, error_type, error_symbol_i
 
 @pytest.fixture
 def network_dict_1():
+    """
+    Fixture to populate the expected network dictionary 
+    for the first test file.
+    """
     network_dict = {}
     network_dict['DEVICES'] = [[Symbol("CLOCK", 5, 1, 10),
                                Symbol("clock1", 16, 1, 16),
@@ -224,9 +228,15 @@ def network_dict_1():
 
 def test_build_network_dict_1(new_names, network_dict_1, new_devices, new_network,
                               new_monitors):
-    """Test that the network dictionary (when CORRECT syntax is passed, used later to
-       check semantics and to build the network, is built correctly - for increasingly
-       complex files - through test_build_network_dict_{1, 2, 3}."""
+    """Test that the network dictionary, used later to check semantics and 
+       to build the network, is built correctly - for increasingly complex files
+       - through test_build_network_dict_{1, 2, 3}.
+       
+       This is the converse of testing for error identification as this dictionary
+       is only built when CORRECT syntax is passed. This is different from the above
+       tests, for which INCORRECT syntax is passed and error identification is tested.
+    """
+
     new_scanner = Scanner("test_parse_files/test_build_network_dict_1.txt", new_names)
     new_parser = Parser(new_names,
                         new_devices,
@@ -241,6 +251,10 @@ def test_build_network_dict_1(new_names, network_dict_1, new_devices, new_networ
 
 @pytest.fixture
 def network_dict_2():
+    """
+    Fixture to populate the expected network dictionary 
+    for the second test file.
+    """
     network_dict_2 = {}
     network_dict_2["DEVICES"] = [[Symbol("SWITCH", 6, 1, 10), Symbol("switch1", 16, 1, 17), Symbol("0", 17, 1, 25)], 
                                  [Symbol("SWITCH", 6, 1, 28), Symbol("switch2", 19, 1, 35), Symbol("0", 17, 1, 43)],
@@ -276,6 +290,10 @@ def test_build_network_dict_2(network_dict_2, new_names, new_devices, new_networ
 
 @pytest.fixture
 def network_dict_3():
+    """
+    Fixture to populate the expected network dictionary 
+    for the third test file.
+    """
     network_dict_3 = {}
     network_dict_3['DEVICES'] = [[Symbol("SWITCH", 6, 1, 10), Symbol("switch1", 16, 1, 17), Symbol("1", 17, 1, 25)],
                                  [Symbol("SWITCH", 6, 1, 28), Symbol("switch2", 19, 1, 35), Symbol("0", 20, 1, 43)],
