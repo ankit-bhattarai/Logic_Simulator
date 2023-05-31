@@ -460,10 +460,9 @@ class Parser:
                 return dev_list
             else:
                 return None
-        elif self.names.get_name_string(self.symbol.id) == "CONNECT":  
-            self.display_syntax_error(19, self.scanner.list_of_symbols[self.scanner.list_of_symbols.index(self.symbol) - 1])
-            return None
         else:
+            if self.names.get_name_string(self.symbol.id) == "CONNECT":
+                return None
             self.display_syntax_error(19, self.scanner.list_of_symbols[self.scanner.list_of_symbols.index(self.symbol) - 1])
             while self.names.get_name_string(self.symbol.id) != "CONNECT":  # !!!
                 self.symbol = self.scanner.get_symbol()
@@ -653,10 +652,9 @@ class Parser:
                 return con_list
             else:
                 return None
-        elif self.names.get_name_string(self.symbol.id) == "MONITOR":  
-            self.display_syntax_error(13, self.scanner.list_of_symbols[self.scanner.list_of_symbols.index(self.symbol) - 1])
-            return None
         else:
+            if self.names.get_name_string(self.symbol.id) == "MONITOR":
+                return None
             self.display_syntax_error(13, self.scanner.list_of_symbols[self.scanner.list_of_symbols.index(self.symbol) - 1])
             while self.names.get_name_string(self.symbol.id) != "MONITOR":
                 self.symbol = self.scanner.get_symbol()
@@ -784,10 +782,9 @@ class Parser:
                 return mon_list
             else:
                 return None
-        elif self.names.get_name_string(self.symbol.id) == "END":  
-            self.display_syntax_error(18, self.scanner.list_of_symbols[self.scanner.list_of_symbols.index(self.symbol) - 1])
-            return None
         else:
+            if self.names.get_name_string(self.symbol.id) == "END":
+                return None
             self.display_syntax_error(18, self.scanner.list_of_symbols[self.scanner.list_of_symbols.index(self.symbol) - 1])
             while self.names.get_name_string(self.symbol.id) != "END":  # !!!
                 self.symbol = self.scanner.get_symbol()
