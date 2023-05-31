@@ -8,10 +8,12 @@ Classes:
 MyGLCanvas - handles all canvas drawing operations.
 Gui - configures the main window and all the widgets.
 """
+import os
 import wx
 import wx.glcanvas as wxcanvas
 from OpenGL import GL, GLUT
 from guiint import GuiInterface
+import webbrowser
 
 change_button_cycles = False
 text_min_height = 1
@@ -219,7 +221,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         base_y = 80
         for i, (name, values) in enumerate(self.guiint.get_signals().items()):
             self.render_signal(base_x, base_y + i * height_above_signal,
-                                values, name)
+                               values, name)
 
     def render(self, text):
         """Handle all drawing operations."""
@@ -384,7 +386,8 @@ class SwitchPanel(wx.Panel):
         # Text for the switches
         self.switch_text = wx.StaticText(
             self, wx.ID_ANY, "SELECT SWITCH AND STATE: ")
-        self.left_sizer.Add(self.switch_text, 1, wx.EXPAND, wx.ALIGN_LEFT| wx.ALL, 10)
+        self.left_sizer.Add(self.switch_text, 1, wx.EXPAND,
+                            wx.ALIGN_LEFT | wx.ALL, 10)
 
         combo_id_switch = wx.NewIdRef()
         combo_choices = list(self.guiint.list_of_switches())
@@ -396,11 +399,13 @@ class SwitchPanel(wx.Panel):
         # Want it to work for both enter and selection
         self.combo_box_switch.Bind(wx.EVT_TEXT_ENTER, self.OnComboSwitch)
         # Add combo box to switch sizer
-        self.left_sizer.Add(self.combo_box_switch, 1, wx.ALIGN_LEFT, wx.ALL, 10)
+        self.left_sizer.Add(self.combo_box_switch, 1,
+                            wx.ALIGN_LEFT, wx.ALL, 10)
         self.switch_text = None  # The option chosen on the combo box
 
         self.switch_state_display = wx.StaticText(self, wx.ID_ANY, "")
-        self.right_sizer.Add(self.switch_state_display, 1, wx.EXPAND, wx.ALIGN_RIGHT | wx.ALL, 10)
+        self.right_sizer.Add(self.switch_state_display, 1,
+                             wx.EXPAND, wx.ALIGN_RIGHT | wx.ALL, 10)
 
         # Create single button - SWITCHES state from the current state - dynamic
         self.switch_button_id = wx.NewIdRef(count=1)
@@ -450,14 +455,15 @@ class SwitchPanel(wx.Panel):
 
             self.switch_state_display.Show()
             switch_state_string = "CLOSED" if switch_state == 1 else "OPENED"
-            self.switch_state_display.SetLabel(f'{self.switch_text} : {switch_state_string}')
+            self.switch_state_display.SetLabel(
+                f'{self.switch_text} : {switch_state_string}')
 
             self.renderSwitchBoxes()
             self.grand_parent.canvas.render(
                 f"Combo box changed. New_value: {combo_value}")
         else:
             self.grand_parent.canvas.render("Invalid Selection Made")
-        
+
         self.main_sizer.Layout()
         self.parent.GetSizer().Layout()
         self.grand_parent.GetSizer().Layout()
@@ -472,12 +478,14 @@ class SwitchPanel(wx.Panel):
             pass
         else:
             switch_state = self.guiint.get_switch_state(switch_text)
-            desired_switch_state = 1 if switch_state == 0 else 0 # Flip the switch
-            self.guiint.set_switch_state(switch_text, desired_switch_state) # Render the change
+            desired_switch_state = 1 if switch_state == 0 else 0  # Flip the switch
+            self.guiint.set_switch_state(
+                switch_text, desired_switch_state)  # Render the change
             self.renderSwitchBoxes()
 
             switch_state_string = "CLOSED" if desired_switch_state == 1 else "OPENED"
-            self.switch_state_display.SetLabel(f'{self.switch_text}: {switch_state_string}')
+            self.switch_state_display.SetLabel(
+                f'{self.switch_text}: {switch_state_string}')
 
             text = f"Switch {switch_text} is now {switch_state_string}."
             self.grand_parent.canvas.render(text)
@@ -519,7 +527,8 @@ class MonitorPanel(wx.Panel):
         # Text for the monitors
         self.monitor_text = wx.StaticText(
             self, wx.ID_ANY, "SELECT MONITOR: ")
-        self.left_sizer.Add(self.monitor_text, 1, wx.EXPAND, wx.ALIGN_LEFT | wx.ALL, 10)
+        self.left_sizer.Add(self.monitor_text, 1, wx.EXPAND,
+                            wx.ALIGN_LEFT | wx.ALL, 10)
 
         # Have to create the combo box for the monitors
         combo_id_monitor = wx.NewIdRef()
@@ -532,10 +541,12 @@ class MonitorPanel(wx.Panel):
         # Want it to work for both enter and selection
         self.combo_box_monitor.Bind(wx.EVT_TEXT_ENTER, self.OnComboMonitor)
         self.monitor_state_display = wx.StaticText(self, wx.ID_ANY, "")
-        self.right_sizer.Add(self.monitor_state_display, 1, wx.EXPAND, wx.ALIGN_RIGHT | wx.ALL, 10)
+        self.right_sizer.Add(self.monitor_state_display, 1,
+                             wx.EXPAND, wx.ALIGN_RIGHT | wx.ALL, 10)
 
         # Add combo box to monitor sizer
-        self.left_sizer.Add(self.combo_box_monitor, 1, wx.ALIGN_LEFT, wx.ALL, 10)
+        self.left_sizer.Add(self.combo_box_monitor, 1,
+                            wx.ALIGN_LEFT, wx.ALL, 10)
         self.monitor_text = None  # The option chosen on the combo box
 
         # For representing the state of the monitor, will have two buttons
@@ -544,14 +555,15 @@ class MonitorPanel(wx.Panel):
 
         # Create the two buttons
         self.monitor_button_id = wx.NewIdRef(count=1)
-        self.button_monitor = wx.Button(self, self.monitor_button_id, 
+        self.button_monitor = wx.Button(self, self.monitor_button_id,
                                         "")
 
         # Bind buttons
         self.button_monitor.Bind(wx.EVT_BUTTON, self.OnButtonMonitor)
 
         # Add buttons to monitor state sizer
-        self.right_sizer.Add(self.button_monitor, 1, wx.ALIGN_RIGHT, wx.ALL, 10)
+        self.right_sizer.Add(self.button_monitor, 1,
+                             wx.ALIGN_RIGHT, wx.ALL, 10)
         # Initially hide the buttons
         self.button_monitor.Hide()
 
@@ -589,10 +601,11 @@ class MonitorPanel(wx.Panel):
         if combo_value in self.guiint.list_of_outputs():
             self.monitor_text = combo_value  # Only change this if valid
             self.renderMonitorButtons()
-            
+
             monitor_state = self.guiint.get_output_state(self.monitor_text)
             monitor_state_string = "MONITORED" if monitor_state == 1 else "HIDDEN"
-            self.monitor_state_display.SetLabel(f'{self.monitor_text}: {monitor_state_string}')
+            self.monitor_state_display.SetLabel(
+                f'{self.monitor_text}: {monitor_state_string}')
 
             self.grand_parent.canvas.render(
                 f"Combo box changed. New_value: {combo_value}")
@@ -619,13 +632,15 @@ class MonitorPanel(wx.Panel):
             self.renderMonitorButtons()
 
             monitor_state_string = "MONITORED" if desired_monitor_state == 1 else "HIDDEN"
-            self.monitor_state_display.SetLabel(f'{self.monitor_text}: {monitor_state_string}')
+            self.monitor_state_display.SetLabel(
+                f'{self.monitor_text}: {monitor_state_string}')
 
             text = f"Switch {monitor_text} is now {monitor_state_string}."
             self.grand_parent.canvas.render(text)
             self.main_sizer.Layout()
             self.parent.GetSizer().Layout()
             self.grand_parent.GetSizer().Layout()
+
 
 class RunPanel(wx.Panel):
     """ Panel for the run button and the cycles text box.
@@ -792,7 +807,7 @@ class Gui(wx.Frame):
         # File path for circuit file which can be chosen from the GUI
         self.file_path = None
         self.guiint = None
-        
+
         if load_graphically:
             self.start_graphically_control()
             # Can only reach this stage if a valid circuit file has been loaded
@@ -800,7 +815,7 @@ class Gui(wx.Frame):
         else:
             guiint = GuiInterface(names, devices, network, monitors, scanner)
             self.guiint = guiint
-        
+
         if self.guiint is not None:
             # Configure the file menu
             fileMenu = wx.Menu()
@@ -858,7 +873,8 @@ class Gui(wx.Frame):
                 box.Destroy()
 
         elif Id == self.help_id_2:
-            wx.MessageBox("User Guide", "User Guide")
+            # wx.MessageBox("User Guide", "User Guide")
+            webbrowser.open(f"{os.getcwd()}/UserGuide.pdf")
         elif Id == self.reset_id:
             self.canvas.reset_view()
         elif Id == self.def_file_show_id:
@@ -872,31 +888,32 @@ class Gui(wx.Frame):
     def start_graphically(self):
         """Load the circuit definition file directly from the GUI."""
         openFileDialog = wx.FileDialog(self, "Open definition file", "",
-                                           "",
-                                           wildcard="TXT files (*.txt)|*.txt",
-                                           style=wx.FD_OPEN +
-                                           wx.FD_FILE_MUST_EXIST)
+                                       "",
+                                       wildcard="TXT files (*.txt)|*.txt",
+                                       style=wx.FD_OPEN +
+                                       wx.FD_FILE_MUST_EXIST)
         if openFileDialog.ShowModal() == wx.ID_CANCEL:
             # The user has cancelled the dialog, close the program
             self.Close(True)
             return None
         # Proceed loading the file chosen by the user
         self.file_path = openFileDialog.GetPath()
-        guiint = GuiInterface(None, None, None, None, None) # These don't need to be initialised
+        # These don't need to be initialised
+        guiint = GuiInterface(None, None, None, None, None)
         success, message = guiint.update_network(self.file_path)
         if success:
             self.guiint = guiint
             if message == "":
                 display_message = "Circuit loaded successfully.\n"
-                title="Circuit Loaded"
+                title = "Circuit Loaded"
             else:  # There is a message to  be printed, but overall the
                 # circuit is valid. It is only a warning
                 display_message = "Circuit loaded with warnings.\n"
                 display_message += "Warnings: \n\n"
                 display_message += message
-                title="Warnings Present"
+                title = "Warnings Present"
             box = MyDialog(self, message=display_message,
-                            title=title)
+                           title=title)
             box.ShowModal()
             box.Destroy()
             return True
@@ -905,30 +922,39 @@ class Gui(wx.Frame):
             error_display += "Errors: \n\n"
             error_display += message
             box = MyDialog(self, message=error_display,
-                            title="Errors Present")
+                           title="Errors Present")
             box.ShowModal()
             box.Destroy()
             return False
 
     def start_graphically_control(self):
+        """Ensure that a valid circuit is loaded before GUI starts.
+
+        Method loops until a valid circuit is loaded, or the user cancels
+        the operation."""
         while True:
             success = self.start_graphically()
             if success is None:
                 self.Close(True)
-                return None
+                return
             if success:
                 break
             else:
                 continue
-
+        return
 
     def load_graphically(self):
-        """Load the circuit definition file directly from the GUI."""
-        openFileDialog = wx.FileDialog(self, "Open definition file", "",
-                                           "",
-                                           wildcard="TXT files (*.txt)|*.txt",
-                                           style=wx.FD_OPEN +
-                                           wx.FD_FILE_MUST_EXIST)
+        """Load the circuit definition file directly from the GUI.
+
+        This is called when the user selects the "Open" option from the menu.
+        The selected file is sent to the GuiInterface object to be parsed and 
+        checked for errors. If errrors exist, they will be displayed in a
+        dialog box and the current circuit will not be overwritten. If no
+        errors exist, the circuit will be loaded and canvas updated."""
+        openFileDialog = wx.FileDialog(self, "Open definition file", "", "",
+                                       wildcard="TXT files (*.txt)|*.txt",
+                                       style=wx.FD_OPEN +
+                                       wx.FD_FILE_MUST_EXIST)
         if openFileDialog.ShowModal() == wx.ID_CANCEL:
             return  # Cancelled, nothing selected
         # Proceed loading the file chosen by the user
@@ -944,7 +970,7 @@ class Gui(wx.Frame):
                 error_display += "Warnings: \n\n"
                 error_display += message
                 box = MyDialog(self, message=error_display,
-                                title="Warnings Present")
+                               title="Warnings Present")
                 box.ShowModal()
                 box.Destroy()
         else:
@@ -952,7 +978,7 @@ class Gui(wx.Frame):
             error_display += "Errors: \n\n"
             error_display += message
             box = MyDialog(self, message=error_display,
-                            title="Errors Present")
+                           title="Errors Present")
             box.ShowModal()
             box.Destroy()
 
