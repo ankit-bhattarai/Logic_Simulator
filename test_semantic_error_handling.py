@@ -411,3 +411,29 @@ def test_display_monitor_present_error(new_semantic_error_handler, new_scanner,
     new_scanner.print_error.assert_called_with(and1, 0,
                                                "Warning: Monitor exists at this output already.")
     assert new_scanner.print_error.call_count == 1
+
+
+def test_display_input_not_connected_error(new_names, new_devices,
+                                           new_monitors, new_network):
+    """Test the display_input_not_connected_error method."""
+    scanner = Scanner("test_parse_files/semantic_error_7.txt", new_names)
+    parser = Parser(new_names, new_devices, new_network, new_monitors, scanner)
+    parser.parse_network()
+    scanner.print_error = MagicMock()
+    symbol = Symbol("I1", 30, 5, 20)
+    parser.semantic_error_handler.display_input_not_connected_error(symbol)
+    scanner.print_error.assert_called_once_with(symbol, 2,
+                                                "The following input pins are not connected to a device: ['dtype1.CLK']")
+
+
+def test_display_input_not_connected_error_multiple(new_names, new_devices,
+                                                    new_monitors, new_network):
+    """Test the display_input_not_connected_error method with multiple inputs not connected."""
+    scanner = Scanner("test_parse_files/semantic_error_10.txt", new_names)
+    parser = Parser(new_names, new_devices, new_network, new_monitors, scanner)
+    parser.parse_network()
+    scanner.print_error = MagicMock()
+    symbol = Symbol("I1", 30, 5, 20)
+    parser.semantic_error_handler.display_input_not_connected_error(symbol)
+    scanner.print_error.assert_called_once_with(symbol, 2,
+                                                "The following input pins are not connected to a device: ['dtype1.CLK', 'xor1.I2']")
