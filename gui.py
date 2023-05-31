@@ -86,8 +86,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_PAINT, self.on_paint)
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
-        self.Bind(wx.EVT_MIDDLE_DOWN, self._reset_pan)
-        self.Bind(wx.EVT_RIGHT_DOWN, self._reset_view)
+        self.Bind(wx.EVT_MIDDLE_DOWN, self.reset_pan)
+        self.Bind(wx.EVT_RIGHT_DOWN, self.reset_view)
 
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
@@ -218,7 +218,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         base_x = 40
         base_y = 80
         for i, (name, values) in enumerate(self.guiint.get_signals().items()):
-            self._render_signal(base_x, base_y + i * height_above_signal,
+            self.render_signal(base_x, base_y + i * height_above_signal,
                                 values, name)
 
     def render(self, text):
@@ -259,7 +259,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         """Handle the canvas resize event."""
         # Forces reconfiguration of the viewport, modelview and projection
         # matrices on the next paint event
-        self._reset_view()  # Rest the zoom and pan whenever screen is resized
+        self.reset_view()  # Rest the zoom and pan whenever screen is resized
         self.init = False
 
     def on_mouse(self, event):
@@ -339,8 +339,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
     def reset_view(self, event=None):
         """Reset the view to the initial view and zoom."""
-        self._reset_pan()
-        self._reset_zoom()
+        self.reset_pan()
+        self.reset_zoom()
 
 
 class SwitchPanel(wx.Panel):
@@ -392,9 +392,9 @@ class SwitchPanel(wx.Panel):
                                             choices=combo_choices,
                                             style=wx.TE_PROCESS_ENTER)
         # Bind the combo box
-        self.combo_box_switch.Bind(wx.EVT_COMBOBOX, self._OnComboSwitch)
+        self.combo_box_switch.Bind(wx.EVT_COMBOBOX, self.OnComboSwitch)
         # Want it to work for both enter and selection
-        self.combo_box_switch.Bind(wx.EVT_TEXT_ENTER, self._OnComboSwitch)
+        self.combo_box_switch.Bind(wx.EVT_TEXT_ENTER, self.OnComboSwitch)
         # Add combo box to switch sizer
         self.left_sizer.Add(self.combo_box_switch, 1, wx.ALL, 5)
         self.switch_text = None  # The option chosen on the combo box
@@ -459,7 +459,7 @@ class SwitchPanel(wx.Panel):
         combo_value = self.combo_box_switch.GetValue()
         if combo_value in self.guiint.list_of_switches():
             self.switch_text = combo_value  # Only change this if valid
-            self._renderSwitchBoxes()
+            self.renderSwitchBoxes()
             self.grand_parent.canvas.render(
                 f"Combo box changed. New_value: {combo_value}")
         else:
@@ -475,7 +475,7 @@ class SwitchPanel(wx.Panel):
             pass  # This can't ever happen
         else:
             self.guiint.set_switch_state(switch_text, 0)
-            self._renderSwitchBoxes()
+            self.renderSwitchBoxes()
         text = f"Switch {switch_text} is now open."
         self.grand_parent.canvas.render(text)
 
@@ -489,7 +489,7 @@ class SwitchPanel(wx.Panel):
             pass  # This can't ever happen
         else:
             self.guiint.set_switch_state(switch_text, 1)
-            self._renderSwitchBoxes()
+            self.renderSwitchBoxes()
         text = f"Switch {switch_text} is now closed."
 
         self.grand_parent.canvas.render(text)
@@ -574,7 +574,7 @@ class MonitorPanel(wx.Panel):
         # Add the sizer to the panel
         self.SetSizer(self.main_sizer)
 
-    def _renderMonitorButtons(self):
+    def renderMonitorButtons(self):
         """Method renders the monitor buttons based on their current state."""
         # Get the current monitor
         monitor_text = self.monitor_text
@@ -608,7 +608,7 @@ class MonitorPanel(wx.Panel):
         combo_value = self.combo_box_monitor.GetValue()
         if combo_value in self.guiint.list_of_outputs():
             self.monitor_text = combo_value  # Only change this if valid
-            self._renderMonitorButtons()
+            self.renderMonitorButtons()
             self.grand_parent.canvas.render(
                 f"Combo box changed. New_value: {combo_value}")
         else:
@@ -625,7 +625,7 @@ class MonitorPanel(wx.Panel):
             pass
         else:
             self.guiint.set_output_state(monitor_text, 0)
-            self._renderMonitorButtons()
+            self.renderMonitorButtons()
             self.grand_parent.canvas.render_signals()
         text = f"Monitor {monitor_text} is now off."
         self.grand_parent.canvas.render(text)
@@ -634,13 +634,13 @@ class MonitorPanel(wx.Panel):
         """Method called when the monitor button 1 is pressed.
 
         Method changes the state of the monitor to 1 and calls the
-        _renderMonitorButtons() method."""
+        renderMonitorButtons() method."""
         monitor_text = self.monitor_text
         if monitor_text is None:
             pass
         else:
             self.guiint.set_output_state(monitor_text, 1)
-            self._renderMonitorButtons()
+            self.renderMonitorButtons()
             self.grand_parent.canvas.render_signals()
         text = f"Monitor {monitor_text} is now on."
         self.grand_parent.canvas.render(text)
@@ -901,7 +901,7 @@ class Gui(wx.Frame):
         elif Id == self.help_id_2:
             wx.MessageBox("User Guide", "User Guide")
         elif Id == self.reset_id:
-            self.canvas._reset_view()
+            self.canvas.reset_view()
         elif Id == self.def_file_show_id:
             file_path = self.guiint.scanner.path
             with open(file_path, "r") as f:
