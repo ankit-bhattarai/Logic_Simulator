@@ -1,6 +1,6 @@
 """Test the parse module."""
 import pytest
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock, call, Mock
 
 from names import Names
 from devices import Devices
@@ -394,7 +394,7 @@ def test_semantic_error_identification(definition_file, symbol_details,
     new_scanner.print_error.assert_called_once_with(symbol, index, message)
     assert new_scanner.print_error.call_count == 1
 
-    @pytest.fixture
+@pytest.fixture
 def get_def_1_parser(new_names, new_devices, new_monitors, new_network):
     """Returns a parser for the def1.txt file."""
     new_scanner = Scanner("test_parse_files/def1.txt", new_names)
