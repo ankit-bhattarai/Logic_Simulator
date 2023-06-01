@@ -94,6 +94,8 @@ class Symbol:
         -------
         is_type_string: bool
         """
+        if string is None:
+            return False
         for char in string:  # Ensures all characters are alphanumeric or _
             if not char.isalnum() and char != "_":
                 return False
@@ -114,6 +116,8 @@ class Symbol:
         -------
         is_type_name: bool
         """
+        if string is None:
+            return False
         is_type_string = cls.is_string(string)
         # Returns false if not composed of alphanumeric characters and _
         if not is_type_string:
@@ -199,6 +203,8 @@ class Symbol:
         -------
         is_type_number: bool
         """
+        if string is None:
+            return False
         if string.isdigit():
             return True
         return False
@@ -215,6 +221,8 @@ class Symbol:
         -------
         is_type_integer: bool
         """
+        if string is None:
+            return False
         if string.isdigit() and string[0] != "0":
             return True
         return False
@@ -250,6 +258,8 @@ class Symbol:
         -------
         symbol_type: str
         """
+        if string is None:
+            return None
         if string in input_pins:
             return "input_pin"
         elif string in output_pins:
@@ -405,6 +415,8 @@ class Scanner:
         next_character: string
             The next character after the number
         """
+        if first_number is None:
+            return None
         met_numbers = first_number
         while True:
             character = self.get_next_char()
@@ -573,6 +585,8 @@ class Scanner:
             line_number = self.current_line_number
             if character == "":  # Case 1 - End of file
                 break  # Exit loop
+            if character is None:
+                break
             elif character.isdigit():  # Case 2 - Digit
                 # Gets the rest of the number and the next character after it
                 (number, character) = self.get_next_number(character)
