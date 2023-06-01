@@ -41,6 +41,8 @@ class Device:
         self.clock_counter = None
         self.switch_state = None
         self.dtype_memory = None
+        self.rc_period = None  # MAINTENANCE
+        self.rc_counter = None  # MAINTENANCE
 
 
 class Devices:
@@ -260,11 +262,25 @@ class Devices:
             self.add_output(device_id, output_id)
         self.cold_startup()  # D-type initialised to a random state
 
+    def make_rc(self, device_id, rc_period):  # MAINTENANCE
+        """Make an RC device with the specified period.
+
+        rc_period is an integer > 0. It is the number of simulation
+        cycles before the rc output switches from high to low.
+        """
+        self.add_device(device_id, self.RC)
+        device = self.get_device(device_id)
+        device.rc_period = rc_period
+        self.cold_startup()
+
     def cold_startup(self):
-        """Simulate cold start-up of D-types and clocks.
+        """Simulate cold start-up of D-types, clocks, RCs and siggens.
 
         Set the memory of the D-types to a random state and make the clocks
         begin from a random point in their cycles.
+
+        Make the RCs begin from the start of their cycles and set their outputs
+        to high.
         """
         for device in self.devices_list:
             if device.device_kind == self.D_TYPE:
@@ -277,6 +293,12 @@ class Devices:
                 # Initialise it to a random point in its cycle.
                 device.clock_counter = \
                     random.randrange(device.clock_half_period)
+
+            elif device.device_kind == self.RC:  # MAINTENANCE
+                rc_signal = self.HIGH
+                self.add_output(device.device_id, output_id=None,
+                                signal=rc_signal)
+                device.rc_counter = 0
 
     def make_device(self, device_id, device_kind, device_property=None):
         """Create the specified device.
@@ -329,6 +351,16 @@ class Devices:
                 error_type = self.QUALIFIER_PRESENT
             else:
                 self.make_d_type(device_id)
+                error_type = self.NO_ERROR
+
+        elif device_kind == self.RC:  # MAINTENANCE
+            # Device property is the RC period > 0
+            if device_property is None:
+                error_type = self.NO_QUALIFIER
+            elif device_property <= 0:
+                error_type = self.INVALID_QUALIFIER
+            else:
+                self.make_rc(device_id, device_property)
                 error_type = self.NO_ERROR
 
         else:
