@@ -227,6 +227,30 @@ class Symbol:
             return True
         return False
 
+    @staticmethod
+    def is_waveform(string):
+        """Return True if string is a valid waveform.
+
+        A waveform is a string which can only contain the characters 0 and 1.
+
+        Parameters
+        ----------
+        string: str
+
+        Returns
+        -------
+        is_type_waveform: bool
+        index: int or None
+            Index where the first invalid character is found. If no invalid
+            characters are found, returns None.
+        """
+        if string is None:
+            return False, 0
+        for i, char in enumerate(string):
+            if char not in ["0", "1"]:
+                return False, i
+        return True, None
+
     @classmethod
     def determine_type(cls, string):
         """Determine the type of the symbol.
@@ -510,6 +534,8 @@ class Scanner:
                 if character == "\n":  # Reached end of line
                     return self.get_next_char()  # Move to next line
                 if character == "":  # Reached end of file
+                    self.print_error(
+                        None, 0, "Multi-line comment not terminated")
                     return character
                 continue
         else:  # Multi-line comment
@@ -518,6 +544,8 @@ class Scanner:
                 if character == multi_line_comment:  # Reached end of comment
                     return self.get_next_char()  # Move to next character
                 if character == "":  # Reached end of file
+                    self.print_error(
+                        None, 0, "Multi-line comment not terminated")
                     return ""
                 continue
 
