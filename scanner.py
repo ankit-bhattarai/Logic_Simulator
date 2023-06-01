@@ -244,7 +244,7 @@ class Symbol:
             Index where the first invalid character is found. If no invalid
             characters are found, returns None.
         """
-        if string is None:
+        if string is None or string == "":
             return False, 0
         for i, char in enumerate(string):
             if char not in ["0", "1"]:
