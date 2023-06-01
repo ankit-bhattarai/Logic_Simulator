@@ -10,7 +10,7 @@ Symbol - encapsulates a symbol and stores its properties.
 """
 max_number_of_input_pins = 16
 keywords = {'DEVICES', 'CONNECT', 'MONITOR', 'END', 'AND', 'NAND', 'OR', 'NOR',
-            'DTYPE', 'XOR', 'SWITCH', 'CLOCK'}
+            'DTYPE', 'XOR', 'SWITCH', 'CLOCK', "RC", "SIGGEN"}
 dtype_input_pins = {"DATA", "SET", "CLEAR", "CLK"}
 gate_pins = {f"I{i}" for i in range(1, max_number_of_input_pins + 1)}
 input_pins = gate_pins.union(dtype_input_pins)
