@@ -239,17 +239,18 @@ class Symbol:
 
         Returns
         -------
-        is_type_waveform: bool
-        index: int or None
-            Index where the first invalid character is found. If no invalid
-            characters are found, returns None.
+        tuple: (is_type_waveform, index)
+            is_type_waveform: bool
+            index: int or None
+                Index where the first invalid character is found. If no invalid
+                characters are found, returns None.
         """
         if string is None or string == "":
-            return False, 0
+            return (False, 0)
         for i, char in enumerate(string):
             if char not in ["0", "1"]:
-                return False, i
-        return True, None
+                return (False, i)
+        return (True, None)
 
     @classmethod
     def determine_type(cls, string):
