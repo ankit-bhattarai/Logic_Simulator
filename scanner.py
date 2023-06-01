@@ -10,7 +10,7 @@ Symbol - encapsulates a symbol and stores its properties.
 """
 max_number_of_input_pins = 16
 keywords = {'DEVICES', 'CONNECT', 'MONITOR', 'END', 'AND', 'NAND', 'OR', 'NOR',
-            'DTYPE', 'XOR', 'SWITCH', 'CLOCK'}
+            'DTYPE', 'XOR', 'SWITCH', 'CLOCK', "RC", "SIGGEN"}
 dtype_input_pins = {"DATA", "SET", "CLEAR", "CLK"}
 gate_pins = {f"I{i}" for i in range(1, max_number_of_input_pins + 1)}
 input_pins = gate_pins.union(dtype_input_pins)
@@ -518,7 +518,7 @@ class Scanner:
                 if character == multi_line_comment:  # Reached end of comment
                     return self.get_next_char()  # Move to next character
                 if character == "":  # Reached end of file
-                    return None
+                    return ""
                 continue
 
     def create_symbol(self, string, column_number, line_number):
@@ -585,8 +585,8 @@ class Scanner:
             line_number = self.current_line_number
             if character == "":  # Case 1 - End of file
                 break  # Exit loop
-            if character is None:
-                break
+            # if character is None:
+            #     break
             elif character.isdigit():  # Case 2 - Digit
                 # Gets the rest of the number and the next character after it
                 (number, character) = self.get_next_number(character)
@@ -695,6 +695,10 @@ class Scanner:
             Returns True if able to successfully print the error message
         """
         try:
+            # Add logic for when the symbol is None
+            if symbol is None:
+                print(message)
+                return
             line_number = symbol.line_number
             line_string = self.get_line(line_number)
             column_number = symbol.column_number

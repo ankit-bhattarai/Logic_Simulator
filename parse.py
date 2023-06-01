@@ -1012,13 +1012,11 @@ class Parser:
         if self.num_of_errors == 0 and network_dict:
             build_network = self.build_network(network_dict=network_dict)
         else:
-            last_symbol = self.scanner.list_of_symbols[-1]
-            last_symbol_string = self.names.get_name_string(last_symbol.id)
             if self.num_of_errors == 1:
-                error_message = f"{self.num_of_errors} syntax error detected before the last symbol"
+                error_message = f"{self.num_of_errors} syntax error detected in the file"
             else:
-                error_message = f"{self.num_of_errors} syntax errors detected before the last symbol"
-            self.scanner.print_error(last_symbol, len(last_symbol_string) - 1, error_message)
+                error_message = f"{self.num_of_errors} syntax errors detected in the file"
+            self.scanner.print_error(None, 0, error_message)
             return False
 
         return build_network
