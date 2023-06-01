@@ -836,7 +836,7 @@ class Parser:
         network_dict = {}
         self.symbol = self.scanner.get_symbol()
         if self.symbol is None:  # *
-            self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+            self.display_syntax_error(22, None)
             return False
         # Parse devices
         if self.names.get_name_string(self.symbol.id) != "DEVICES":
