@@ -42,7 +42,7 @@ class Parser:
         self.network = network
         self.monitors = monitors
         self.scanner = scanner
-        self.symbol = scanner.list_of_symbols[0]
+        self.symbol = None
         self.num_of_errors = 0
         self.syntax_error_types = {
             1: "NameError: File should start with keyword 'DEVICES'",
