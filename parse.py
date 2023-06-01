@@ -50,11 +50,11 @@ class Parser:
             3: "NameError: ';' after the last connection should be followed by keyword 'MONITOR'.",
             4: "NameError: ';' after the last monitor should be followed by keyword 'END'.",
             5: "ValueError: There should be at least one device.",
-            6: "ValueError: The required number of parameters for a device of the type CLOCK/SWITCH/AND/OR/NAND/NOR is 3. Should also check for incorrect placement or missing punctuations.",
-            7: "ValueError: The required number of parameters for a device of the type XOR/DTYPE is 2. Should also check for incorrect placement or missing punctuations.",
+            6: "ValueError: The required number of parameters for a device of the type CLOCK/SWITCH/AND/OR/NAND/NOR/RC/SIGGEN is 3. Should also check for incorrect placement of or missing punctuations.",  # MAINTENANCE
+            7: "ValueError: The required number of parameters for a device of the type XOR/DTYPE is 2. Should also check for incorrect placement of or missing punctuations.",
             8: "NameError: 1st parameter of a device should be the keyword for that device.",
             9: "TypeError: Device name should be a lowercase alphanumeric string (including '_').",
-            10: "ValueError: Clock speed should be a positive integer.",
+            10: "ValueError: Clock speed/RC time constant should be a positive integer.",  # MAINTENANCE
             11: "ValueError: Switch state should be either 0 or 1.",
             12: "ValueError: Number of inputs for an AND/NAND/OR/NOR device should be between 1 and 16.",
             13: "TypeError: Connections should be separated by ',' and ended by ';'. Should also check for excessive parameters of a connection.",
@@ -66,7 +66,8 @@ class Parser:
             19: "TypeError: Devices should be separated by ',' and ended by ';'. Should also check for excessive parameters of a device.",
             20: "NameError: DEVICES, CONNECT and MONITOR should be followed by ':'.",
             21: "NameError: 'END' should be followed by ';'.",
-            22: "RuntimeError: File ends too early. Should check for missing sections."}
+            22: "RuntimeError: File ends too early. Should check for missing sections.",
+            23: "ValueError: Siggen waveform should only consist of 0s and 1s."}  # MAINTENANCE
         self.semantic_error_handler = SemanticErrorHandler(
             self.names, self.devices, self.network, self.monitors, self.scanner)
 
@@ -86,7 +87,7 @@ class Parser:
             self.display_syntax_error(9, self.symbol)
             return False
 
-    def check_clock(self, dev, dev_list):
+    def check_clock_rc(self, dev, dev_list):
         """Check the parameters of a clock device.
 
         Update the list of device parameters.
@@ -147,8 +148,7 @@ class Parser:
             while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
-                    self.display_syntax_error(
-                        22, self.scanner.list_of_symbols[-1])
+                    self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
                     return
             return
         if self.symbol.type == "comma" or self.symbol.type == "semi-colon":
@@ -157,7 +157,7 @@ class Parser:
         else:
             dev_list.append(None)
             self.display_syntax_error(19, self.symbol)
-            while self.symbol.type != "comma" and self.symbol.type != "semi-colon" and self.names.get_name_string(self.symbol.id) != "CONNECT": 
+            while self.symbol.type != "comma" and self.symbol.type != "semi-colon" and self.names.get_name_string(self.symbol.id) != "CONNECT":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
                     self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
@@ -235,7 +235,7 @@ class Parser:
         else:
             dev_list.append(None)
             self.display_syntax_error(19, self.symbol)
-            while self.symbol.type != "comma" and self.symbol.type != "semi-colon" and self.names.get_name_string(self.symbol.id) != "CONNECT": 
+            while self.symbol.type != "comma" and self.symbol.type != "semi-colon" and self.names.get_name_string(self.symbol.id) != "CONNECT":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
                     self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
@@ -314,7 +314,7 @@ class Parser:
         else:
             dev_list.append(None)
             self.display_syntax_error(19, self.symbol)
-            while self.symbol.type != "comma" and self.symbol.type != "semi-colon" and self.names.get_name_string(self.symbol.id) != "CONNECT": 
+            while self.symbol.type != "comma" and self.symbol.type != "semi-colon" and self.names.get_name_string(self.symbol.id) != "CONNECT":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
                     self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
@@ -371,9 +371,86 @@ class Parser:
         else:
             dev_list.append(None)
             self.display_syntax_error(19, self.symbol)
-            while self.symbol.type != "comma" and self.symbol.type != "semi-colon" and self.names.get_name_string(self.symbol.id) != "CONNECT": 
+            while self.symbol.type != "comma" and self.symbol.type != "semi-colon" and self.names.get_name_string(self.symbol.id) != "CONNECT":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
+                    self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+                    return
+            return
+
+    def check_siggen(self, dev, dev_list):  # MIAINTENANCE
+        """Check the parameters of a siggen device.
+
+        Update the list of device parameters.
+        Append this list to the list of devices if no error is detected.
+        Append None to the list of devices if an error is detected.
+
+        Parameters
+        ----------
+        dev: list
+            list of siggen device parameters
+        dev_list: list
+            list of devices
+
+        Returns
+        -------
+        bool
+            True if no errors detected, return nothing otherwise
+        """
+        dev.append(self.symbol)  # Append symbol
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol is None:
+            dev_list.append(None)
+            self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+            return
+        if self.symbol.type == "comma" or self.symbol.type == "semi-colon":
+            dev_list.append(None)
+            self.display_syntax_error(6, self.symbol)
+            return
+        if self.check_name():
+            dev.append(self.symbol)  # Append symbol
+        else:
+            dev_list.append(None)
+            while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
+                self.symbol = self.scanner.get_symbol()
+                if self.symbol is None:
+                    self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+                    return
+            return
+        self.symbol = self.scanner.get_symbol()
+        if self.symbol is None:
+            dev_list.append(None)
+            self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+            return
+        if self.symbol.type == "comma" or self.symbol.type == "semi-colon":
+            dev_list.append(None)
+            self.display_syntax_error(6, self.symbol)
+            return
+        if self.symbol.is_waveform(self.names.get_name_string(self.symbol.id))[0]:
+            dev.append(self.symbol)  # Append symbol
+            self.symbol = self.scanner.get_symbol()
+            if self.symbol is None:
+                dev_list.append(None)
+                self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+                return
+        else:
+            dev_list.append(None)
+            self.display_syntax_error(23, self.symbol)
+            while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
+                self.symbol = self.scanner.get_symbol()
+                if self.symbol is None:
+                    self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+                    return
+            return
+        if self.symbol.type == "comma" or self.symbol.type == "semi-colon":
+            dev_list.append(dev)
+            return True
+        else:
+            dev_list.append(None)
+            self.display_syntax_error(19, self.symbol)
+            while self.symbol.type != "comma" and self.symbol.type != "semi-colon" and self.names.get_name_string(self.symbol.id) != "CONNECT":
+                self.symbol = self.scanner.get_symbol()
+                if self.symbol is None:
                     self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
                     return
             return
@@ -396,10 +473,12 @@ class Parser:
             True if no errors detected, return nothing otherwise
         """
         dev = []
-        if self.names.get_name_string(self.symbol.id) == 'CLOCK':
-            self.check_clock(dev, dev_list)
+        if self.names.get_name_string(self.symbol.id) in {'CLOCK', 'RC'}:
+            self.check_clock_rc(dev, dev_list)
         elif self.names.get_name_string(self.symbol.id) == 'SWITCH':
             self.check_switch(dev, dev_list)
+        elif self.names.get_name_string(self.symbol.id) == 'SIGGEN':  # MAINTENANCE
+            self.check_siggen(dev, dev_list)
         elif self.names.get_name_string(self.symbol.id) in {'AND', 'NAND', 'OR', 'NOR'}:
             self.check_logic_device(dev, dev_list)
         elif self.names.get_name_string(self.symbol.id) in {'XOR', 'DTYPE'}:
@@ -600,7 +679,7 @@ class Parser:
         else:
             con_list.append(None)
             self.display_syntax_error(13, self.symbol)
-            while self.symbol.type != "comma" and self.symbol.type != "semi-colon" and self.names.get_name_string(self.symbol.id) != "MONITOR":  
+            while self.symbol.type != "comma" and self.symbol.type != "semi-colon" and self.names.get_name_string(self.symbol.id) != "MONITOR":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
                     self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
@@ -730,7 +809,7 @@ class Parser:
         else:
             mon_list.append(None)
             self.display_syntax_error(18, self.symbol)
-            while self.symbol.type != "comma" and self.symbol.type != "semi-colon" and self.names.get_name_string(self.symbol.id) != "END":  
+            while self.symbol.type != "comma" and self.symbol.type != "semi-colon" and self.names.get_name_string(self.symbol.id) != "END":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
                     self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
@@ -821,6 +900,9 @@ class Parser:
             index_of_arrow = self.symbol.index_not_name(name_string)[0]
             exact_error_message = name_error[self.symbol.index_not_name(name_string)[1] - 1]
             return self.scanner.print_error(symbol, index_of_arrow, error_message + exact_error_message)
+        elif error_index == 23:
+            index_of_arrow = self.symbol.is_waveform(self.names.get_name_string(self.symbol.id))[1]
+            return self.scanner.print_error(symbol, index_of_arrow, error_message)
         return self.scanner.print_error(symbol, 0, error_message)
 
     def network_dict(self):
