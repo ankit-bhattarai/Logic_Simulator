@@ -95,3 +95,18 @@ def test_determine_type(new_symbol, string, expected_output):
 def test_index_not_name(new_symbol, string, expected_output):
     """Test if index_not_name returns the expected tuple."""
     assert new_symbol.index_not_name(string) == expected_output
+
+
+@pytest.mark.parametrize("string, expected_output", [
+    (None, (False, 0)),
+    ('', (False, 0)),
+    ('0110101', (True, None)),
+    ('0', (True, None)),
+    ('1x1x1x', (False, 1)),
+    ('31010', (False, 0)),
+    ('0110?1', (False, 4)),
+    (' 011010', (False, 0))
+])
+def test_is_waveform(new_symbol, string, expected_output):
+    """Test if is_waveform returns the expected tuple."""
+    assert new_symbol.is_waveform(string) == expected_output
