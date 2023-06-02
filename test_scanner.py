@@ -109,4 +109,5 @@ def test_print_error(capfd, new_scanner, print_message):
     new_scanner.print_error(new_scanner.list_of_symbols[21], 0, "m_3")
     out, err = capfd.readouterr()
     assert out == print_message[2]
-    assert new_scanner.print_error(None, 0, "None") is False
+    assert new_scanner.print_error(None, 0, "None") is None
+    assert new_scanner.print_error(0, 0, "None") is False
