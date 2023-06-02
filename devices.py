@@ -289,8 +289,8 @@ class Devices:
         self.add_device(device_id, self.SIGGEN)
         device = self.get_device(device_id)
 
-        # Convert waveform string to list of bools
-        device.siggen_waveform = [bool(int(i)) for i in waveform]
+        # Convert waveform string to list of ints
+        device.siggen_waveform = [int(i) for i in waveform]
         self.cold_startup()
 
     def cold_startup(self):
