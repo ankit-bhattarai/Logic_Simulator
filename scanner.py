@@ -445,13 +445,10 @@ class Scanner:
         met_numbers = first_number
         while True:
             character = self.get_next_char()
-            if character.isdigit():
-                # If the character is a digit, add it to the string of numbers
-                # previously found before this current character
+            if character.isspace() or character in terminate_name_scan_characters:
+                return (met_numbers, character)
+            else:
                 met_numbers += character
-            else:  # Current character is not a digit
-                return (met_numbers, character)  # This works for both end of
-            # normal numbers as well as the end of the file
 
     def get_next_name(self, first_letter):
         """Seek any characters after first_letter and return them.
