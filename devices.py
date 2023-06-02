@@ -274,6 +274,17 @@ class Devices:
         device = self.get_device(device_id)
         device.rc_period = rc_period
         self.cold_startup()
+    
+    def make_siggen(self, device_id, waveform): # MAINTENANCE
+        """Make a siggen device with the specified waveform 
+        (passed as string)"""
+        self.add_device(device_id, self.SIGGEN)
+        device = self.get_device(device_id)
+
+        # Convert waveform string to list of bools
+        device.siggen_waveform = [bool(int(i)) for i in waveform]
+        device.siggen_counter = 0
+        self.cold_startup()
 
     def cold_startup(self):
         """Simulate cold start-up of D-types, clocks, RCs and siggens.
@@ -283,6 +294,8 @@ class Devices:
 
         Make the RCs begin from the start of their cycles and set their outputs
         to high.
+
+        Make the siggens begin from the start of their cycles and set their outputs
         """
         for device in self.devices_list:
             if device.device_kind == self.D_TYPE:
@@ -301,12 +314,23 @@ class Devices:
                 self.add_output(device.device_id, output_id=None,
                                 signal=rc_signal)
                 device.rc_counter = 0
+            elif device.device_kind == self.SIGGEN:
+                siggen_signal = device.siggen_waveform[0]
+                self.add_output(device.device_id, output_id=None,
+                                signal=siggen_signal)
+                device.siggen_counter = 0
+
 
     def make_device(self, device_id, device_kind, device_property=None):
         """Create the specified device.
 
         Return self.NO_ERROR if successful. Return corresponding error if not.
         """
+        # Maintenance: Process device_property if it is not None
+        if device_property is not None:
+            if device_kind != self.SIGGEN:
+                device_property = int(device_property)
+            
         # Device has already been added to the devices_list
         if self.get_device(device_id) is not None:
             error_type = self.DEVICE_PRESENT
@@ -368,8 +392,9 @@ class Devices:
             if device_property is None:
                 # Should never happen - dealt with our syntax
                 error_type = self.NO_QUALIFIER # MAINTENANCE
-            
-
+            else:
+                self.make_siggen(device_id, device_property)
+                error_type = self.NO_ERROR
         else:
             error_type = self.BAD_DEVICE
 

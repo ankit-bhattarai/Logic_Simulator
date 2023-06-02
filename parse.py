@@ -989,11 +989,14 @@ class Parser:
         for device in devices_list:
             device_type = device[0].id
             device_name = device[1].id
+            
+            # Maintenance - change in type passed for device_property (int -> str)
             device_property = (
-                int(self.names.get_name_string(device[2].id))
+                self.names.get_name_string(device[2].id)
                 if len(device) == 3
                 else None
             )
+
             error_code = self.devices.make_device(device_name, device_type,
                                                   device_property)
 
