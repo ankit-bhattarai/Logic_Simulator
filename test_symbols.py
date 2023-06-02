@@ -98,6 +98,30 @@ def test_index_not_name(new_symbol, string, expected_output):
 
 
 @pytest.mark.parametrize("string, expected_output", [
+    (None, 0),
+    ('12345', None),
+    ('1_1', 1),
+    (' 9', 0),
+    ('11x1', 2)
+])
+def test_index_not_number(new_symbol, string, expected_output):
+    """Test if index_not_number returns the expected integer or None."""
+    assert new_symbol.index_not_number(string) == expected_output
+
+
+@pytest.mark.parametrize("string, expected_output", [
+    (None, 0),
+    ('011', 0),
+    (' 11', 0),
+    ('123_', 3),
+    ('12a3', 2)
+])
+def test_index_not_integer(new_symbol, string, expected_output):
+    """Test if index_not_integer returns the expected integer or None."""
+    assert new_symbol.index_not_integer(string) == expected_output
+
+
+@pytest.mark.parametrize("string, expected_output", [
     (None, (False, 0)),
     ('', (False, 0)),
     ('0110101', (True, None)),
