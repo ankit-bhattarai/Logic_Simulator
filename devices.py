@@ -44,7 +44,7 @@ class Device:
         self.rc_period = None  # MAINTENANCE
         self.rc_counter = None  # MAINTENANCE
         self.siggen_waveform = None # MAINTENANCE - stores the waveform in a list of bools
-        self.siggen_counter = None # MAINTENANCE - stores the current position in the waveform - loops back to 0 when it reaches the end using modulus
+        self.siggen_counter = None # MAINTENANCE - stores the current position in the waveform 
 
 
 class Devices:
@@ -95,10 +95,18 @@ class Devices:
 
     make_d_type(self, device_id): Makes a D-type device.
 
+    make_rc(self, device_id, rc_period): Makes an RC device with the specified
+                                            period. (MAINTENANCE)         
+
+    make_siggen(self, device_id, waveform): Makes a siggen device with the specified
+                                                waveform (passed as string)
+                                                (MAINTENANCE)                        
+
     cold_startup(self): Simulates cold start-up of D-types and clocks.
 
     make_device(self, device_id, device_kind, device_property=None): Creates
                        the specified device and returns errors if unsuccessful.
+    
     """
 
     def __init__(self, names):
@@ -283,7 +291,6 @@ class Devices:
 
         # Convert waveform string to list of bools
         device.siggen_waveform = [bool(int(i)) for i in waveform]
-        device.siggen_counter = 0
         self.cold_startup()
 
     def cold_startup(self):
@@ -319,7 +326,6 @@ class Devices:
                 self.add_output(device.device_id, output_id=None,
                                 signal=siggen_signal)
                 device.siggen_counter = 0
-
 
     def make_device(self, device_id, device_kind, device_property=None):
         """Create the specified device.

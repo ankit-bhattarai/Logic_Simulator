@@ -53,9 +53,15 @@ class Network:
 
     execute_clock(self, device_id): Simulates a clock and updates its output
                                     signal value.
+    
+    execute_rc(self, device_id): Simulates an RC device and updates its output
+                                    signal value.  (MAINTENANCE)            
 
     update_clocks(self): If it is time to do so, sets clock signals to RISING
                          or FALLING.
+    
+    update_rc(self): If it is time to do so, sets RC signals to FALLING.
+                        (MAINTENANCE)   
 
     execute_network(self): Executes all the devices in the network for one
                            simulation cycle.
@@ -372,6 +378,20 @@ class Network:
             if device.rc_counter == device.rc_period:
                 device.outputs[None] = self.devices.FALLING
             device.rc_counter += 1
+    
+
+    def update_siggen(self):  # MAINTENANCE
+        """Set the SIGGEN signal to 0 or 1 as appropriate."""
+        siggen_devices = self.devices.find_devices(self.devices.SIGGEN)
+        for device_id in siggen_devices:
+            device = self.devices.get_device(device_id)
+            
+            if device.siggen_counter == len(device.siggen_waveform):
+                device.siggen_counter = 0
+            
+            device.outputs[None] = device.siggen_waveform[device.siggen_counter]
+            device.siggen_counter += 1
+        
 
     def execute_network(self):
         """Execute all the devices in the network for one simulation cycle.
@@ -387,12 +407,16 @@ class Network:
         nor_devices = self.devices.find_devices(self.devices.NOR)
         xor_devices = self.devices.find_devices(self.devices.XOR)
         rc_devices = self.devices.find_devices(self.devices.RC)  # MAINTENANCE
+        siggen_devices = self.devices.find_devices(self.devices.SIGGEN) # MAINTENANCE
 
         # This sets clock signals to RISING or FALLING, where necessary
         self.update_clocks()
 
         # This sets RC signals to FALLING, where necessary
         self.update_rc()  # MAINTENANCE
+
+        # This sets the SIGGEN signal to 0 or 1 as appropriate
+        self.update_siggen()  # MAINTENANCE
 
         # Number of iterations to wait for the signals to settle before
         # declaring the network unstable
@@ -436,6 +460,13 @@ class Network:
             for device_id in xor_devices:  # execute XOR devices
                 if not self.execute_gate(device_id, None, None):
                     return False
+                
+            # Is there a need for such a method? - simply needs to be updated using .update_siggen()? right?
+            # for device_id in siggen_devices: # MAINTENANCE
+            #     if not self.siggen_devices(device_id):
+            #         return False
+
             if self.steady_state:
                 break
+
         return self.steady_state
