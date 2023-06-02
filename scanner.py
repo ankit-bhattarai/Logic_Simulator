@@ -191,6 +191,54 @@ class Symbol:
                 return (i, 3)
         return None
 
+    @classmethod
+    def index_not_number(cls, string):
+        """Return index of first character that violates number rules.
+
+        Iterate through string and return the index of the first character that
+        doesn't satisfy the rules for a number. If all characters satisfy the
+        rules, return None.
+
+        Parameters
+        ----------
+        string: str
+
+        Returns
+        -------
+        error_loc: int or None
+        """
+        if string is None:
+            return 0
+        for i, char in enumerate(string):
+            if not char.isdigit():
+                return i
+        return None
+
+    @classmethod
+    def index_not_integer(cls, string):
+        """Return index of first character that violates integer rules.
+
+        Iterate through string and return the index of the first character that
+        doesn't satisfy the rules for an integer. If all characters satisfy the
+        rules, return None.
+
+        Parameters
+        ----------
+        string: str
+
+        Returns
+        -------
+        error_loc: int or None
+        """
+        if string is None:
+            return 0
+        if string[0] == "0" or not string.isdigit():
+            return 0
+        for i, char in enumerate(string):
+            if not char.isdigit():
+                return i
+        return None
+
     @staticmethod
     def is_number(string):
         """Return True if string only contains digits.
