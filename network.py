@@ -345,6 +345,34 @@ class Network:
                     device.outputs[None] = self.devices.RISING
             device.clock_counter += 1
 
+    def execute_rc(self, device_id):  # MAINTENANCE
+        """Simulate an RC device and update its output signal value.
+
+        Return True if successful.
+        """
+        device = self.devices.get_device(device_id)
+        output_signal = device.outputs[None]  # output ID is None
+
+        if output_signal == self.devices.FALLING:
+            new_signal = self.update_signal(output_signal, self.devices.LOW)
+            if new_signal is None:
+                return False
+            device.outputs[None] = new_signal
+            return True
+        elif output_signal in [self.devices.HIGH, self.devices.LOW]:
+            return True
+        else:
+            return False
+
+    def update_rc(self):  # MAINTENANCE
+        """If it is time to do so, set RC signals to FALLING."""
+        rc_devices = self.devices.find_devices(self.devices.RC)
+        for device_id in rc_devices:
+            device = self.devices.get_device(device_id)
+            if device.rc_counter == device.rc_period:
+                device.outputs[None] = self.devices.FALLING
+            device.rc_counter += 1
+
     def execute_network(self):
         """Execute all the devices in the network for one simulation cycle.
 
@@ -358,9 +386,13 @@ class Network:
         nand_devices = self.devices.find_devices(self.devices.NAND)
         nor_devices = self.devices.find_devices(self.devices.NOR)
         xor_devices = self.devices.find_devices(self.devices.XOR)
+        rc_devices = self.devices.find_devices(self.devices.RC)  # MAINTENANCE
 
         # This sets clock signals to RISING or FALLING, where necessary
         self.update_clocks()
+
+        # This sets RC signals to FALLING, where necessary
+        self.update_rc()  # MAINTENANCE
 
         # Number of iterations to wait for the signals to settle before
         # declaring the network unstable
@@ -381,6 +413,9 @@ class Network:
                     return False
             for device_id in clock_devices:  # complete clock executions
                 if not self.execute_clock(device_id):
+                    return False
+            for device_id in rc_devices:  # MAINTENANCE
+                if not self.execute_rc(device_id):
                     return False
             for device_id in and_devices:  # execute AND gate devices
                 if not self.execute_gate(device_id, self.devices.HIGH,
