@@ -43,6 +43,8 @@ class Device:
         self.dtype_memory = None
         self.rc_period = None  # MAINTENANCE
         self.rc_counter = None  # MAINTENANCE
+        self.siggen_waveform = None # MAINTENANCE - stores the waveform in a list of bools
+        self.siggen_counter = None # MAINTENANCE - stores the current position in the waveform - loops back to 0 when it reaches the end using modulus
 
 
 class Devices:
@@ -362,6 +364,11 @@ class Devices:
             else:
                 self.make_rc(device_id, device_property)
                 error_type = self.NO_ERROR
+        elif device_kind == self.SIGGEN: # MAINTENANCE
+            if device_property is None:
+                # Should never happen - dealt with our syntax
+                error_type = self.NO_QUALIFIER # MAINTENANCE
+            
 
         else:
             error_type = self.BAD_DEVICE

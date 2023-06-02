@@ -378,7 +378,7 @@ class Parser:
                     return
             return
 
-    def check_siggen(self, dev, dev_list):  # MIAINTENANCE
+    def check_siggen(self, dev, dev_list):  # MAINTENANCE
         """Check the parameters of a siggen device.
 
         Update the list of device parameters.

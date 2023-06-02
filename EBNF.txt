@@ -6,19 +6,23 @@ integer = non_zero_digits, {digits};
 device_name = letters, {letters|digits|'_'};
 number_inputs = non_zero_digits|'10'|'11'|'12'|'13'|'14'|'15'|'16';
 clock_speed = integer;
+rc_period = integer;
+waveform = bool_digits, {bool_digits};
 switch_state = bool_digits;
 input_pin = 'I',number_inputs;
 input = input_pin|'DATA'|'CLK'|'SET'|'CLEAR'; 
 output = 'Q'|'QBAR';
 
 devices = "DEVICES:", device, {',', device};
-device = CLOCK|SWITCH|LOGIC_DEVICE|DTYPE|XOR;
+device = CLOCK|SWITCH|LOGIC_DEVICE|DTYPE|XOR|RC|SIGGEN;
 CLOCK = "CLOCK", device_name, clock_speed;
 SWITCH = "SWITCH", device_name, switch_state;
 LOGIC_DEVICE = logic_device_name, device_name, number_inputs;
 logic_device_name = "AND"|"NAND"|"OR"|"NOR";
 DTYPE = "DTYPE", device_name;
 XOR = "XOR", device_name;
+RC = "RC", device_name, rc_period;
+SIGGEN = "SIGGEN", device_name, waveform;
 
 connections = "CONNECT:", [connection], {',', connection};
 connection = device_name,['.', output],'>', device_name,'.', input;
