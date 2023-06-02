@@ -232,7 +232,7 @@ class Symbol:
         """
         if string is None:
             return 0
-        if string[0] == "0" or not string.[0]isdigit():
+        if string[0] == "0" or not string[0].isdigit():
             return 0
         for i, char in enumerate(string):
             if not char.isdigit():
