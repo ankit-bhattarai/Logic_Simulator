@@ -56,16 +56,23 @@ def test_make_device(new_devices):
     """Test if make_device correctly makes devices with their properties."""
     names = new_devices.names
 
-    [NAND1_ID, CLOCK1_ID, D1_ID, I1_ID,
-     I2_ID] = names.lookup(["Nand1", "Clock1", "D1", "I1", "I2"])
+    [NAND1_ID, CLOCK1_ID, D1_ID, RC1_ID, SIGGEN1_ID, I1_ID,
+     I2_ID] = names.lookup(["Nand1", "Clock1", "RC1", "Siggen1",
+                            "D1", "I1", "I2"])
     new_devices.make_device(NAND1_ID, new_devices.NAND, 2)  # 2-input NAND
     # Clock half period is 5
     new_devices.make_device(CLOCK1_ID, new_devices.CLOCK, 5)
     new_devices.make_device(D1_ID, new_devices.D_TYPE)
+    # RC period is 3
+    new_devices.make_device(RC1_ID, new_devices.RC, 3)
+    # Siggen waveform is 0110
+    new_devices.make_device(SIGGEN1_ID, new_devices.SIGGEN, "0110")
 
     nand_device = new_devices.get_device(NAND1_ID)
     clock_device = new_devices.get_device(CLOCK1_ID)
     dtype_device = new_devices.get_device(D1_ID)
+    rc_device = new_devices.get_device(RC1_ID)
+    siggen_device = new_devices.get_device(SIGGEN1_ID)
 
     assert nand_device.inputs == {I1_ID: None, I2_ID: None}
     assert clock_device.inputs == {}
@@ -83,10 +90,19 @@ def test_make_device(new_devices):
     assert dtype_device.outputs == {new_devices.Q_ID: new_devices.LOW,
                                     new_devices.QBAR_ID: new_devices.LOW}
 
+    assert rc_device.outputs == {None: new_devices.HIGH}
+    assert siggen_device.outputs == {None: 0}
+
     assert clock_device.clock_half_period == 5
+    assert rc_device.rc_period == 3
+    assert siggen_device.siggen_waveform == [0, 1, 1, 0]
     # Clock counter and D-type memory are initially at random states
     assert clock_device.clock_counter in range(5)
     assert dtype_device.dtype_memory in [new_devices.LOW, new_devices.HIGH]
+    # RC counter is initially at 0
+    assert rc_device.rc_counter == 0
+    # Siggen counter is initially at 0
+    assert siggen_device.siggen_counter == 0
 
 
 @pytest.mark.parametrize("function_args, error", [
@@ -96,6 +112,8 @@ def test_make_device(new_devices):
     ("(D_ID, D_ID, None)", "new_devices.BAD_DEVICE"),
     ("(CL_ID, new_devices.CLOCK, 0)", "new_devices.INVALID_QUALIFIER"),
     ("(CL_ID, new_devices.CLOCK, 10)", "new_devices.NO_ERROR"),
+    ("(RC_ID, new_devices.RC, -1)", "new_devices.INVALID_QUALIFIER"),
+    ("(SIGGEN_ID, new_devices.SIGGEN, 01)", "new_devices.NO_ERROR"),
 
     # Note: XOR device X2_ID will have been made earlier in the function
     ("(X2_ID, new_devices.XOR)", "new_devices.DEVICE_PRESENT"),
