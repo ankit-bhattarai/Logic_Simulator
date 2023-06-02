@@ -801,13 +801,21 @@ class Gui(wx.Frame):
     """
 
     def __init__(self, title, path, names, devices, network, monitors,
-                 scanner=None, load_graphically=False):
+                 scanner=None, load_graphically=False, locale=None):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(800, 600))
         # File path for circuit file which can be chosen from the GUI
         self.file_path = None
         self.guiint = None
-
+        if locale is not None:
+            allowed_locale = [wx.LANGUAGE_CHINESE,
+                              wx.LANGUAGE_ENGLISH, wx.LANGUAGE_FRENCH]
+            if locale not in allowed_locale:
+                print("Locale not supported, using default locale - English")
+            else:
+                locale = wx.Locale(locale)
+                wx.Locale.AddCatalogLookupPathPrefix('locale')
+                print("Done")
         if load_graphically:
             self.start_graphically_control()
             # Can only reach this stage if a valid circuit file has been loaded
@@ -824,16 +832,19 @@ class Gui(wx.Frame):
             menuBar = wx.MenuBar()
             self.open_id, self.help_id_1, self.help_id_2 = wx.NewIdRef(count=3)
             self.reset_id, self.def_file_show_id = wx.NewIdRef(count=2)
-            fileMenu.Append(self.open_id, "&Open")
-            fileMenu.Append(wx.ID_ABOUT, "&About")
-            fileMenu.Append(wx.ID_EXIT, "&Exit")
-            viewMenu.Append(self.reset_id, "&Reset")
-            viewMenu.Append(self.def_file_show_id, "&Show Definition File")
-            helpMenu.Append(self.help_id_1, "&EBNF Syntax")
-            helpMenu.Append(self.help_id_2, "&User Guide")
-            menuBar.Append(fileMenu, "&File")
-            menuBar.Append(viewMenu, "&View")
-            menuBar.Append(helpMenu, "&Help")
+            fileMenu.Append(self.open_id,  wx.GetTranslation("&Open"))
+            fileMenu.Append(wx.ID_ABOUT, wx.GetTranslation("&About"))
+            fileMenu.Append(wx.ID_EXIT,  wx.GetTranslation("&Exit"))
+            viewMenu.Append(self.reset_id, wx.GetTranslation("&Reset"))
+            viewMenu.Append(self.def_file_show_id,
+                            wx.GetTranslation("&Show Definition File"))
+            helpMenu.Append(self.help_id_1,
+                            wx.GetTranslation("&EBNF Syntax"))
+            helpMenu.Append(self.help_id_2,
+                            wx.GetTranslation("&User Guide"))
+            menuBar.Append(fileMenu, wx.GetTranslation("&File"))
+            menuBar.Append(viewMenu, wx.GetTranslation("&View"))
+            menuBar.Append(helpMenu,  wx.GetTranslation("&Help"))
             self.SetMenuBar(menuBar)
 
             # Canvas for drawing signals
@@ -859,8 +870,9 @@ class Gui(wx.Frame):
         if Id == wx.ID_EXIT:
             self.Close(True)
         elif Id == wx.ID_ABOUT:
+            about_string = wx.GetTranslation("&About") + " Logsim"
             wx.MessageBox("Logic Simulator\nCreated by Ankit Adhi Jessy\n2023",
-                          "About Logsim", wx.ICON_INFORMATION | wx.OK)
+                          about_string, wx.ICON_INFORMATION | wx.OK)
         elif Id == self.open_id:
             self.load_graphically()
 
@@ -881,7 +893,8 @@ class Gui(wx.Frame):
             file_path = self.guiint.scanner.path
             with open(file_path, "r") as f:
                 box = MyDialog(self, message=f.read(),
-                               title="Definition File", editable=False)
+                               title=wx.GetTranslation("Definition File"),
+                               editable=False)
                 box.ShowModal()
                 box.Destroy()
 

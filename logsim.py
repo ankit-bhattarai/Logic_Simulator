@@ -13,6 +13,7 @@ Graphical user interface (load definition file from GUI): logsim.py -g
 """
 import getopt
 import sys
+import os
 
 import wx
 
@@ -24,6 +25,17 @@ from scanner import Scanner
 from parse import Parser
 from userint import UserInterface
 from gui import Gui
+
+other_locale = {"es_ES.utf8": "Spanish",
+                "fr_FR.utf8": "French", "zh_CN.utf8": "Chinese"}
+if os.environ.get('LANG') in other_locale:
+    print("Hello world in", other_locale[os.environ.get('LANG')])
+    lang = wx.LANGUAGE_SPANISH if os.environ.get(
+        'LANG') == "es_ES.utf8" else wx.LANGUAGE_CHINESE
+    print(wx.Locale.IsAvailable(lang))
+else:
+    print("Hello world")
+    lang = None
 
 
 def main(arg_list):
@@ -61,9 +73,10 @@ def main(arg_list):
                 # Initialise an instance of the userint.UserInterface() class
                 userint = UserInterface(names, devices, network, monitors)
                 userint.command_interface()
-        elif option == "-g": # Load the definition file from the GUI itself
+        elif option == "-g":  # Load the definition file from the GUI itself
             app = wx.App()
-            gui = Gui("Logic Simulator", None, None, None, None, None, None, load_graphically=True)
+            gui = Gui("Logic Simulator", None, None, None,
+                      None, None, None, load_graphically=True, locale=lang)
             gui.Show(True)
             app.MainLoop()
 
@@ -81,7 +94,7 @@ def main(arg_list):
             # Initialise an instance of the gui.Gui() class
             app = wx.App()
             gui = Gui("Logic Simulator", path, names, devices, network,
-                      monitors, scanner)
+                      monitors, scanner, locale=lang)
             gui.Show(True)
             app.MainLoop()
 

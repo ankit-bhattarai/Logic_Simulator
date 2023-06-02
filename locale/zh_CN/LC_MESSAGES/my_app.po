@@ -1,0 +1,56 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: zh\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "&File"
+msgstr "&文件"
+
+msgid "&Open"
+msgstr "&打开"
+
+msgid "&About"
+msgstr "&关于"
+
+msgid "&Exit"
+msgstr "&退出"
+
+msgid "&View"
+msgstr "&视图"
+
+msgid "&Reset"
+msgstr "&重置"
+
+msgid "&Show Definition File"
+msgstr "&查看定义文件"
+
+msgid "&Help"
+msgstr "&帮助"
+
+msgid "&EBNF Syntax"
+msgstr "&扩展巴科斯范式语法"
+
+msgid "&User Guide"
+msgstr "&用户指南"
+
+msgid "&Cycle"
+msgstr "&循环"
+
+msgid "&Run"
+msgstr "&运行"
+
+msgid "&Continue"
+msgstr "&继续"
+
+msgid "&Select switch and state"
+msgstr "&选择开关与状态"
+
+msgid "&Select monitor"
+msgstr "&选择监测器"
