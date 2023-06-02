@@ -26,12 +26,10 @@ from parse import Parser
 from userint import UserInterface
 from gui import Gui
 
-other_locale = {"es_ES.utf8": "Spanish",
-                "fr_FR.utf8": "French", "zh_CN.utf8": "Chinese"}
+other_locale = {"es_ES.utf8": wx.LANGUAGE_SPANISH,
+                "fr_FR.utf8": wx.LANGUAGE_FRENCH, "zh_CN.utf8": wx.LANGUAGE_CHINESE_SIMPLIFIED}
 if os.environ.get('LANG') in other_locale:
-    print("Hello world in", other_locale[os.environ.get('LANG')])
-    lang = wx.LANGUAGE_SPANISH if os.environ.get(
-        'LANG') == "es_ES.utf8" else wx.LANGUAGE_CHINESE
+    lang = other_locale[os.environ.get('LANG')]
     print(wx.Locale.IsAvailable(lang))
 else:
     print("Hello world")

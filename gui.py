@@ -808,7 +808,7 @@ class Gui(wx.Frame):
         self.file_path = None
         self.guiint = None
         if locale is not None:
-            allowed_locale = [wx.LANGUAGE_CHINESE,
+            allowed_locale = [wx.LANGUAGE_CHINESE_SIMPLIFIED,
                               wx.LANGUAGE_ENGLISH, wx.LANGUAGE_FRENCH]
             if locale not in allowed_locale:
                 print("Locale not supported, using default locale - English")
