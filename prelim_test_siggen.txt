@@ -1,4 +1,4 @@
-DEVICES: SIGGEN siggen1 111000111000111, SIGGEN siggen2 1x1x1x1, AND and1 2;
+DEVICES: SIGGEN siggen1 1, SIGGEN siggen2 1010101, AND and1 2;
 CONNECT: siggen1 > and1.I1, siggen2 > and1.I2;
 MONITOR: and1, siggen1, siggen2;
 END;

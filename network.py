@@ -369,6 +369,31 @@ class Network:
             return True
         else:
             return False
+    
+    def execute_siggen(self, device_id):  # MAINTENANCE
+        """Simulate a SIGGEN device and update its output signal value.
+
+        Return True if successful. --- mirrors to clocks
+        """
+        device = self.devices.get_device(device_id)
+        output_signal = device.outputs[None]
+
+        if output_signal == self.devices.RISING:
+            new_signal = self.update_signal(output_signal, self.devices.HIGH)
+            if new_signal is None:
+                return False
+            device.outputs[None] = new_signal
+            return True
+        elif output_signal == self.devices.FALLING:
+            new_signal = self.update_signal(output_signal, self.devices.LOW)
+            if new_signal is None:
+                return False
+            device.outputs[None] = new_signal
+            return True
+        elif output_signal in [self.devices.HIGH, self.devices.LOW]:
+            return True
+        else:
+            return False
 
     def update_rc(self):  # MAINTENANCE
         """If it is time to do so, set RC signals to FALLING."""
@@ -385,13 +410,19 @@ class Network:
         siggen_devices = self.devices.find_devices(self.devices.SIGGEN)
         for device_id in siggen_devices:
             device = self.devices.get_device(device_id)
-            
+            current_output = device.outputs[None]
+
             if device.siggen_counter == len(device.siggen_waveform):
                 device.siggen_counter = 0
             
-            device.outputs[None] = device.siggen_waveform[device.siggen_counter]
-            device.siggen_counter += 1
-        
+            desired_output = device.siggen_waveform[device.siggen_counter]
+            # Change downwards
+            if (current_output != desired_output) and desired_output == self.devices.LOW:
+                device.outputs[None] = self.devices.FALLING
+            # Change upwards
+            if (current_output != desired_output) and desired_output == self.devices.HIGH:
+                device.outputs[None] = self.devices.RISING
+            device.siggen_counter += 1      
 
     def execute_network(self):
         """Execute all the devices in the network for one simulation cycle.
@@ -461,10 +492,9 @@ class Network:
                 if not self.execute_gate(device_id, None, None):
                     return False
                 
-            # Is there a need for such a method? - simply needs to be updated using .update_siggen()? right?
-            # for device_id in siggen_devices: # MAINTENANCE
-            #     if not self.siggen_devices(device_id):
-            #         return False
+            for device_id in siggen_devices: # MAINTENANCE
+                if not self.execute_siggen(device_id):
+                    return False
 
             if self.steady_state:
                 break
