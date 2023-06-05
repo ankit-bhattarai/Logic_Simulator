@@ -30,9 +30,7 @@ other_locale = {"es_ES.utf8": wx.LANGUAGE_SPANISH,
                 "fr_FR.utf8": wx.LANGUAGE_FRENCH, "zh_CN.utf8": wx.LANGUAGE_CHINESE_SIMPLIFIED}
 if os.environ.get('LANG') in other_locale:
     lang = other_locale[os.environ.get('LANG')]
-    print(wx.Locale.IsAvailable(lang))
 else:
-    print("Hello world")
     lang = None
 
 
