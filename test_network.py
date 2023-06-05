@@ -385,7 +385,7 @@ def test_execute_non_gates2(new_network):
 
         devices.set_switch(SW1_ID, LOW)  # Sw1 is connected to DATA
         network.execute_network()  # the clock has risen
-        # sw1(DATA) is HIGH, rc(SET) is LOW, clock is rising, so Q is HIGH
+        # sw1(DATA) is LOW, rc(SET) is LOW, clock is rising, so Q is HIGH
         assert [eval(sw1_output), eval(clock_output),
                 eval(dtype_Q), eval(dtype_QBAR),
                 eval(rc_output), eval(siggen_output)] == [LOW, HIGH, HIGH, LOW,
