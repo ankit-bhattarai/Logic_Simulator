@@ -98,6 +98,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.SetCurrent(self.context)
         GL.glDrawBuffer(GL.GL_BACK)
         GL.glClearColor(1.0, 1.0, 1.0, 0.0)
+        # GL.glClearColor(0, 0, 0, 1.0) - For dark mode
         GL.glViewport(0, 0, size.width, size.height)
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
@@ -459,7 +460,8 @@ class SwitchPanel(wx.Panel):
             switch_state = self.guiint.get_switch_state(self.switch_text)
 
             self.switch_state_display.Show()
-            switch_state_string = "CLOSED" if switch_state == 1 else "OPENED"
+            switch_state_string = self.grand_parent.GetTranslation(
+                "CLOSED") if switch_state == 1 else self.grand_parent.GetTranslation("OPENED")
             self.switch_state_display.SetLabel(
                 f'{self.switch_text} : {switch_state_string}')
 
@@ -488,7 +490,8 @@ class SwitchPanel(wx.Panel):
                 switch_text, desired_switch_state)  # Render the change
             self.renderSwitchBoxes()
 
-            switch_state_string = "CLOSED" if desired_switch_state == 1 else "OPENED"
+            switch_state_string = self.grand_parent.GetTranslation(
+                "CLOSED") if desired_switch_state == 1 else self.grand_parent.GetTranslation("OPENED")
             self.switch_state_display.SetLabel(
                 f'{self.switch_text}: {switch_state_string}')
 
@@ -589,9 +592,12 @@ class MonitorPanel(wx.Panel):
         self.button_monitor.Show()
         # Set the text of the buttons based on the current state - ACTIONS
         if monitor_state == 0:
-            self.button_monitor.SetLabel("ADD MONITOR")
+            self.button_monitor.SetLabel(
+                self.grand_parent.GetTranslation("ADD") + " " +
+                self.grand_parent.GetTranslation("MONITOR"))
         else:  # monitor_state == 1
-            self.button_monitor.SetLabel("HIDE MONITOR")
+            self.button_monitor.SetLabel(
+                self.grand_parent.GetTranslation("HIDE") + " " + self.grand_parent.GetTranslation("MONITOR"))
 
         self.main_sizer.Layout()
         self.parent.GetSizer().Layout()
@@ -610,7 +616,8 @@ class MonitorPanel(wx.Panel):
             self.renderMonitorButtons()
 
             monitor_state = self.guiint.get_output_state(self.monitor_text)
-            monitor_state_string = "MONITORED" if monitor_state == 1 else "HIDDEN"
+            monitor_state_string = self.grand_parent.GetTranslation(
+                "MONITORED") if monitor_state == 1 else self.grand_parent.GetTranslation("HIDDEN")
             self.monitor_state_display.SetLabel(
                 f'{self.monitor_text}: {monitor_state_string}')
 
@@ -638,7 +645,8 @@ class MonitorPanel(wx.Panel):
             self.guiint.set_output_state(monitor_text, desired_monitor_state)
             self.renderMonitorButtons()
 
-            monitor_state_string = "MONITORED" if desired_monitor_state == 1 else "HIDDEN"
+            monitor_state_string = self.grand_parent.GetTranslation(
+                "MONITORED") if desired_monitor_state == 1 else self.grand_parent.GetTranslation("HIDDEN")
             self.monitor_state_display.SetLabel(
                 f'{self.monitor_text}: {monitor_state_string}')
 
@@ -784,7 +792,7 @@ class RightPanel(wx.Panel):
 
         # Set the sizer for the panel
         self.SetSizer(main_sizer)
-    
+
     def change_colour_child(self, child):
         for child in child.GetChildren():
             if isinstance(child, wx.StaticText):
@@ -793,12 +801,14 @@ class RightPanel(wx.Panel):
             if isinstance(child, wx.Button):
                 child.SetForegroundColour(
                     self.parent.colour_palette[self.parent.colour_mode]["Panel Colour"])
-    
+
     def change_colour(self):
         for child in self.GetChildren():
             self.change_colour_child(child)
-        self.SetBackgroundColour(self.parent.colour_palette[self.parent.colour_mode]["Panel Colour"])
+        self.SetBackgroundColour(
+            self.parent.colour_palette[self.parent.colour_mode]["Panel Colour"])
         self.Refresh()
+
 
 class Gui(wx.Frame):
     """Configure the main window and all the widgets.
@@ -830,7 +840,7 @@ class Gui(wx.Frame):
         # File path for circuit file which can be chosen from the GUI
         self.file_path = None
         self.guiint = None
-        self.locale_language = locale_text
+        self.load_dictionary(locale_text)
         if locale is not None:
             allowed_locale = [wx.LANGUAGE_CHINESE_SIMPLIFIED,
                               wx.LANGUAGE_ENGLISH, wx.LANGUAGE_FRENCH]
@@ -854,14 +864,16 @@ class Gui(wx.Frame):
             helpMenu = wx.Menu()
             menuBar = wx.MenuBar()
             self.open_id, self.help_id_1, self.help_id_2 = wx.NewIdRef(count=3)
-            self.reset_id, self.def_file_show_id, self.change_colour_id = wx.NewIdRef(count=3)
+            self.reset_id, self.def_file_show_id, self.change_colour_id = wx.NewIdRef(
+                count=3)
             fileMenu.Append(self.open_id,  self.GetTranslation("&Open"))
             fileMenu.Append(wx.ID_ABOUT, self.GetTranslation("&About"))
             fileMenu.Append(wx.ID_EXIT,  self.GetTranslation("&Exit"))
             viewMenu.Append(self.reset_id, self.GetTranslation("&Reset"))
             viewMenu.Append(self.def_file_show_id,
                             self.GetTranslation("&Show Definition File"))
-            viewMenu.Append(self.change_colour_id, self.GetTranslation("&Change Colour"))
+            viewMenu.Append(self.change_colour_id,
+                            self.GetTranslation("&Change Colour"))
             helpMenu.Append(self.help_id_1,
                             self.GetTranslation("&EBNF Syntax"))
             helpMenu.Append(self.help_id_2,
@@ -887,33 +899,42 @@ class Gui(wx.Frame):
 
             self.SetSizeHints(600, 600)
             self.SetSizer(main_sizer)
-        
-        self.colour_palette = {"Light Mode": {"Text Colour": "black", "Panel Colour": "light grey"}, 
-                        "Dark Mode": {"Text Colour": "light grey", "Panel Colour": "dark grey"}}
+
+        self.colour_palette = {"Light Mode": {"Text Colour": "black", "Panel Colour": "light grey"},
+                               "Dark Mode": {"Text Colour": "light grey", "Panel Colour": "dark grey"}}
 
         self.colour_mode = "Light Mode"
         self.change_colour()
 
+    def load_dictionary(self, locale_language):
+        if locale_language is not None:  # English or some other language not supported
+            file = open(f"translations/{locale_language}.json", "r")
+            self.translation_dict = json.load(file)
+            file.close()
+        else:
+            self.translation_dict = {}
+
     def GetTranslation(self, string):
-        locale = self.locale_language
         translated = string
-        if locale is not None:  # English or some other language not supported
-            dict_ = json.load(open(f"translations/{locale}.json", "r"))
-            if string[0] == "&":
-                translated = "&" + dict_.get(string[1:], string[1:])
-            else:  # No &
-                translated = dict_.get(string, string)
+        if string[0] == "&":
+            translated = "&" + \
+                self.translation_dict.get(string[1:], string[1:])
+        else:  # No &
+            translated = self.translation_dict.get(string, string)
+
         return translated  # Return the string as it is if translation not found or translation
-    
+
     def change_colour(self):
         for child in self.GetChildren():
             if isinstance(child, wx.Panel):
                 child.change_colour()
         menu = self.GetMenuBar()
-        menu.SetBackgroundColour(self.colour_palette[self.colour_mode]["Panel Colour"])
-        menu.SetForegroundColour(self.colour_palette[self.colour_mode]["Text Colour"])
+        menu.SetBackgroundColour(
+            self.colour_palette[self.colour_mode]["Panel Colour"])
+        menu.SetForegroundColour(
+            self.colour_palette[self.colour_mode]["Text Colour"])
         # self.canvas.SetColour('white')
-        
+
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
         Id = event.GetId()
@@ -947,12 +968,12 @@ class Gui(wx.Frame):
                                editable=False)
                 box.ShowModal()
                 box.Destroy()
-            
+
         elif Id == self.change_colour_id:
             if self.colour_mode == "Light Mode":
                 self.colour_mode = "Dark Mode"
                 self.change_colour()
-            else: # Self.colour_mode == "Dark Mode"
+            else:  # Self.colour_mode == "Dark Mode"
                 self.colour_mode = "Light Mode"
                 self.change_colour()
 
