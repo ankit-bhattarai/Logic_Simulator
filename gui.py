@@ -16,7 +16,6 @@ from guiint import GuiInterface
 import webbrowser
 import json
 
-change_button_cycles = False
 text_min_height = 1
 
 
@@ -727,7 +726,9 @@ class RunPanel(wx.Panel):
         text = "Run button pressed."
         success = self.guiint.run_network(self.spin.GetValue())
         if isinstance(success, str):
-            wx.MessageBox(success, "Message", wx.OK | wx.ICON_ERROR)
+            translated_message = self.grand_parent.GetTranslation(success)
+            title = self.grand_parent.GetTranslation("Message")
+            wx.MessageBox(translated_message, title, wx.OK | wx.ICON_ERROR)
         self.grand_parent.canvas.render(text)
         self.button_continue.Show()
         self.grand_parent.canvas.render_signals()
@@ -736,9 +737,11 @@ class RunPanel(wx.Panel):
     def OnButtonContinue(self, event):
         """Handle the event when the user clicks the continue button."""
         text = "Continue button pressed."
-        successs = self.guiint.continue_network(self.spin.GetValue())
-        if isinstance(successs, str):
-            wx.MessageBox(successs, "Message", wx.OK | wx.ICON_ERROR)
+        success = self.guiint.continue_network(self.spin.GetValue())
+        if isinstance(success, str):
+            translated_message = self.grand_parent.GetTranslation(success)
+            title = self.grand_parent.GetTranslation("Message")
+            wx.MessageBox(translated_message, title, wx.OK | wx.ICON_ERROR)
         self.grand_parent.canvas.render(text)
         self.grand_parent.canvas.render_signals()
         self.Layout()
@@ -747,12 +750,6 @@ class RunPanel(wx.Panel):
         """Handle the event when the user changes the spin value."""
         spin_value = self.spin.GetValue()
         self.grand_parent.canvas.render(f"Spin value: {spin_value}")
-        # Can modify the text of the buttons to this
-        if change_button_cycles:
-            self.button_run.SetLabel(f"Run for: {spin_value}")
-            self.button_continue.SetLabel(f"Continue for: {spin_value}")
-            self.main_sizer.Layout()
-            self.grand_parent.GetSizer().Layout()
 
 
 class RightPanel(wx.Panel):
@@ -951,7 +948,7 @@ class Gui(wx.Frame):
             with open("EBNF.txt", "r") as f:
                 # wx.MessageBox(f.read(), "EBNF Syntax")
                 box = MyDialog(self, message=f.read(),
-                               title="EBNF Syntax", allow_wrap=False)
+                               title=self.GetTranslation("EBNF Syntax"), allow_wrap=False)
                 box.ShowModal()
                 box.Destroy()
 
@@ -979,7 +976,10 @@ class Gui(wx.Frame):
 
     def start_graphically(self):
         """Load the circuit definition file directly from the GUI."""
-        openFileDialog = wx.FileDialog(self, "Open definition file", "",
+        title = self.GetTranslation("Open")
+        title += " "
+        title += self.GetTranslation("Definition File")
+        openFileDialog = wx.FileDialog(self, title, "",
                                        "",
                                        wildcard="TXT files (*.txt)|*.txt",
                                        style=wx.FD_OPEN +
@@ -997,13 +997,13 @@ class Gui(wx.Frame):
             self.guiint = guiint
             if message == "":
                 display_message = "Circuit loaded successfully.\n"
-                title = "Circuit Loaded"
+                title = self.GetTranslation("Circuit Loaded")
             else:  # There is a message to  be printed, but overall the
                 # circuit is valid. It is only a warning
                 display_message = "Circuit loaded with warnings.\n"
                 display_message += "Warnings: \n\n"
                 display_message += message
-                title = "Warnings Present"
+                title = self.GetTranslation("Warnings Present")
             box = MyDialog(self, message=display_message,
                            title=title)
             box.ShowModal()
@@ -1013,8 +1013,9 @@ class Gui(wx.Frame):
             error_display = "Invalid circuit definition file.\n"
             error_display += "Errors: \n\n"
             error_display += message
+            title = self.GetTranslation("Errors Present")
             box = MyDialog(self, message=error_display,
-                           title="Errors Present")
+                           title=title)
             box.ShowModal()
             box.Destroy()
             return False
@@ -1043,7 +1044,10 @@ class Gui(wx.Frame):
         checked for errors. If errrors exist, they will be displayed in a
         dialog box and the current circuit will not be overwritten. If no
         errors exist, the circuit will be loaded and canvas updated."""
-        openFileDialog = wx.FileDialog(self, "Open definition file", "", "",
+        title = self.GetTranslation("Open")
+        title += " "
+        title += self.GetTranslation("Definition File")
+        openFileDialog = wx.FileDialog(self, title, "", "",
                                        wildcard="TXT files (*.txt)|*.txt",
                                        style=wx.FD_OPEN +
                                        wx.FD_FILE_MUST_EXIST)
