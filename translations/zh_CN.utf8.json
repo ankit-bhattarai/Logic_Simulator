@@ -29,21 +29,21 @@
 
 "SELECT MONITOR": "选择监测器",
 
-"OPEN": "",
+"OPEN": "断开",
 
-"CLOSE": "",
+"CLOSE": "闭合",
 
-"OPENED": "",
+"OPENED": "已断开",
 
-"CLOSED": "",
+"CLOSED": "已闭合",
 
-"HIDDEN": "",
+"HIDDEN": "已隐藏",
 
-"MONITORED": "",
+"MONITORED": "监测中",
 
-"MONITOR": "",
+"MONITOR": "监测器",
 
-"ADD": "",
+"ADD": "添加",
 
-"HIDE": ""
+"HIDE": "隐藏"
 }
