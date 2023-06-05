@@ -782,7 +782,21 @@ class RightPanel(wx.Panel):
 
         # Set the sizer for the panel
         self.SetSizer(main_sizer)
-
+    
+    def change_colour_child(self, child):
+        for child in child.GetChildren():
+            if isinstance(child, wx.StaticText):
+                child.SetForegroundColour(
+                    self.parent.colour_palette[self.parent.colour_mode]["Text Colour"])
+            if isinstance(child, wx.Button):
+                child.SetForegroundColour(
+                    self.parent.colour_palette[self.parent.colour_mode]["Panel Colour"])
+    
+    def change_colour(self):
+        for child in self.GetChildren():
+            self.change_colour_child(child)
+        self.SetBackgroundColour(self.parent.colour_palette[self.parent.colour_mode]["Panel Colour"])
+        self.Refresh()
 
 class Gui(wx.Frame):
     """Configure the main window and all the widgets.
@@ -839,13 +853,14 @@ class Gui(wx.Frame):
             helpMenu = wx.Menu()
             menuBar = wx.MenuBar()
             self.open_id, self.help_id_1, self.help_id_2 = wx.NewIdRef(count=3)
-            self.reset_id, self.def_file_show_id = wx.NewIdRef(count=2)
+            self.reset_id, self.def_file_show_id, self.change_colour_id = wx.NewIdRef(count=3)
             fileMenu.Append(self.open_id,  self.GetTranslation("&Open"))
             fileMenu.Append(wx.ID_ABOUT, self.GetTranslation("&About"))
             fileMenu.Append(wx.ID_EXIT,  self.GetTranslation("&Exit"))
             viewMenu.Append(self.reset_id, self.GetTranslation("&Reset"))
             viewMenu.Append(self.def_file_show_id,
                             self.GetTranslation("&Show Definition File"))
+            viewMenu.Append(self.change_colour_id, self.GetTranslation("&Change Colour"))
             helpMenu.Append(self.help_id_1,
                             self.GetTranslation("&EBNF Syntax"))
             helpMenu.Append(self.help_id_2,
@@ -871,6 +886,12 @@ class Gui(wx.Frame):
 
             self.SetSizeHints(600, 600)
             self.SetSizer(main_sizer)
+        
+        self.colour_palette = {"Light Mode": {"Text Colour": "black", "Panel Colour": "light grey"}, 
+                        "Dark Mode": {"Text Colour": "light grey", "Panel Colour": "dark grey"}}
+
+        self.colour_mode = "Light Mode"
+        self.change_colour()
 
     def GetTranslation(self, string):
         locale = self.locale_language
@@ -882,7 +903,16 @@ class Gui(wx.Frame):
             else:  # No &
                 translated = dict_.get(string, string)
         return translated  # Return the string as it is if translation not found or translation
-
+    
+    def change_colour(self):
+        for child in self.GetChildren():
+            if isinstance(child, wx.Panel):
+                child.change_colour()
+        menu = self.GetMenuBar()
+        menu.SetBackgroundColour(self.colour_palette[self.colour_mode]["Panel Colour"])
+        menu.SetForegroundColour(self.colour_palette[self.colour_mode]["Text Colour"])
+        # self.canvas.SetColour('white')
+        
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
         Id = event.GetId()
@@ -916,6 +946,14 @@ class Gui(wx.Frame):
                                editable=False)
                 box.ShowModal()
                 box.Destroy()
+            
+        elif Id == self.change_colour_id:
+            if self.colour_mode == "Light Mode":
+                self.colour_mode = "Dark Mode"
+                self.change_colour()
+            else: # Self.colour_mode == "Dark Mode"
+                self.colour_mode = "Light Mode"
+                self.change_colour()
 
     def start_graphically(self):
         """Load the circuit definition file directly from the GUI."""
