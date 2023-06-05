@@ -1,0 +1,39 @@
+{
+ "File" : "文件",
+
+"Open": "打开",
+
+"About": "关于",
+
+"Exit": "退出",
+
+"View": "视图",
+
+"Reset": "重置",
+
+"Show Definition File" : "查看定义文件",
+
+"Help": "帮助",
+
+"EBNF Syntax": "扩展巴科斯范式语法",
+
+"User Guide": "用户指南",
+
+"CYCLES": "循环",
+
+"RUN": "运行",
+
+"CONTINUE": "继续",
+
+"SELECT SWITCH AND STATE": "选择开关与状态",
+
+"SELECT MONITOR": "选择监测器",
+
+"OPEN": "",
+
+"CLOSE": "",
+
+"OPENED": "",
+
+"CLOSED": ""
+}

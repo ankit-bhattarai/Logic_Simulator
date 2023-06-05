@@ -14,6 +14,7 @@ import wx.glcanvas as wxcanvas
 from OpenGL import GL, GLUT
 from guiint import GuiInterface
 import webbrowser
+import json
 
 change_button_cycles = False
 text_min_height = 1
@@ -384,8 +385,9 @@ class SwitchPanel(wx.Panel):
         # Creating the widgets
 
         # Text for the switches
+        SWITCH_STATE_TEXT = self.grand_parent.GetTranslation("SELECT SWITCH AND STATE") + ":"
         self.switch_text = wx.StaticText(
-            self, wx.ID_ANY, "SELECT SWITCH AND STATE: ")
+            self, wx.ID_ANY, SWITCH_STATE_TEXT)
         self.left_sizer.Add(self.switch_text, 1, wx.EXPAND,
                             wx.ALIGN_LEFT | wx.ALL, 10)
 
@@ -525,8 +527,9 @@ class MonitorPanel(wx.Panel):
         self.main_sizer.Add(self.right_sizer, 1, wx.EXPAND | wx.ALL, 10)
 
         # Text for the monitors
+        MONITOR_SELECT_TEXT = self.grand_parent.GetTranslation("SELECT MONITOR") + ": "
         self.monitor_text = wx.StaticText(
-            self, wx.ID_ANY, "SELECT MONITOR: ")
+            self, wx.ID_ANY, MONITOR_SELECT_TEXT)
         self.left_sizer.Add(self.monitor_text, 1, wx.EXPAND,
                             wx.ALIGN_LEFT | wx.ALL, 10)
 
@@ -661,8 +664,8 @@ class RunPanel(wx.Panel):
     def __init__(self, parent, guiint):
         """Method initalises the panel"""
         super().__init__(parent=parent)  # Initialise
-        self.grand_parent = parent
-        self.grand_parent = self.grand_parent.parent
+        self.parent = parent
+        self.grand_parent = self.parent.parent
         self.guiint = guiint
 
         # Creating the sizers
@@ -675,7 +678,8 @@ class RunPanel(wx.Panel):
         self.main_sizer.Add(self.middle_sizer, 0, wx.ALL, 5)
 
         # Add the text on the top
-        self.cycles_text = wx.StaticText(self, wx.ID_ANY, "CYCLES: ")
+        CYCLES_TEXT = self.grand_parent.GetTranslation("CYCLES") + ": "
+        self.cycles_text = wx.StaticText(self, wx.ID_ANY, CYCLES_TEXT)
         self.top_sizer.Add(self.cycles_text, 1, wx.EXPAND | wx.ALL, 10)
 
         # Create the spin object
@@ -690,9 +694,9 @@ class RunPanel(wx.Panel):
 
         # Create the two buttons
         self.run_button_id, self.continue_button_id = wx.NewIdRef(count=2)
-        self.button_run = wx.Button(self, self.run_button_id, "RUN")
+        self.button_run = wx.Button(self, self.run_button_id, self.grand_parent.GetTranslation("RUN"))
         self.button_continue = wx.Button(self, self.continue_button_id,
-                                         "CONTINUE")
+                                         self.grand_parent.GetTranslation("CONTINUE"))
         # Bind buttons
         self.button_run.Bind(wx.EVT_BUTTON, self.OnButtonRun)
         self.button_continue.Bind(wx.EVT_BUTTON, self.OnButtonContinue)
@@ -813,6 +817,7 @@ class Gui(wx.Frame):
             if locale not in allowed_locale:
                 print("Locale not supported, using default locale - English")
             else:
+                self.locale_language = locale
                 locale = wx.Locale(locale)
                 wx.Locale.AddCatalogLookupPathPrefix('locale')
                 print("Done")
@@ -832,19 +837,19 @@ class Gui(wx.Frame):
             menuBar = wx.MenuBar()
             self.open_id, self.help_id_1, self.help_id_2 = wx.NewIdRef(count=3)
             self.reset_id, self.def_file_show_id = wx.NewIdRef(count=2)
-            fileMenu.Append(self.open_id,  wx.GetTranslation("&Open"))
-            fileMenu.Append(wx.ID_ABOUT, wx.GetTranslation("&About"))
-            fileMenu.Append(wx.ID_EXIT,  wx.GetTranslation("&Exit"))
-            viewMenu.Append(self.reset_id, wx.GetTranslation("&Reset"))
+            fileMenu.Append(self.open_id,  self.GetTranslation("&Open"))
+            fileMenu.Append(wx.ID_ABOUT, self.GetTranslation("&About"))
+            fileMenu.Append(wx.ID_EXIT,  self.GetTranslation("&Exit"))
+            viewMenu.Append(self.reset_id, self.GetTranslation("&Reset"))
             viewMenu.Append(self.def_file_show_id,
-                            wx.GetTranslation("&Show Definition File"))
+                            self.GetTranslation("&Show Definition File"))
             helpMenu.Append(self.help_id_1,
-                            wx.GetTranslation("&EBNF Syntax"))
+                            self.GetTranslation("&EBNF Syntax"))
             helpMenu.Append(self.help_id_2,
-                            wx.GetTranslation("&User Guide"))
-            menuBar.Append(fileMenu, wx.GetTranslation("&File"))
-            menuBar.Append(viewMenu, wx.GetTranslation("&View"))
-            menuBar.Append(helpMenu,  wx.GetTranslation("&Help"))
+                            self.GetTranslation("&User Guide"))
+            menuBar.Append(fileMenu, self.GetTranslation("&File"))
+            menuBar.Append(viewMenu, self.GetTranslation("&View"))
+            menuBar.Append(helpMenu,  self.GetTranslation("&Help"))
             self.SetMenuBar(menuBar)
 
             # Canvas for drawing signals
@@ -864,13 +869,24 @@ class Gui(wx.Frame):
             self.SetSizeHints(600, 600)
             self.SetSizer(main_sizer)
 
+    def GetTranslation(self, string):
+        locale = self.locale_language
+        translated = string
+        if locale is not None: # English or some other language not supported
+            dict_ = json.load(open(f"translations/{locale}.json", "r"))
+            if string[0] == "&":
+                translated = "&" + dict_.get(string[1:], string[1:])
+            else: # No &
+                translated = dict_.get(string, string)
+        return translated # Return the string as it is if translation not found or translation
+
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
         Id = event.GetId()
         if Id == wx.ID_EXIT:
             self.Close(True)
         elif Id == wx.ID_ABOUT:
-            about_string = wx.GetTranslation("&About") + " Logsim"
+            about_string = self.GetTranslation("&About") + " Logsim"
             wx.MessageBox("Logic Simulator\nCreated by Ankit Adhi Jessy\n2023",
                           about_string, wx.ICON_INFORMATION | wx.OK)
         elif Id == self.open_id:
@@ -893,7 +909,7 @@ class Gui(wx.Frame):
             file_path = self.guiint.scanner.path
             with open(file_path, "r") as f:
                 box = MyDialog(self, message=f.read(),
-                               title=wx.GetTranslation("Definition File"),
+                               title=self.GetTranslation("Definition File"),
                                editable=False)
                 box.ShowModal()
                 box.Destroy()
