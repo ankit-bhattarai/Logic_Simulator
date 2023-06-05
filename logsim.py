@@ -30,8 +30,10 @@ other_locale = {"es_ES.utf8": wx.LANGUAGE_SPANISH,
                 "fr_FR.utf8": wx.LANGUAGE_FRENCH, "zh_CN.utf8": wx.LANGUAGE_CHINESE_SIMPLIFIED}
 if os.environ.get('LANG') in other_locale:
     lang = other_locale[os.environ.get('LANG')]
+    locale_text = os.environ.get('LANG')
 else:
     lang = None
+    locale_text = None
 
 
 def main(arg_list):
@@ -72,7 +74,8 @@ def main(arg_list):
         elif option == "-g":  # Load the definition file from the GUI itself
             app = wx.App()
             gui = Gui("Logic Simulator", None, None, None,
-                      None, None, None, load_graphically=True, locale=lang)
+                      None, None, None, load_graphically=True, locale=lang,
+                      locale_text=locale_text)
             gui.Show(True)
             app.MainLoop()
 
@@ -90,7 +93,7 @@ def main(arg_list):
             # Initialise an instance of the gui.Gui() class
             app = wx.App()
             gui = Gui("Logic Simulator", path, names, devices, network,
-                      monitors, scanner, locale=lang)
+                      monitors, scanner, locale=lang, locale_text=locale_text)
             gui.Show(True)
             app.MainLoop()
 

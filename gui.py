@@ -385,7 +385,8 @@ class SwitchPanel(wx.Panel):
         # Creating the widgets
 
         # Text for the switches
-        SWITCH_STATE_TEXT = self.grand_parent.GetTranslation("SELECT SWITCH AND STATE") + ":"
+        SWITCH_STATE_TEXT = self.grand_parent.GetTranslation(
+            "SELECT SWITCH AND STATE") + ":"
         self.switch_text = wx.StaticText(
             self, wx.ID_ANY, SWITCH_STATE_TEXT)
         self.left_sizer.Add(self.switch_text, 1, wx.EXPAND,
@@ -527,7 +528,8 @@ class MonitorPanel(wx.Panel):
         self.main_sizer.Add(self.right_sizer, 1, wx.EXPAND | wx.ALL, 10)
 
         # Text for the monitors
-        MONITOR_SELECT_TEXT = self.grand_parent.GetTranslation("SELECT MONITOR") + ": "
+        MONITOR_SELECT_TEXT = self.grand_parent.GetTranslation(
+            "SELECT MONITOR") + ": "
         self.monitor_text = wx.StaticText(
             self, wx.ID_ANY, MONITOR_SELECT_TEXT)
         self.left_sizer.Add(self.monitor_text, 1, wx.EXPAND,
@@ -694,7 +696,8 @@ class RunPanel(wx.Panel):
 
         # Create the two buttons
         self.run_button_id, self.continue_button_id = wx.NewIdRef(count=2)
-        self.button_run = wx.Button(self, self.run_button_id, self.grand_parent.GetTranslation("RUN"))
+        self.button_run = wx.Button(
+            self, self.run_button_id, self.grand_parent.GetTranslation("RUN"))
         self.button_continue = wx.Button(self, self.continue_button_id,
                                          self.grand_parent.GetTranslation("CONTINUE"))
         # Bind buttons
@@ -805,19 +808,19 @@ class Gui(wx.Frame):
     """
 
     def __init__(self, title, path, names, devices, network, monitors,
-                 scanner=None, load_graphically=False, locale=None):
+                 scanner=None, load_graphically=False, locale=None, locale_text=None):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(800, 600))
         # File path for circuit file which can be chosen from the GUI
         self.file_path = None
         self.guiint = None
+        self.locale_language = locale_text
         if locale is not None:
             allowed_locale = [wx.LANGUAGE_CHINESE_SIMPLIFIED,
                               wx.LANGUAGE_ENGLISH, wx.LANGUAGE_FRENCH]
             if locale not in allowed_locale:
                 print("Locale not supported, using default locale - English")
             else:
-                self.locale_language = locale
                 locale = wx.Locale(locale)
                 wx.Locale.AddCatalogLookupPathPrefix('locale')
                 print("Done")
@@ -872,13 +875,13 @@ class Gui(wx.Frame):
     def GetTranslation(self, string):
         locale = self.locale_language
         translated = string
-        if locale is not None: # English or some other language not supported
+        if locale is not None:  # English or some other language not supported
             dict_ = json.load(open(f"translations/{locale}.json", "r"))
             if string[0] == "&":
                 translated = "&" + dict_.get(string[1:], string[1:])
-            else: # No &
+            else:  # No &
                 translated = dict_.get(string, string)
-        return translated # Return the string as it is if translation not found or translation
+        return translated  # Return the string as it is if translation not found or translation
 
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
