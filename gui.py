@@ -236,7 +236,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glClear(GL.GL_COLOR_BUFFER_BIT)
 
         # Draw specified text at position (10, 10)
-        self.render_text(text, 10, 10)
+        # self.render_text(text, 10, 10)
         # Draw the signal traces
         self.render_signals()
 
@@ -837,7 +837,6 @@ class Gui(wx.Frame):
             else:
                 locale = wx.Locale(locale)
                 wx.Locale.AddCatalogLookupPathPrefix('locale')
-                print("Done")
         if load_graphically:
             self.start_graphically_control()
             # Can only reach this stage if a valid circuit file has been loaded
