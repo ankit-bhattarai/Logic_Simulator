@@ -112,7 +112,7 @@ class Parser:
             dev_list.append(None)
             self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
             return
-        if self.symbol.type == "comma" or self.symbol.type == "semi-colon":  # NEW
+        if self.symbol.type == "comma" or self.symbol.type == "semi-colon":
             dev_list.append(None)
             self.display_syntax_error(6, self.symbol)
             return
@@ -123,7 +123,8 @@ class Parser:
             while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
-                    self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+                    self.display_syntax_error(
+                        22, self.scanner.list_of_symbols[-1])
                     return
             return
         self.symbol = self.scanner.get_symbol()
@@ -131,7 +132,7 @@ class Parser:
             dev_list.append(None)
             self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
             return
-        if self.symbol.type == "comma" or self.symbol.type == "semi-colon":  # NEW
+        if self.symbol.type == "comma" or self.symbol.type == "semi-colon":
             dev_list.append(None)
             self.display_syntax_error(6, self.symbol)
             return
@@ -148,7 +149,8 @@ class Parser:
             while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
-                    self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+                    self.display_syntax_error(
+                        22, self.scanner.list_of_symbols[-1])
                     return
             return
         if self.symbol.type == "comma" or self.symbol.type == "semi-colon":
@@ -160,7 +162,8 @@ class Parser:
             while self.symbol.type != "comma" and self.symbol.type != "semi-colon" and self.names.get_name_string(self.symbol.id) != "CONNECT":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
-                    self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+                    self.display_syntax_error(
+                        22, self.scanner.list_of_symbols[-1])
                     return
             return
 
@@ -189,7 +192,7 @@ class Parser:
             dev_list.append(None)
             self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
             return
-        if self.symbol.type == "comma" or self.symbol.type == "semi-colon":  # NEW
+        if self.symbol.type == "comma" or self.symbol.type == "semi-colon":
             dev_list.append(None)
             self.display_syntax_error(6, self.symbol)
             return
@@ -200,7 +203,8 @@ class Parser:
             while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
-                    self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+                    self.display_syntax_error(
+                        22, self.scanner.list_of_symbols[-1])
                     return
             return
         self.symbol = self.scanner.get_symbol()
@@ -208,7 +212,7 @@ class Parser:
             dev_list.append(None)
             self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
             return
-        if self.symbol.type == "comma" or self.symbol.type == "semi-colon":  # NEW
+        if self.symbol.type == "comma" or self.symbol.type == "semi-colon":
             dev_list.append(None)
             self.display_syntax_error(6, self.symbol)
             return
@@ -238,7 +242,8 @@ class Parser:
             while self.symbol.type != "comma" and self.symbol.type != "semi-colon" and self.names.get_name_string(self.symbol.id) != "CONNECT":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
-                    self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+                    self.display_syntax_error(
+                        22, self.scanner.list_of_symbols[-1])
                     return
             return
 
@@ -267,7 +272,7 @@ class Parser:
             dev_list.append(None)
             self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
             return
-        if self.symbol.type == "comma" or self.symbol.type == "semi-colon":  # NEW
+        if self.symbol.type == "comma" or self.symbol.type == "semi-colon":
             dev_list.append(None)
             self.display_syntax_error(6, self.symbol)
             return
@@ -287,7 +292,7 @@ class Parser:
             dev_list.append(None)
             self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
             return
-        if self.symbol.type == "comma" or self.symbol.type == "semi-colon":  # NEW
+        if self.symbol.type == "comma" or self.symbol.type == "semi-colon":
             dev_list.append(None)
             self.display_syntax_error(6, self.symbol)
             return
@@ -305,7 +310,8 @@ class Parser:
             while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
-                    self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+                    self.display_syntax_error(
+                        22, self.scanner.list_of_symbols[-1])
                     return
             return
         if self.symbol.type == "comma" or self.symbol.type == "semi-colon":
@@ -317,7 +323,8 @@ class Parser:
             while self.symbol.type != "comma" and self.symbol.type != "semi-colon" and self.names.get_name_string(self.symbol.id) != "CONNECT":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
-                    self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+                    self.display_syntax_error(
+                        22, self.scanner.list_of_symbols[-1])
                     return
             return
 
@@ -346,7 +353,7 @@ class Parser:
             dev_list.append(None)
             self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
             return
-        if self.symbol.type == "comma" or self.symbol.type == "semi-colon":  # NEW
+        if self.symbol.type == "comma" or self.symbol.type == "semi-colon":
             dev_list.append(None)
             self.display_syntax_error(7, self.symbol)
             return
@@ -362,7 +369,8 @@ class Parser:
             while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
-                    self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+                    self.display_syntax_error(
+                        22, self.scanner.list_of_symbols[-1])
                     return
             return
         if self.symbol.type == "comma" or self.symbol.type == "semi-colon":
@@ -374,7 +382,8 @@ class Parser:
             while self.symbol.type != "comma" and self.symbol.type != "semi-colon" and self.names.get_name_string(self.symbol.id) != "CONNECT":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
-                    self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+                    self.display_syntax_error(
+                        22, self.scanner.list_of_symbols[-1])
                     return
             return
 
@@ -414,7 +423,8 @@ class Parser:
             while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:
-                    self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+                    self.display_syntax_error(
+                        22, self.scanner.list_of_symbols[-1])
                     return
             return
         self.symbol = self.scanner.get_symbol()
@@ -439,7 +449,8 @@ class Parser:
             while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:
-                    self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+                    self.display_syntax_error(
+                        22, self.scanner.list_of_symbols[-1])
                     return
             return
         if self.symbol.type == "comma" or self.symbol.type == "semi-colon":
@@ -451,7 +462,8 @@ class Parser:
             while self.symbol.type != "comma" and self.symbol.type != "semi-colon" and self.names.get_name_string(self.symbol.id) != "CONNECT":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:
-                    self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+                    self.display_syntax_error(
+                        22, self.scanner.list_of_symbols[-1])
                     return
             return
 
@@ -546,7 +558,8 @@ class Parser:
             while self.names.get_name_string(self.symbol.id) != "CONNECT":  # !!!
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
-                    self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+                    self.display_syntax_error(
+                        22, self.scanner.list_of_symbols[-1])
                     return None
             return None
 
@@ -682,7 +695,8 @@ class Parser:
             while self.symbol.type != "comma" and self.symbol.type != "semi-colon" and self.names.get_name_string(self.symbol.id) != "MONITOR":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
-                    self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+                    self.display_syntax_error(
+                        22, self.scanner.list_of_symbols[-1])
                     return
             return
 
@@ -738,7 +752,8 @@ class Parser:
             while self.names.get_name_string(self.symbol.id) != "MONITOR":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
-                    self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+                    self.display_syntax_error(
+                        22, self.scanner.list_of_symbols[-1])
                     return None
             return None
 
@@ -767,7 +782,8 @@ class Parser:
             while self.symbol.type != "comma" and self.symbol.type != "semi-colon":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
-                    self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+                    self.display_syntax_error(
+                        22, self.scanner.list_of_symbols[-1])
                     return
             return
         self.symbol = self.scanner.get_symbol()
@@ -812,7 +828,8 @@ class Parser:
             while self.symbol.type != "comma" and self.symbol.type != "semi-colon" and self.names.get_name_string(self.symbol.id) != "END":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
-                    self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+                    self.display_syntax_error(
+                        22, self.scanner.list_of_symbols[-1])
                     return
             return
 
@@ -868,7 +885,8 @@ class Parser:
             while self.names.get_name_string(self.symbol.id) != "END":  # !!!
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
-                    self.display_syntax_error(22, self.scanner.list_of_symbols[-1])
+                    self.display_syntax_error(
+                        22, self.scanner.list_of_symbols[-1])
                     return None
             return None
 
@@ -898,11 +916,15 @@ class Parser:
         if error_index == 9:
             name_string = self.names.get_name_string(self.symbol.id)
             index_of_arrow = self.symbol.index_not_name(name_string)[0]
-            exact_error_message = name_error[self.symbol.index_not_name(name_string)[1] - 1]
-            return self.scanner.print_error(symbol, index_of_arrow, error_message + exact_error_message)
+            exact_error_message = name_error[
+                self.symbol.index_not_name(name_string)[1] - 1]
+            return self.scanner.print_error(
+                symbol, index_of_arrow, error_message + exact_error_message)
         elif error_index == 23:
-            index_of_arrow = self.symbol.is_waveform(self.names.get_name_string(self.symbol.id))[1]
-            return self.scanner.print_error(symbol, index_of_arrow, error_message)
+            index_of_arrow = self.symbol.is_waveform(
+                self.names.get_name_string(self.symbol.id))[1]
+            return self.scanner.print_error(
+                symbol, index_of_arrow, error_message)
         return self.scanner.print_error(symbol, 0, error_message)
 
     def network_dict(self):
@@ -989,7 +1011,7 @@ class Parser:
         for device in devices_list:
             device_type = device[0].id
             device_name = device[1].id
-            
+
             # Maintenance - change in type passed for device_property (int -> str)
             device_property = (
                 self.names.get_name_string(device[2].id)

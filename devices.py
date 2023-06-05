@@ -394,10 +394,11 @@ class Devices:
             else:
                 self.make_rc(device_id, device_property)
                 error_type = self.NO_ERROR
-        elif device_kind == self.SIGGEN: # MAINTENANCE
+
+        elif device_kind == self.SIGGEN:  # MAINTENANCE
             if device_property is None:
                 # Should never happen - dealt with our syntax
-                error_type = self.NO_QUALIFIER # MAINTENANCE
+                error_type = self.NO_QUALIFIER  # MAINTENANCE
             else:
                 self.make_siggen(device_id, device_property)
                 error_type = self.NO_ERROR
