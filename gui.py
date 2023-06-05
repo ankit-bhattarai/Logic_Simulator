@@ -438,9 +438,11 @@ class SwitchPanel(wx.Panel):
         self.button_switch.Show()
         # Set the text of the buttons based on the current state - ACTIONS
         if switch_state == 0:
-            self.button_switch.SetLabel("CLOSE")
+            self.button_switch.SetLabel(
+                self.grand_parent.GetTranslation("CLOSE"))
         else:  # switch_state == 1
-            self.button_switch.SetLabel("OPEN")
+            self.button_switch.SetLabel(
+                self.grand_parent.GetTranslation("OPEN"))
 
         self.main_sizer.Layout()
         self.parent.GetSizer().Layout()
