@@ -73,12 +73,12 @@ class GuiInterface():
         -------
         List of output names (strings)
         """
-        output_names = []
+        output_names = [] 
 
         for device in self.devices.devices_list:
             device_name = self.names.get_name_string(device.device_id)
             for output_port_id in device.outputs.keys():
-                if output_port_id:  # if output_port_id is not None
+                if output_port_id:  # if there is an output port - add it to the name
                     output_names.append(
                         device_name + "." + self.names.get_name_string(output_port_id))
                 else:
@@ -126,6 +126,7 @@ class GuiInterface():
         device_id = self.names.query(split_name[0])
         port_id = self.names.query(
             split_name[1]) if len(split_name) == 2 else None
+        # if the output is in the monitor dictionary, return True 
         if (device_id, port_id) in self.monitors.monitors_dictionary:
             return True
         return False
@@ -144,9 +145,9 @@ class GuiInterface():
         device_id = self.names.query(split_name[0])
         port_id = self.names.query(
             split_name[1]) if len(split_name) == 2 else None
-        if output_state:
+        if output_state: # Add monitor
             self.monitors.make_monitor(device_id, port_id)
-        else:
+        else: # Remove monitor
             self.monitors.remove_monitor(device_id, port_id)
 
     def run_network(self, n_cycles):
@@ -161,6 +162,7 @@ class GuiInterface():
         self.devices.cold_startup()
         self.monitors.reset_monitors()
         for i in range(n_cycles):
+            # Important check to see if network is oscillating
             if not self.network.execute_network():
                 return "Network oscillating!"
             self.monitors.record_signals()
@@ -177,6 +179,7 @@ class GuiInterface():
         """
         for i in range(n_cycles):
             if not self.network.execute_network():
+                # Important check to see if network is oscillating
                 return "Network oscillating!"
             self.monitors.record_signals()
         return True
@@ -191,7 +194,7 @@ class GuiInterface():
         Dictionary of all monitered signal states for each monitored output
         """
         max_length = -1
-        signals_dictionary = {}
+        signals_dictionary = {} # Output signal name (str): list of signal values (bool)
 
         for key, value in self.monitors.monitors_dictionary.items():
             device_id, port_id = key
@@ -201,7 +204,9 @@ class GuiInterface():
 
             signals_dictionary[output_name_string] = value
             max_length = max(max_length, len(value))
-
+        
+        # Pad the signals with None values to make them all the same length
+        # (signal values are only recorded when they are monitored)
         for key, value in signals_dictionary.items():
             signals_dictionary[key] = [None] * \
                 (max_length - len(value)) + value
@@ -227,6 +232,7 @@ class GuiInterface():
         error_messages: string
             Any error or warning messages that occurred during parsing
         """
+        # Create new instances of all the classes - for the new network
         new_names = Names()
         new_devices = Devices(new_names)
         new_network = Network(new_names, new_devices)
@@ -236,7 +242,7 @@ class GuiInterface():
         new_parser = Parser(new_names, new_devices,
                             new_network, new_monitors, new_scanner)
         if new_parser.parse_network():
-            # If able to parse the network and build it currently, update the network
+            # If able to parse the new network and build it, update the network
             self.names = new_names
             self.devices = new_devices
             self.network = new_network
@@ -244,6 +250,7 @@ class GuiInterface():
             self.scanner = new_scanner
             passed = True
         else:  # Don't update the network if the new definition file is invalid
-            passed = False
+            passed = False 
+        # Get any error messages from the scanner - for printing to GUI
         error_messages = new_scanner.get_error_messages()
         return passed, error_messages
