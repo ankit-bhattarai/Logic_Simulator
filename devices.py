@@ -43,8 +43,8 @@ class Device:
         self.dtype_memory = None
         self.rc_period = None  # MAINTENANCE
         self.rc_counter = None  # MAINTENANCE
-        self.siggen_waveform = None # MAINTENANCE - stores the waveform as a list of ints
-        self.siggen_counter = None # MAINTENANCE - stores the current position in the waveform 
+        self.siggen_waveform = None  # MAINTENANCE - stores the waveform as a list of ints
+        self.siggen_counter = None  # MAINTENANCE - stores the current position in the waveform
 
 
 class Devices:
@@ -96,17 +96,17 @@ class Devices:
     make_d_type(self, device_id): Makes a D-type device.
 
     make_rc(self, device_id, rc_period): Makes an RC device with the specified
-                                            period. (MAINTENANCE)         
+                                            period. (MAINTENANCE)
 
     make_siggen(self, device_id, waveform): Makes a siggen device with the specified
                                             waveform (passed as string)
-                                            (MAINTENANCE)                        
+                                            (MAINTENANCE)
 
     cold_startup(self): Simulates cold start-up of D-types and clocks.
 
     make_device(self, device_id, device_kind, device_property=None): Creates
                        the specified device and returns errors if unsuccessful.
-    
+
     """
 
     def __init__(self, names):
@@ -282,9 +282,9 @@ class Devices:
         device = self.get_device(device_id)
         device.rc_period = rc_period
         self.cold_startup()
-    
-    def make_siggen(self, device_id, waveform): # MAINTENANCE
-        """Make a siggen device with the specified waveform 
+
+    def make_siggen(self, device_id, waveform):  # MAINTENANCE
+        """Make a siggen device with the specified waveform.
         (passed as string)"""
         self.add_device(device_id, self.SIGGEN)
         device = self.get_device(device_id)
@@ -334,9 +334,9 @@ class Devices:
         """
         # Maintenance: Process device_property if it is not None
         if device_property is not None:
-            if device_kind != self.SIGGEN: # Only siggen has string property
+            if device_kind != self.SIGGEN:  # Only siggen has string property
                 device_property = int(device_property)
-            
+
         # Device has already been added to the devices_list
         if self.get_device(device_id) is not None:
             error_type = self.DEVICE_PRESENT

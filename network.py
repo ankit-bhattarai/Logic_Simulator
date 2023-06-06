@@ -53,19 +53,19 @@ class Network:
 
     execute_clock(self, device_id): Simulates a clock and updates its output
                                     signal value.
-    
+
     execute_rc(self, device_id): Simulates an RC device and updates its output
-                                    signal value.  (MAINTENANCE)           
-    
+                                    signal value.  (MAINTENANCE)
+
     execute_siggen(self, device_id): Simulates a SIGGEN device and updates its output
                                     signal value.  (MAINTENANCE)
-                    
+
     update_clocks(self): If it is time to do so, sets clock signals to RISING
                          or FALLING.
-    
+
     update_rc(self): If it is time to do so, sets RC signals to FALLING.
                         (MAINTENANCE)
-    
+
     update_siggen(self): If it is time to do so, sets SIGGEN signals to 0 or 1.
 
     execute_network(self): Executes all the devices in the network for one
@@ -374,7 +374,7 @@ class Network:
             return True
         else:
             return False
-    
+
     def execute_siggen(self, device_id):  # MAINTENANCE
         """Simulate a SIGGEN device and update its output signal value.
 
@@ -383,7 +383,7 @@ class Network:
         device = self.devices.get_device(device_id)
         output_signal = device.outputs[None]
 
-        # Mirrors execute clock - similar in the edge triggering sense 
+        # Mirrors execute clock - similar in the edge triggering sense
         # but arbitrary waveform generated as defined by user
         if output_signal == self.devices.RISING:
             new_signal = self.update_signal(output_signal, self.devices.HIGH)
@@ -410,7 +410,6 @@ class Network:
             if device.rc_counter == device.rc_period:
                 device.outputs[None] = self.devices.FALLING
             device.rc_counter += 1
-    
 
     def update_siggen(self):  # MAINTENANCE
         """Set the SIGGEN signal to 0 or 1 as appropriate."""
@@ -418,11 +417,11 @@ class Network:
         for device_id in siggen_devices:
             device = self.devices.get_device(device_id)
             current_output = device.outputs[None]
-            
+
             # Reset counter if it has reached the end of the waveform
             if device.siggen_counter == len(device.siggen_waveform):
                 device.siggen_counter = 0
-            
+
             desired_output = device.siggen_waveform[device.siggen_counter]
             # If current output is not the desired output and change is downwards
             if (current_output != desired_output) and desired_output == self.devices.LOW:
@@ -430,7 +429,7 @@ class Network:
             # If current output is not the desired output and change is upwards
             if (current_output != desired_output) and desired_output == self.devices.HIGH:
                 device.outputs[None] = self.devices.RISING
-            device.siggen_counter += 1      
+            device.siggen_counter += 1
 
     def execute_network(self):
         """Execute all the devices in the network for one simulation cycle.
@@ -446,7 +445,7 @@ class Network:
         nor_devices = self.devices.find_devices(self.devices.NOR)
         xor_devices = self.devices.find_devices(self.devices.XOR)
         rc_devices = self.devices.find_devices(self.devices.RC)  # MAINTENANCE
-        siggen_devices = self.devices.find_devices(self.devices.SIGGEN) # MAINTENANCE
+        siggen_devices = self.devices.find_devices(self.devices.SIGGEN)  # MAINTENANCE
 
         # This sets clock signals to RISING or FALLING, where necessary
         self.update_clocks()
@@ -499,8 +498,8 @@ class Network:
             for device_id in xor_devices:  # execute XOR devices
                 if not self.execute_gate(device_id, None, None):
                     return False
-                
-            for device_id in siggen_devices: # MAINTENANCE
+
+            for device_id in siggen_devices:  # MAINTENANCE
                 if not self.execute_siggen(device_id):
                     return False
 

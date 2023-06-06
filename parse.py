@@ -1022,9 +1022,9 @@ class Parser:
             # A 'code' is always returned, not all of them are errors
             error_code = self.devices.make_device(device_name, device_type,
                                                   device_property)
-            
+
             if self.semantic_error_handler.handle_error(error_code, device):
-                return False # Code corresponds to terminal error
+                return False  # Code corresponds to terminal error
 
         return True
 
@@ -1055,11 +1055,11 @@ class Parser:
 
             error_code = self.network.make_connection(
                 first_device, first_port, second_device, second_port)
-            
-            # A 'code' is always returned, not all of them are errors 
+
+            # A 'code' is always returned, not all of them are errors
             if self.semantic_error_handler.handle_error(
                     error_code, connection):
-                return False # Code corresponds to terminal error 
+                return False  # Code corresponds to terminal error
 
         if not self.network.check_network():
             self.semantic_error_handler.display_input_not_connected_error(
@@ -1084,9 +1084,9 @@ class Parser:
             port_name = monitor[2].id if len(monitor) == 3 else None
             error_code = self.monitors.make_monitor(device_name, port_name)
 
-            # A 'code' is always returned, not all of them are errors 
+            # A 'code' is always returned, not all of them are errors
             if self.semantic_error_handler.handle_error(error_code, monitor):
-                return False # Code corresponds to terminal error 
+                return False  # Code corresponds to terminal error
 
         return True
 
@@ -1104,12 +1104,12 @@ class Parser:
         """
 
         if not self.build_devices(network_dict["DEVICES"]):
-            return False # Semantic error detected in devices
+            return False  # Semantic error detected in devices
         if not self.build_connections(network_dict["CONNECT"]):
-            return False # Semantic error detected in connections
+            return False  # Semantic error detected in connections
         if not self.build_monitors(network_dict["MONITOR"]):
-            return False # Semantic error detected in monitors
-        return True 
+            return False  # Semantic error detected in monitors
+        return True
 
     def parse_network(self):
         """Parse the circuit definition file.
@@ -1124,13 +1124,13 @@ class Parser:
         if self.num_of_errors == 0 and network_dict:
             # Build the logic network if there are no syntax errors
             build_network = self.build_network(network_dict=network_dict)
-        else: # Display the number of syntax errors detected in the file and exit
+        else:  # Display the number of syntax errors detected in the file and exit
             if self.num_of_errors == 1:
                 error_message = f"{self.num_of_errors} syntax error detected in the file"
             else:
                 error_message = f"{self.num_of_errors} syntax errors detected in the file"
             self.scanner.print_error(None, 0, error_message)
             return False
-        
+
         # Return the built network if it is semantically correct
         return build_network
