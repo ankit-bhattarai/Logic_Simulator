@@ -83,6 +83,21 @@ class Symbol:
         return True
 
     @staticmethod
+    def verify_is_py_string(string):
+        """Method to verify that string is a non-empty string.
+
+        Parameters
+        ----------
+        string: str
+
+        Returns
+        -------
+        is_type_non_empty_string: bool"""
+        if not isinstance(string, str) or string == "":
+            return False
+        return True
+
+    @staticmethod
     def is_string(string):
         """Return True if string is alphanumeric plus underscore.
 
@@ -94,7 +109,7 @@ class Symbol:
         -------
         is_type_string: bool
         """
-        if string is None:
+        if Symbol.verify_is_py_string(string) is False:
             return False
         for char in string:  # Ensures all characters are alphanumeric or _
             if not char.isalnum() and char != "_":
@@ -116,7 +131,7 @@ class Symbol:
         -------
         is_type_name: bool
         """
-        if string is None:
+        if Symbol.verify_is_py_string(string) is False:
             return False
         is_type_string = cls.is_string(string)
         # Returns false if not composed of alphanumeric characters and _
@@ -180,6 +195,8 @@ class Symbol:
         """
         # First character must be a lowercase letter
         # If either of the conditions in the or statement are true, return 0
+        if cls.verify_is_py_string(string) is False:
+            return None  # Return None if string is not a string or is empty
         if (not string[0].isalpha()) or (not string[0] == string[0].lower()):
             return (0, 1)
         for i, char in enumerate(string[1:], 1):
@@ -207,7 +224,7 @@ class Symbol:
         -------
         error_loc: int or None
         """
-        if string is None:
+        if cls.verify_is_py_string(string) is False:
             return 0
         for i, char in enumerate(string):
             if not char.isdigit():
@@ -230,7 +247,7 @@ class Symbol:
         -------
         error_loc: int or None
         """
-        if string is None:
+        if cls.verify_is_py_string(string) is False:
             return 0
         if string[0] == "0" or not string[0].isdigit():
             return 0
@@ -251,7 +268,7 @@ class Symbol:
         -------
         is_type_number: bool
         """
-        if string is None:
+        if Symbol.verify_is_py_string(string) is False:
             return False
         if string.isdigit():
             return True
@@ -269,7 +286,7 @@ class Symbol:
         -------
         is_type_integer: bool
         """
-        if string is None:
+        if Symbol.verify_is_py_string(string) is False:
             return False
         if string.isdigit() and string[0] != "0":
             return True
@@ -293,7 +310,7 @@ class Symbol:
                 Index where the first invalid character is found. If no invalid
                 characters are found, returns None.
         """
-        if string is None or string == "":
+        if Symbol.verify_is_py_string(string) is False:
             return (False, 0)
         for i, char in enumerate(string):
             if char not in ["0", "1"]:
@@ -331,7 +348,7 @@ class Symbol:
         -------
         symbol_type: str
         """
-        if string is None:
+        if cls.verify_is_py_string(string) is False:
             return None
         if string in input_pins:
             return "input_pin"
@@ -659,8 +676,8 @@ class Scanner:
             line_number = self.current_line_number
             if character == "":  # Case 1 - End of file
                 break  # Exit loop
-            # if character is None:
-            #     break
+            if character is None:
+                break
             elif character.isdigit():  # Case 2 - Digit
                 # Gets the rest of the number and the next character after it
                 (number, character) = self.get_next_number(character)

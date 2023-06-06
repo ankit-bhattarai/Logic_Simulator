@@ -120,8 +120,6 @@ def test_name_error_identification(definition_file, name_error_indices, error_sy
                           ("test_parse_files/syntax_error_22_f.txt"),
                           ("test_parse_files/syntax_error_22_g.txt"),
                           ("test_parse_files/syntax_error_22_h.txt")])
-
-
 def test_early_termination_error_identification(early_termination_definition_file, new_names,
                                                 new_devices, new_network,
                                                 new_monitors):
@@ -141,7 +139,7 @@ def test_early_termination_error_identification(early_termination_definition_fil
     # Check that the print error function is called only once and with the correct error message/location
     new_scanner.print_error.assert_called_once_with(
         erronous_symbol, 0, syntax_error_types[22])
-    # Check that this is the only error that has been accumulated by num of errors 
+    # Check that this is the only error that has been accumulated by num of errors
     assert new_parser.num_of_errors == 1
 
 
@@ -174,8 +172,6 @@ def test_early_termination_error_identification(early_termination_definition_fil
                           ("test_parse_files/syntax_error_20.txt",
                            20, [1, 79]),
                           ("test_parse_files/syntax_error_21.txt", 21, [95])])
-
-
 def test_syntax_error_identification(definition_file, error_type, error_symbol_indices,
                                      new_names, new_devices, new_network, new_monitors):
     """Test that the correct syntax error is identified and subsequently sent to the
@@ -210,6 +206,7 @@ def test_syntax_error_identification(definition_file, error_type, error_symbol_i
     # Assert that the internally stored number of errors is correct
     assert new_parser.num_of_errors == len(error_symbol_indices)
 
+
 @pytest.fixture
 def network_dict_1():
     """
@@ -220,8 +217,8 @@ def network_dict_1():
     network_dict['DEVICES'] = [[Symbol("CLOCK", 5, 1, 10),
                                Symbol("clock1", 16, 1, 16),
                                Symbol("10", 17, 1, 23)]]
-    network_dict['CONNECT'] = [[Symbol("clock1", 16, 2, 10), 
-                                Symbol(">", 20, 2, 17), 
+    network_dict['CONNECT'] = [[Symbol("clock1", 16, 2, 10),
+                                Symbol(">", 20, 2, 17),
                                 Symbol("and1", 21, 2, 19),
                                 Symbol(".", 22, 2, 23),
                                 Symbol("I1", 23, 2, 24)]]
@@ -235,19 +232,20 @@ def test_build_network_dict_1(new_names, network_dict_1, new_devices, new_networ
     """Test that the network dictionary, used later to check semantics and 
        to build the network, is built correctly - for increasingly complex files
        - through test_build_network_dict_{1, 2, 3}.
-       
+
        This is the converse of testing for error identification as this dictionary
        is only built when CORRECT syntax is passed. This is different from the above
        tests, for which INCORRECT syntax is passed and error identification is tested.
     """
 
-    new_scanner = Scanner("test_parse_files/test_build_network_dict_1.txt", new_names)
+    new_scanner = Scanner(
+        "test_parse_files/test_build_network_dict_1.txt", new_names)
     new_parser = Parser(new_names,
                         new_devices,
                         new_network,
                         new_monitors,
                         new_scanner)
-    
+
     # Check that the network dictionary is built correctly
     assert new_parser.network_dict() == network_dict_1
     # Check that no errors have been accumulated
@@ -261,28 +259,33 @@ def network_dict_2():
     for the second test file - "test_parse_files/test_build_network_dict_2.txt"
     """
     network_dict_2 = {}
-    network_dict_2["DEVICES"] = [[Symbol("SWITCH", 6, 1, 10), Symbol("switch1", 16, 1, 17), Symbol("0", 17, 1, 25)], 
-                                 [Symbol("SWITCH", 6, 1, 28), Symbol("switch2", 19, 1, 35), Symbol("0", 17, 1, 43)],
-                                 [Symbol("AND", 0, 1, 46), Symbol("and1", 20, 1, 50), Symbol("2", 21, 1, 55)],
-                                 [Symbol("OR", 1, 1, 58), Symbol("or1", 22, 1, 61), Symbol("2", 21, 1, 65)], 
+    network_dict_2["DEVICES"] = [[Symbol("SWITCH", 6, 1, 10), Symbol("switch1", 16, 1, 17), Symbol("0", 17, 1, 25)],
+                                 [Symbol("SWITCH", 6, 1, 28), Symbol(
+                                     "switch2", 19, 1, 35), Symbol("0", 17, 1, 43)],
+                                 [Symbol("AND", 0, 1, 46), Symbol(
+                                     "and1", 20, 1, 50), Symbol("2", 21, 1, 55)],
+                                 [Symbol("OR", 1, 1, 58), Symbol(
+                                     "or1", 22, 1, 61), Symbol("2", 21, 1, 65)],
                                  [Symbol("NAND", 2, 1, 68), Symbol("nand1", 23, 1, 73), Symbol("2", 21, 1, 79)]]
-    
-    network_dict_2['CONNECT'] = [[Symbol("switch1", 16, 2, 10), Symbol(">", 26, 2, 18), Symbol("and1", 20, 2, 20), Symbol(".", 27, 2, 24), 
+
+    network_dict_2['CONNECT'] = [[Symbol("switch1", 16, 2, 10), Symbol(">", 26, 2, 18), Symbol("and1", 20, 2, 20), Symbol(".", 27, 2, 24),
                                   Symbol("I1", 28, 2, 25)], [Symbol("switch1", 16, 2, 29), Symbol(">", 26, 2, 37), Symbol("or1", 22, 2, 39),
-                                  Symbol(".", 27, 2, 42), Symbol("I1", 28, 2, 43)], [Symbol("switch2", 19, 2, 47), Symbol(">", 26, 2, 55), 
-                                  Symbol("and1", 20, 2, 57), Symbol(".", 27, 2, 61), Symbol("I2", 29, 2, 62)], [Symbol("switch2", 19, 2, 66), 
-                                  Symbol(">", 26, 2, 74), Symbol("or1", 22, 2, 76), Symbol(".", 27, 2, 79), Symbol("I2", 29, 2, 80)], 
-                                 [Symbol("and1", 20, 3, 2), Symbol(">", 26, 3, 7), Symbol("nand1", 23, 3, 9), Symbol(".", 27, 3, 14), 
-                                  Symbol("I1", 28, 3, 15)], [Symbol("or1", 22, 3, 19), Symbol(">", 26, 3, 23), Symbol("nand1", 23, 3, 25), 
-                                  Symbol(".", 27, 3, 30), Symbol("I2", 29, 3, 31)]]
-    
-    network_dict_2['MONITOR'] = [[Symbol("and1", 20, 4, 10)], [Symbol("or1", 22, 4, 16)], [Symbol("nand1", 23, 4, 21)]]
+                                                             Symbol(".", 27, 2, 42), Symbol("I1", 28, 2, 43)], [Symbol("switch2", 19, 2, 47), Symbol(">", 26, 2, 55),
+                                                                                                                Symbol("and1", 20, 2, 57), Symbol(".", 27, 2, 61), Symbol("I2", 29, 2, 62)], [Symbol("switch2", 19, 2, 66),
+                                                                                                                                                                                              Symbol(">", 26, 2, 74), Symbol("or1", 22, 2, 76), Symbol(".", 27, 2, 79), Symbol("I2", 29, 2, 80)],
+                                 [Symbol("and1", 20, 3, 2), Symbol(">", 26, 3, 7), Symbol("nand1", 23, 3, 9), Symbol(".", 27, 3, 14),
+                                  Symbol("I1", 28, 3, 15)], [Symbol("or1", 22, 3, 19), Symbol(">", 26, 3, 23), Symbol("nand1", 23, 3, 25),
+                                                             Symbol(".", 27, 3, 30), Symbol("I2", 29, 3, 31)]]
+
+    network_dict_2['MONITOR'] = [[Symbol("and1", 20, 4, 10)], [Symbol(
+        "or1", 22, 4, 16)], [Symbol("nand1", 23, 4, 21)]]
 
     return network_dict_2
 
 
 def test_build_network_dict_2(network_dict_2, new_names, new_devices, new_network, new_monitors):
-    new_scanner = Scanner("test_parse_files/test_build_network_dict_2.txt", new_names)
+    new_scanner = Scanner(
+        "test_parse_files/test_build_network_dict_2.txt", new_names)
     new_parser = Parser(new_names,
                         new_devices,
                         new_network,
@@ -303,34 +306,42 @@ def network_dict_3():
     """
     network_dict_3 = {}
     network_dict_3['DEVICES'] = [[Symbol("SWITCH", 6, 1, 10), Symbol("switch1", 16, 1, 17), Symbol("1", 17, 1, 25)],
-                                 [Symbol("SWITCH", 6, 1, 28), Symbol("switch2", 19, 1, 35), Symbol("0", 20, 1, 43)],
-                                 [Symbol("CLOCK", 5, 1, 46), Symbol("clock1", 21, 1, 52), Symbol("2", 22, 1, 59)],
+                                 [Symbol("SWITCH", 6, 1, 28), Symbol(
+                                     "switch2", 19, 1, 35), Symbol("0", 20, 1, 43)],
+                                 [Symbol("CLOCK", 5, 1, 46), Symbol(
+                                     "clock1", 21, 1, 52), Symbol("2", 22, 1, 59)],
                                  [Symbol("DTYPE", 7, 1, 62), Symbol("dtype1", 23, 1, 68)], [Symbol("NOR", 3, 2, 10),
-                                  Symbol("nor1", 24, 2, 14), Symbol("2", 22, 2, 19)], [Symbol("XOR", 4, 2, 22), 
-                                  Symbol("xor1", 25, 2, 26)]]
+                                                                                            Symbol("nor1", 24, 2, 14), Symbol("2", 22, 2, 19)], [Symbol("XOR", 4, 2, 22),
+                                                                                                                                                 Symbol("xor1", 25, 2, 26)]]
     network_dict_3['CONNECT'] = [[Symbol("switch1", 16, 3, 10), Symbol(">", 28, 3, 18), Symbol("dtype1", 23, 3, 20),
-                                  Symbol(".", 29, 3, 26), Symbol("DATA", 11, 3, 27)], [Symbol("switch1", 16, 3, 33), 
-                                  Symbol(">", 28, 3, 41), Symbol("dtype1", 23, 3, 43), Symbol(".", 29, 3, 49), 
-                                  Symbol("SET", 9, 3, 50)], [Symbol("switch1", 16, 3, 55), Symbol(">", 28, 3, 63),
-                                  Symbol("nor1", 24, 3, 65), Symbol(".", 29, 3, 69), Symbol("I1", 30, 3, 70)],
-                                 [Symbol("switch2", 19, 4, 1), Symbol(">", 28, 4, 9), Symbol("dtype1", 23, 4, 11), 
+                                  Symbol(".", 29, 3, 26), Symbol("DATA", 11, 3, 27)], [Symbol("switch1", 16, 3, 33),
+                                                                                       Symbol(">", 28, 3, 41), Symbol(
+                                                                                           "dtype1", 23, 3, 43), Symbol(".", 29, 3, 49),
+                                                                                       Symbol("SET", 9, 3, 50)], [Symbol("switch1", 16, 3, 55), Symbol(">", 28, 3, 63),
+                                                                                                                  Symbol("nor1", 24, 3, 65), Symbol(".", 29, 3, 69), Symbol("I1", 30, 3, 70)],
+                                 [Symbol("switch2", 19, 4, 1), Symbol(">", 28, 4, 9), Symbol("dtype1", 23, 4, 11),
                                   Symbol(".", 29, 4, 17), Symbol("CLEAR", 10, 4, 18)], [Symbol("switch2", 19, 4, 25),
-                                  Symbol(">", 28, 4, 33), Symbol("xor1", 25, 4, 35), Symbol(".", 29, 4, 39), 
-                                  Symbol("I2", 31, 4, 40)], [Symbol("dtype1", 23, 4, 44), Symbol(".", 29, 4, 50),
-                                  Symbol("Q", 12, 4, 51), Symbol(">", 28, 4, 53), Symbol("nor1", 24, 4, 55), 
-                                  Symbol(".", 29, 4, 59), Symbol("I2", 31, 4, 60)], [Symbol("dtype1", 23, 5, 1), Symbol(".", 29, 5, 7), 
-                                  Symbol("QBAR", 13, 5, 8), Symbol(">", 28, 5, 13), Symbol("xor1", 25, 5, 15), Symbol(".", 29, 5, 19),
-                                  Symbol("I1", 30, 5, 20)], [Symbol("clock1", 21, 5, 24), Symbol(">", 28, 5, 31),
-                                  Symbol("dtype1", 23, 5, 33), Symbol(".", 29, 5, 39), Symbol("CLK", 8, 5, 40)]]
-    network_dict_3['MONITOR'] = [[Symbol("switch1", 16, 6, 10)], [Symbol("clock1", 21, 6, 19)], [Symbol("switch2", 19, 6, 27)], 
-                                 [Symbol("dtype1", 23, 6, 36), Symbol(".", 29, 6, 42), Symbol("Q", 12, 6, 43)], 
+                                                                                        Symbol(">", 28, 4, 33), Symbol(
+                                      "xor1", 25, 4, 35), Symbol(".", 29, 4, 39),
+        Symbol("I2", 31, 4, 40)], [Symbol("dtype1", 23, 4, 44), Symbol(".", 29, 4, 50),
+                                   Symbol("Q", 12, 4, 51), Symbol(
+            ">", 28, 4, 53), Symbol("nor1", 24, 4, 55),
+        Symbol(".", 29, 4, 59), Symbol("I2", 31, 4, 60)], [Symbol("dtype1", 23, 5, 1), Symbol(".", 29, 5, 7),
+                                                           Symbol("QBAR", 13, 5, 8), Symbol(">", 28, 5, 13), Symbol(
+            "xor1", 25, 5, 15), Symbol(".", 29, 5, 19),
+        Symbol("I1", 30, 5, 20)], [Symbol("clock1", 21, 5, 24), Symbol(">", 28, 5, 31),
+                                   Symbol("dtype1", 23, 5, 33), Symbol(".", 29, 5, 39), Symbol("CLK", 8, 5, 40)]]
+    network_dict_3['MONITOR'] = [[Symbol("switch1", 16, 6, 10)], [Symbol("clock1", 21, 6, 19)], [Symbol("switch2", 19, 6, 27)],
+                                 [Symbol("dtype1", 23, 6, 36), Symbol(
+                                     ".", 29, 6, 42), Symbol("Q", 12, 6, 43)],
                                  [Symbol("nor1", 24, 6, 46)], [Symbol("xor1", 25, 6, 52)]]
-    
+
     return network_dict_3
 
 
 def test_build_network_dict_3(network_dict_3, new_names, new_devices, new_network, new_monitors):
-    new_scanner = Scanner("test_parse_files/test_build_network_dict_3.txt", new_names)
+    new_scanner = Scanner(
+        "test_parse_files/test_build_network_dict_3.txt", new_names)
     new_parser = Parser(new_names,
                         new_devices,
                         new_network,
@@ -344,38 +355,36 @@ def test_build_network_dict_3(network_dict_3, new_names, new_devices, new_networ
 
 
 @pytest.mark.parametrize("definition_file, symbol_details, message, index, success",
-                         [("test_parse_files/semantic_error_1.txt", ["switch1", 16, 1, 35],
+                         [("test_parse_files/semantic_error_1.txt", ["switch1", 18, 1, 35],
                            "Device names are not unique. switch1 is already the name of a device", 0, False),
-                          ("test_parse_files/semantic_error_2.txt", ["switch3", 30, 4, 33],
+                          ("test_parse_files/semantic_error_2.txt", ["switch3", 32, 4, 33],
                           "Device switch3 is not defined", 0, False),
-                          ("test_parse_files/semantic_error_3.txt", ["I3", 30, 4, 70],
+                          ("test_parse_files/semantic_error_3.txt", ["I3", 32, 4, 70],
                            "Port I3 is not defined for device nor1", 0, False),
-                          ("test_parse_files/semantic_error_4.txt", ["I1", 30, 4, 18],
+                          ("test_parse_files/semantic_error_4.txt", ["I1", 32, 4, 18],
                            "Port I1 is not defined for device dtype1", 0, False),
-                          ("test_parse_files/semantic_error_5.txt", ["DATA", 11, 5, 62],
+                          ("test_parse_files/semantic_error_5.txt", ["DATA", 13, 5, 62],
                            "Signal switch1 is already connected to the input pin dtype1.DATA. Only one signal must be connected to an input.", 0, False),
-                          ("test_parse_files/semantic_error_6.txt", ["DATA", 11, 5, 62],
+                          ("test_parse_files/semantic_error_6.txt", ["DATA", 13, 5, 62],
                            "Signal switch1 is already connected to the input pin dtype1.DATA. Only one signal must be connected to an input.", 0, False),
-                          ("test_parse_files/semantic_error_7.txt", ["I1", 30, 5, 20],
+                          ("test_parse_files/semantic_error_7.txt", ["I1", 32, 5, 20],
                            "The following input pins are not connected to a device: ['dtype1.CLK']", 2, False),
-                          ("test_parse_files/semantic_error_8.txt", ["dtype1", 23, 4, 44],
+                          ("test_parse_files/semantic_error_8.txt", ["dtype1", 25, 4, 44],
                            "Port is missing for device dtype1", 0, False),
-                          ("test_parse_files/semantic_error_9.txt", ["QBAR", 13, 5, 50],
+                          ("test_parse_files/semantic_error_9.txt", ["QBAR", 15, 5, 50],
                            "Port QBAR is not defined for device xor1", 0, False),
-                          ("test_parse_files/semantic_error_10.txt", ["I1", 30, 5, 20],
+                          ("test_parse_files/semantic_error_10.txt", ["I1", 32, 5, 20],
                            "The following input pins are not connected to a device: ['dtype1.CLK', 'xor1.I2']", 2, False),
-                          ("test_parse_files/semantic_error_11.txt", ["xor2", 33, 6, 52],
+                          ("test_parse_files/semantic_error_11.txt", ["xor2", 35, 6, 52],
                            "Device xor2 is not defined", 0, False),
-                          ("test_parse_files/semantic_error_12.txt", ["QBAR", 13, 6, 57],
+                          ("test_parse_files/semantic_error_12.txt", ["QBAR", 15, 6, 57],
                              "This is not an output. Only outputs can be monitored.", 0, False),
-                          ("test_parse_files/semantic_error_13.txt", ["dtype1", 23, 6, 36],
+                          ("test_parse_files/semantic_error_13.txt", ["dtype1", 25, 6, 36],
                              "This is not an output. Only outputs can be monitored.", 0, False),
-                             ("test_parse_files/semantic_error_14.txt", ["Q", 12, 6, 59],
+                             ("test_parse_files/semantic_error_14.txt", ["Q", 14, 6, 59],
                               "Warning: Monitor exists at this output already.", 0, True)
                           ]
-                        )
-
-
+                         )
 def test_semantic_error_identification(definition_file, symbol_details,
                                        message, index, success, new_names, new_devices,
                                        new_network, new_monitors):
@@ -419,11 +428,11 @@ def test_build_devices_1(new_names, new_devices, get_def_1_parser):
     network_dict = new_parser.network_dict()
     new_devices.make_device = Mock()
     new_parser.build_devices(network_dict["DEVICES"])
-    switch1_call = call(*new_names.lookup(["switch1", "SWITCH"]), 0)
-    switch2_call = call(*new_names.lookup(["switch2", "SWITCH"]), 0)
-    and1_call = call(*new_names.lookup(["and1", "AND"]), 2)
-    or1_call = call(*new_names.lookup(["or1", "OR"]), 2)
-    nand1_call = call(*new_names.lookup(["nand1", "NAND"]), 2)
+    switch1_call = call(*new_names.lookup(["switch1", "SWITCH"]), '0')
+    switch2_call = call(*new_names.lookup(["switch2", "SWITCH"]), '0')
+    and1_call = call(*new_names.lookup(["and1", "AND"]), '2')
+    or1_call = call(*new_names.lookup(["or1", "OR"]), '2')
+    nand1_call = call(*new_names.lookup(["nand1", "NAND"]), '2')
     expected_calls = [switch1_call, switch2_call, and1_call, or1_call,
                       nand1_call]
     new_devices.make_device.assert_has_calls(expected_calls, any_order=False)
@@ -452,11 +461,11 @@ def test_build_devices_2(new_names, new_devices, get_def_2_parser):
     network_dict = new_parser.network_dict()
     new_devices.make_device = Mock()
     new_parser.build_devices(network_dict["DEVICES"])
-    switch1_call = call(*new_names.lookup(["switch1", "SWITCH"]), 1)
-    switch2_call = call(*new_names.lookup(["switch2", "SWITCH"]), 0)
-    clock1_call = call(*new_names.lookup(["clock1", "CLOCK"]), 2)
+    switch1_call = call(*new_names.lookup(["switch1", "SWITCH"]), '1')
+    switch2_call = call(*new_names.lookup(["switch2", "SWITCH"]), '0')
+    clock1_call = call(*new_names.lookup(["clock1", "CLOCK"]), '2')
     dtype1_call = call(*new_names.lookup(["dtype1", "DTYPE"]), None)
-    nor1_call = call(*new_names.lookup(["nor1", "NOR"]), 2)
+    nor1_call = call(*new_names.lookup(["nor1", "NOR"]), '2')
     xor1_call = call(*new_names.lookup(["xor1", "XOR"]), None)
     expected_calls = [switch1_call, switch2_call, clock1_call, dtype1_call,
                       nor1_call, xor1_call]
@@ -488,8 +497,8 @@ def test_build_devices_order_quit_2(new_names, new_devices,
     network_dict = new_parser.network_dict()
     new_devices.make_device = Mock()
     new_parser.build_devices(network_dict["DEVICES"])
-    switch1_call = call(*new_names.lookup(["switch1", "SWITCH"]), 1)
-    switch1_dup_call = call(*new_names.lookup(["switch1", "SWITCH"]), 0)
+    switch1_call = call(*new_names.lookup(["switch1", "SWITCH"]), '1')
+    switch1_dup_call = call(*new_names.lookup(["switch1", "SWITCH"]), '0')
     expected_calls = [switch1_call, switch1_dup_call]
     new_devices.make_device.assert_has_calls(expected_calls, any_order=False)
 
@@ -515,7 +524,8 @@ def test_build_connections_1(new_names, new_devices, get_def_1_parser):
 
     expected_calls = []
     new_devices.make_connection.assert_has_calls(expected_calls,
-                                                  any_order=False)
+                                                 any_order=False)
+
 
 def test_build_connections_1_success(get_def_1_parser):
     """Tests the build connections method with a valid file and checks it returns True."""
@@ -537,20 +547,24 @@ def test_build_connections_2(new_names, new_devices, get_def_2_parser):
     new_parser.build_devices(network_dict["DEVICES"])
     new_parser.build_connections(network_dict["CONNECT"])
 
-    connection_1 = call(*new_names.lookup(["switch1", None, "dtype1", "DATA"]), 0)
-    connection_2 = call(*new_names.lookup(["switch1", None, "dtype1", "SET"]), 0)
+    connection_1 = call(
+        *new_names.lookup(["switch1", None, "dtype1", "DATA"]), 0)
+    connection_2 = call(
+        *new_names.lookup(["switch1", None, "dtype1", "SET"]), 0)
     connection_3 = call(*new_names.lookup(["switch1", None, "nor1", "I1"]), 0)
-    connection_4 = call(*new_names.lookup(["switch2", None, "dtype1", "CLEAR"]), 0)
+    connection_4 = call(
+        *new_names.lookup(["switch2", None, "dtype1", "CLEAR"]), 0)
     connection_5 = call(*new_names.lookup(["switch2", None, "xor1", "I2"]), 0)
     connection_6 = call(*new_names.lookup(["dtype1", "Q", "nor1", "I2"]), 0)
     connection_7 = call(*new_names.lookup(["dtype1", "QBAR", "xor1", "I1"]), 0)
-    connection_8 = call(*new_names.lookup(["clock1", None, "dtype1", "CLK"]), 0)
+    connection_8 = call(
+        *new_names.lookup(["clock1", None, "dtype1", "CLK"]), 0)
     expected_calls = [connection_1, connection_2, connection_3, connection_4,
                       connection_5, connection_6, connection_7, connection_8]
 
     expected_calls = []
     new_devices.make_connection.assert_has_calls(expected_calls,
-                                                  any_order=False)
+                                                 any_order=False)
 
 
 def test_build_connections_2_success(get_def_2_parser):
@@ -562,6 +576,7 @@ def test_build_connections_2_success(get_def_2_parser):
     # Check that the build connections method returns True
     result = new_parser.build_connections(network_dict["CONNECT"])
     assert result
+
 
 @pytest.fixture
 def get_semantic_error_5_parser(new_names, new_devices, new_monitors,
@@ -600,7 +615,7 @@ def test_build_monitors_1(new_names, new_monitors, get_def_1_parser):
 
     expected_calls = [monitor_1, monitor_2, monitor_3]
     new_monitors.make_monitor.assert_has_calls(expected_calls,
-                                                  any_order=False)
+                                               any_order=False)
 
 
 def test_build_monitors_1_success(get_def_1_parser):
@@ -631,9 +646,9 @@ def test_build_monitors_2(new_names, new_monitors, get_def_2_parser):
 
     expected_calls = [monitor_1, monitor_2, monitor_3,
                       monitor_4, monitor_5, monitor_6]
-    
+
     new_monitors.make_monitor.assert_has_calls(expected_calls,
-                                                  any_order=False)
+                                               any_order=False)
 
 
 def test_build_monitors_2_success(get_def_2_parser):
@@ -677,7 +692,6 @@ def test_build_monitors_order_quit_12(new_names, new_monitors, get_semantic_erro
     new_parser.build_connections(network_dict["CONNECT"])
     new_parser.build_monitors(network_dict["MONITOR"])
 
-
     monitor_1 = call(new_names.query("switch1"), None)
     monitor_2 = call(new_names.query("clock1"), None)
     monitor_3 = call(new_names.query("switch2"), None)
@@ -686,6 +700,6 @@ def test_build_monitors_order_quit_12(new_names, new_monitors, get_semantic_erro
 
     expected_calls = [monitor_1, monitor_2, monitor_3,
                       monitor_4, monitor_5]
-    
+
     new_monitors.make_monitor.assert_has_calls(expected_calls,
                                                any_order=False)

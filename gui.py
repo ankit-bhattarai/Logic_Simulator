@@ -440,9 +440,11 @@ class SwitchPanel(wx.Panel):
         self.button_switch.Show()
         # Set the text of the buttons based on the current state - ACTIONS
         if switch_state == 0:
-            self.button_switch.SetLabel("CLOSE")
+            self.button_switch.SetLabel(
+                self.grand_parent.GetTranslation("CLOSE"))
         else:  # switch_state == 1
-            self.button_switch.SetLabel("OPEN")
+            self.button_switch.SetLabel(
+                self.grand_parent.GetTranslation("OPEN"))
 
         self.main_sizer.Layout()
         self.parent.GetSizer().Layout()
@@ -488,7 +490,8 @@ class SwitchPanel(wx.Panel):
                 switch_text, desired_switch_state)  # Render the change
             self.renderSwitchBoxes()
 
-            switch_state_string = "CLOSED" if desired_switch_state == 1 else "OPENED"
+            switch_state_string = self.grand_parent.GetTranslation(
+                "CLOSED") if desired_switch_state == 1 else self.grand_parent.GetTranslation("OPENED")
             self.switch_state_display.SetLabel(
                 f'{self.switch_text}: {switch_state_string}')
 
@@ -589,9 +592,12 @@ class MonitorPanel(wx.Panel):
         self.button_monitor.Show()
         # Set the text of the buttons based on the current state - ACTIONS
         if monitor_state == 0:
-            self.button_monitor.SetLabel("ADD MONITOR")
+            self.button_monitor.SetLabel(
+                self.grand_parent.GetTranslation("ADD") + " " +
+                self.grand_parent.GetTranslation("MONITOR"))
         else:  # monitor_state == 1
-            self.button_monitor.SetLabel("HIDE MONITOR")
+            self.button_monitor.SetLabel(
+                self.grand_parent.GetTranslation("HIDE") + " " + self.grand_parent.GetTranslation("MONITOR"))
 
         self.main_sizer.Layout()
         self.parent.GetSizer().Layout()
@@ -610,7 +616,8 @@ class MonitorPanel(wx.Panel):
             self.renderMonitorButtons()
 
             monitor_state = self.guiint.get_output_state(self.monitor_text)
-            monitor_state_string = "MONITORED" if monitor_state == 1 else "HIDDEN"
+            monitor_state_string = self.grand_parent.GetTranslation(
+                "MONITORED") if monitor_state == 1 else self.grand_parent.GetTranslation("HIDDEN")
             self.monitor_state_display.SetLabel(
                 f'{self.monitor_text}: {monitor_state_string}')
 
@@ -638,7 +645,8 @@ class MonitorPanel(wx.Panel):
             self.guiint.set_output_state(monitor_text, desired_monitor_state)
             self.renderMonitorButtons()
 
-            monitor_state_string = "MONITORED" if desired_monitor_state == 1 else "HIDDEN"
+            monitor_state_string = self.grand_parent.GetTranslation(
+                "MONITORED") if desired_monitor_state == 1 else self.grand_parent.GetTranslation("HIDDEN")
             self.monitor_state_display.SetLabel(
                 f'{self.monitor_text}: {monitor_state_string}')
 
@@ -719,7 +727,9 @@ class RunPanel(wx.Panel):
         text = "Run button pressed."
         success = self.guiint.run_network(self.spin.GetValue())
         if isinstance(success, str):
-            wx.MessageBox(success, "Message", wx.OK | wx.ICON_ERROR)
+            translated_message = self.grand_parent.GetTranslation(success)
+            title = self.grand_parent.GetTranslation("Message")
+            wx.MessageBox(translated_message, title, wx.OK | wx.ICON_ERROR)
         self.grand_parent.canvas.render(text)
         self.button_continue.Show()
         self.grand_parent.canvas.render_signals()
@@ -728,9 +738,11 @@ class RunPanel(wx.Panel):
     def OnButtonContinue(self, event):
         """Handle the event when the user clicks the continue button."""
         text = "Continue button pressed."
-        successs = self.guiint.continue_network(self.spin.GetValue())
-        if isinstance(successs, str):
-            wx.MessageBox(successs, "Message", wx.OK | wx.ICON_ERROR)
+        success = self.guiint.continue_network(self.spin.GetValue())
+        if isinstance(success, str):
+            translated_message = self.grand_parent.GetTranslation(success)
+            title = self.grand_parent.GetTranslation("Message")
+            wx.MessageBox(translated_message, title, wx.OK | wx.ICON_ERROR)
         self.grand_parent.canvas.render(text)
         self.grand_parent.canvas.render_signals()
         self.Layout()
@@ -739,12 +751,6 @@ class RunPanel(wx.Panel):
         """Handle the event when the user changes the spin value."""
         spin_value = self.spin.GetValue()
         self.grand_parent.canvas.render(f"Spin value: {spin_value}")
-        # Can modify the text of the buttons to this
-        if change_button_cycles:
-            self.button_run.SetLabel(f"Run for: {spin_value}")
-            self.button_continue.SetLabel(f"Continue for: {spin_value}")
-            self.main_sizer.Layout()
-            self.grand_parent.GetSizer().Layout()
 
 
 class RightPanel(wx.Panel):
@@ -784,7 +790,7 @@ class RightPanel(wx.Panel):
 
         # Set the sizer for the panel
         self.SetSizer(main_sizer)
-    
+
     def change_colour_child(self, child):
         for child in child.GetChildren():
             if isinstance(child, wx.StaticText):
@@ -796,12 +802,12 @@ class RightPanel(wx.Panel):
         self.Refresh()
         self.Layout()
         self.parent.GetSizer().Layout()
-
     
     def change_colour(self):
         for child in self.GetChildren():
             self.change_colour_child(child)
-        self.SetBackgroundColour(self.parent.colour_palette[self.parent.colour_mode]["Panel Colour"])
+        self.SetBackgroundColour(
+            self.parent.colour_palette[self.parent.colour_mode]["Panel Colour"])
         self.Refresh()
 
 class Gui(wx.Frame):
@@ -834,7 +840,7 @@ class Gui(wx.Frame):
         # File path for circuit file which can be chosen from the GUI
         self.file_path = None
         self.guiint = None
-        self.locale_language = locale_text
+        self.load_dictionary(locale_text)
         if locale is not None:
             allowed_locale = [wx.LANGUAGE_CHINESE_SIMPLIFIED,
                               wx.LANGUAGE_ENGLISH, wx.LANGUAGE_FRENCH]
@@ -858,14 +864,16 @@ class Gui(wx.Frame):
             helpMenu = wx.Menu()
             menuBar = wx.MenuBar()
             self.open_id, self.help_id_1, self.help_id_2 = wx.NewIdRef(count=3)
-            self.reset_id, self.def_file_show_id, self.change_colour_id = wx.NewIdRef(count=3)
+            self.reset_id, self.def_file_show_id, self.change_colour_id = wx.NewIdRef(
+                count=3)
             fileMenu.Append(self.open_id,  self.GetTranslation("&Open"))
             fileMenu.Append(wx.ID_ABOUT, self.GetTranslation("&About"))
             fileMenu.Append(wx.ID_EXIT,  self.GetTranslation("&Exit"))
             viewMenu.Append(self.reset_id, self.GetTranslation("&Reset"))
             viewMenu.Append(self.def_file_show_id,
                             self.GetTranslation("&Show Definition File"))
-            viewMenu.Append(self.change_colour_id, self.GetTranslation("&Change Colour"))
+            viewMenu.Append(self.change_colour_id,
+                            self.GetTranslation("&Change Colour"))
             helpMenu.Append(self.help_id_1,
                             self.GetTranslation("&EBNF Syntax"))
             helpMenu.Append(self.help_id_2,
@@ -891,29 +899,42 @@ class Gui(wx.Frame):
 
             self.SetSizeHints(600, 600)
             self.SetSizer(main_sizer)
-        
-        self.colour_palette = {"Light Mode": {"Text Colour": "black", "Panel Colour": "light grey"}, 
-                        "Dark Mode": {"Text Colour": "light grey", "Panel Colour": "dark grey"}}
+
+        self.colour_palette = {"Light Mode": {"Text Colour": "black", "Panel Colour": "light grey"},
+                               "Dark Mode": {"Text Colour": "light grey", "Panel Colour": "dark grey"}}
 
         self.colour_mode = "Light Mode"
         self.change_colour()
 
+    def load_dictionary(self, locale_language):
+        if locale_language is not None:  # English or some other language not supported
+            file = open(f"translations/{locale_language}.json", "r")
+            self.translation_dict = json.load(file)
+            file.close()
+        else:
+            self.translation_dict = {}
+
     def GetTranslation(self, string):
-        locale = self.locale_language
         translated = string
-        if locale is not None:  # English or some other language not supported
-            dict_ = json.load(open(f"translations/{locale}.json", "r"))
-            if string[0] == "&":
-                translated = "&" + dict_.get(string[1:], string[1:])
-            else:  # No &
-                translated = dict_.get(string, string)
+        if string[0] == "&":
+            translated = "&" + \
+                self.translation_dict.get(string[1:], string[1:])
+        else:  # No &
+            translated = self.translation_dict.get(string, string)
+
         return translated  # Return the string as it is if translation not found or translation
-    
+
     def change_colour(self):
         for child in self.GetChildren():
             if isinstance(child, wx.Panel):
                 child.change_colour()
-        
+        menu = self.GetMenuBar()
+        menu.SetBackgroundColour(
+            self.colour_palette[self.colour_mode]["Panel Colour"])
+        menu.SetForegroundColour(
+            self.colour_palette[self.colour_mode]["Text Colour"])
+        # self.canvas.SetColour('white')
+
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
         Id = event.GetId()
@@ -930,7 +951,7 @@ class Gui(wx.Frame):
             with open("EBNF.txt", "r") as f:
                 # wx.MessageBox(f.read(), "EBNF Syntax")
                 box = MyDialog(self, message=f.read(),
-                               title="EBNF Syntax", allow_wrap=False)
+                               title=self.GetTranslation("EBNF Syntax"), allow_wrap=False)
                 box.ShowModal()
                 box.Destroy()
 
@@ -947,18 +968,21 @@ class Gui(wx.Frame):
                                editable=False)
                 box.ShowModal()
                 box.Destroy()
-            
+
         elif Id == self.change_colour_id:
             if self.colour_mode == "Light Mode":
                 self.colour_mode = "Dark Mode"
                 self.change_colour()
-            else: # Self.colour_mode == "Dark Mode"
+            else:  # Self.colour_mode == "Dark Mode"
                 self.colour_mode = "Light Mode"
                 self.change_colour()
 
     def start_graphically(self):
         """Load the circuit definition file directly from the GUI."""
-        openFileDialog = wx.FileDialog(self, "Open definition file", "",
+        title = self.GetTranslation("Open")
+        title += " "
+        title += self.GetTranslation("Definition File")
+        openFileDialog = wx.FileDialog(self, title, "",
                                        "",
                                        wildcard="TXT files (*.txt)|*.txt",
                                        style=wx.FD_OPEN +
@@ -976,13 +1000,13 @@ class Gui(wx.Frame):
             self.guiint = guiint
             if message == "":
                 display_message = "Circuit loaded successfully.\n"
-                title = "Circuit Loaded"
+                title = self.GetTranslation("Circuit Loaded")
             else:  # There is a message to  be printed, but overall the
                 # circuit is valid. It is only a warning
                 display_message = "Circuit loaded with warnings.\n"
                 display_message += "Warnings: \n\n"
                 display_message += message
-                title = "Warnings Present"
+                title = self.GetTranslation("Warnings Present")
             box = MyDialog(self, message=display_message,
                            title=title)
             box.ShowModal()
@@ -992,8 +1016,9 @@ class Gui(wx.Frame):
             error_display = "Invalid circuit definition file.\n"
             error_display += "Errors: \n\n"
             error_display += message
+            title = self.GetTranslation("Errors Present")
             box = MyDialog(self, message=error_display,
-                           title="Errors Present")
+                           title=title)
             box.ShowModal()
             box.Destroy()
             return False
@@ -1022,7 +1047,10 @@ class Gui(wx.Frame):
         checked for errors. If errrors exist, they will be displayed in a
         dialog box and the current circuit will not be overwritten. If no
         errors exist, the circuit will be loaded and canvas updated."""
-        openFileDialog = wx.FileDialog(self, "Open definition file", "", "",
+        title = self.GetTranslation("Open")
+        title += " "
+        title += self.GetTranslation("Definition File")
+        openFileDialog = wx.FileDialog(self, title, "", "",
                                        wildcard="TXT files (*.txt)|*.txt",
                                        style=wx.FD_OPEN +
                                        wx.FD_FILE_MUST_EXIST)
