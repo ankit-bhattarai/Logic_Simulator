@@ -97,7 +97,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         size = self.GetClientSize()
         self.SetCurrent(self.context)
         GL.glDrawBuffer(GL.GL_BACK)
-        GL.glClearColor(1.0, 1.0, 1.0, 0.0)
+        GL.glClearColor(0.2, 0.2, 0.2, 1)
         GL.glViewport(0, 0, size.width, size.height)
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
@@ -227,6 +227,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
     def render(self, text):
         """Handle all drawing operations."""
         self.SetCurrent(self.context)
+        print(self.parent.colour_palette)
+
         if not self.init:
             # Configure the viewport, modelview and projection matrices
             self.init_gl()
@@ -789,8 +791,12 @@ class RightPanel(wx.Panel):
                 child.SetForegroundColour(
                     self.parent.colour_palette[self.parent.colour_mode]["Text Colour"])
             if isinstance(child, wx.Button):
-                child.SetForegroundColour(
+                child.SetBackgroundColour(
                     self.parent.colour_palette[self.parent.colour_mode]["Panel Colour"])
+        self.Refresh()
+        self.Layout()
+        self.parent.GetSizer().Layout()
+
     
     def change_colour(self):
         for child in self.GetChildren():
@@ -907,10 +913,6 @@ class Gui(wx.Frame):
         for child in self.GetChildren():
             if isinstance(child, wx.Panel):
                 child.change_colour()
-        menu = self.GetMenuBar()
-        menu.SetBackgroundColour(self.colour_palette[self.colour_mode]["Panel Colour"])
-        menu.SetForegroundColour(self.colour_palette[self.colour_mode]["Text Colour"])
-        # self.canvas.SetColour('white')
         
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
