@@ -64,55 +64,55 @@ def new_semantic_error_handler(new_names, new_devices, new_network,
 @pytest.fixture
 def switch1():
     """Return a switch symbol."""
-    return Symbol('switch1', 16, 1, 17)
+    return Symbol('switch1', 18, 1, 17)
 
 
 @pytest.fixture
 def arrow():
     """Return an arrow symbol."""
-    return Symbol('>', 28, 4, 18)
+    return Symbol('>', 30, 4, 18)
 
 
 @pytest.fixture
 def dtype1():
     """Return a dtype symbol."""
-    return Symbol('dtype1', 23, 1, 68)
+    return Symbol('dtype1', 25, 1, 68)
 
 
 @pytest.fixture
 def dot():
     """Return a dot symbol."""
-    return Symbol('.', 29, 4, 26)
+    return Symbol('.', 31, 4, 26)
 
 
 @pytest.fixture
 def data_pin():
     """Return a data pin symbol."""
-    return Symbol('DATA', 11, 4, 27)
+    return Symbol('DATA', 13, 4, 27)
 
 
 @pytest.fixture
 def qbar_pin():
     """Return a qbar pin symbol."""
-    return Symbol('QBAR', 13, 6, 8)
+    return Symbol('QBAR', 15, 6, 8)
 
 
 @pytest.fixture
 def xor1():
     """Return an xor symbol."""
-    return Symbol('xor1', 25, 5, 35)
+    return Symbol('xor1', 27, 5, 35)
 
 
 @pytest.fixture
 def nor1():
     """Return a nor symbol."""
-    return Symbol('nor1', 24, 2, 14)
+    return Symbol('nor1', 26, 2, 14)
 
 
 @pytest.fixture
 def I1_pin():
     """Return an I1 pin symbol."""
-    return Symbol('I1', 30, 4, 70)
+    return Symbol('I1', 32, 4, 70)
 
 
 @pytest.fixture
@@ -124,7 +124,7 @@ def I3_pin(new_names):
 
 @pytest.fixture
 def clear_pin():
-    return Symbol('CLEAR', 10, 5, 18)
+    return Symbol('CLEAR', 12, 5, 18)
 
 
 @pytest.fixture
@@ -420,7 +420,7 @@ def test_display_input_not_connected_error(new_names, new_devices,
     parser = Parser(new_names, new_devices, new_network, new_monitors, scanner)
     parser.parse_network()
     scanner.print_error = MagicMock()
-    symbol = Symbol("I1", 30, 5, 20)
+    symbol = Symbol("I1", 32, 5, 20)
     parser.semantic_error_handler.display_input_not_connected_error(symbol)
     scanner.print_error.assert_called_once_with(symbol, 2,
                                                 "The following input pins are not connected to a device: ['dtype1.CLK']")
@@ -433,7 +433,7 @@ def test_display_input_not_connected_error_multiple(new_names, new_devices,
     parser = Parser(new_names, new_devices, new_network, new_monitors, scanner)
     parser.parse_network()
     scanner.print_error = MagicMock()
-    symbol = Symbol("I1", 30, 5, 20)
+    symbol = Symbol("I1", 32, 5, 20)
     parser.semantic_error_handler.display_input_not_connected_error(symbol)
     scanner.print_error.assert_called_once_with(symbol, 2,
                                                 "The following input pins are not connected to a device: ['dtype1.CLK', 'xor1.I2']")
