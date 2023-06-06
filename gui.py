@@ -351,9 +351,9 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.reset_zoom()
     
     def change_colour(self):
-        """Change the colour scheme of the canvas.
-        Must change the background colour, signals and axes
-        """
+        """Change the colour scheme of the canvas - called when colour mode is changed
+        by the parent. The colour attributes are set to the appropriate values and the
+        canvas is refreshed."""
         colour_mode = self.parent.colour_mode
         self.canvas_colour = self.parent.colour_palette[colour_mode]["Canvas Colour"]
         self.axes_colour = self.parent.colour_palette[colour_mode]["Axes Colour"]
@@ -807,6 +807,8 @@ class RightPanel(wx.Panel):
         self.SetSizer(main_sizer)
 
     def change_colour_child(self, child):
+        """Change the colour of the children of 'child' depending on the type of the 
+        children - StaticText or Button"""
         for child in child.GetChildren():
             if isinstance(child, wx.StaticText):
                 child.SetForegroundColour(
@@ -819,6 +821,7 @@ class RightPanel(wx.Panel):
         self.parent.GetSizer().Layout()
     
     def change_colour(self):
+        """Change the colour scheme of the panel - method called by the parent"""
         for child in self.GetChildren():
             self.change_colour_child(child)
         self.SetBackgroundColour(
@@ -914,7 +917,8 @@ class Gui(wx.Frame):
 
             self.SetSizeHints(600, 600)
             self.SetSizer(main_sizer)
-
+        
+        # String are wxpython colour names, tuples are RGB{A} for opengl rendering
         self.colour_palette = {"Light Mode": {"Panel Text Colour": "black", "Panel Colour": "light grey",
                                               "Canvas Colour": (1, 1, 1, 0), "Signal Colour": (0, 0, 1), 
                                               "Axes Colour": (0, 0, 0, 1), "Canvas Text Colour": (0, 0, 0)},
@@ -944,6 +948,8 @@ class Gui(wx.Frame):
         return translated  # Return the string as it is if translation not found or translation
 
     def change_colour(self):
+        """Change the colour of the GUI by calling the change_colour method of
+        the child panels."""
         for child in self.GetChildren():
             # Change the colour of right panel
             if isinstance(child, wx.Panel):
@@ -987,7 +993,7 @@ class Gui(wx.Frame):
                 box.Destroy()
 
         elif Id == self.change_colour_id:
-            # Flip the current mode and call the change_colour method
+            # Flip the current colour mode and call the change_colour method
             if self.colour_mode == "Light Mode":
                 self.colour_mode = "Dark Mode"
                 self.change_colour()
