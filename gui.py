@@ -92,12 +92,17 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_MIDDLE_DOWN, self.reset_pan)
         self.Bind(wx.EVT_RIGHT_DOWN, self.reset_view)
 
+        self.canvas_colour = (1, 1, 1, 0) # Default colour is white
+        self.axes_colour = (0, 0, 0) # Default colour is black
+        self.signal_colour = (0, 0, 1) # Default colour is blue
+        self.text_colour = (0, 0, 0)
+
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
         size = self.GetClientSize()
         self.SetCurrent(self.context)
         GL.glDrawBuffer(GL.GL_BACK)
-        GL.glClearColor(0.2, 0.2, 0.2, 1)
+        GL.glClearColor(*self.canvas_colour)
         GL.glViewport(0, 0, size.width, size.height)
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
@@ -127,7 +132,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         """
         axes_offset_x = 5
         axes_offset_y = 5
-        GL.glColor3f(0.0, 0.0, 0.0)  # Black
+        GL.glColor3f(*self.axes_colour)
         GL.glBegin(GL.GL_LINES)
         axes_offset_y = 8
         axes_offset_x = 8
@@ -175,7 +180,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                          y_start + height + name_offset_up)
 
     def render_signal(self, x_start, y_start, values, name,
-                      colour=(0.0, 0.0, 1.0),
                       width=20, height=25):
         """Method to render a single signal based on the values provided.
 
@@ -196,7 +200,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         height: int, optional, default=25
             height of the signal.
         """
-        GL.glColor3f(*colour)
+        GL.glColor3f(*self.signal_colour)
         GL.glBegin(GL.GL_LINE_STRIP)
         x = x_start
         y = y_start
@@ -220,6 +224,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         height_above_signal = 100
         base_x = 40
         base_y = 80
+
         for i, (name, values) in enumerate(self.guiint.get_signals().items()):
             self.render_signal(base_x, base_y + i * height_above_signal,
                                values, name)
@@ -227,8 +232,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
     def render(self, text):
         """Handle all drawing operations."""
         self.SetCurrent(self.context)
-        print(self.parent.colour_palette)
-
         if not self.init:
             # Configure the viewport, modelview and projection matrices
             self.init_gl()
@@ -320,7 +323,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
     def render_text(self, text, x_pos, y_pos):
         """Handle text drawing operations."""
-        GL.glColor3f(0.0, 0.0, 0.0)  # text is black
+        GL.glColor3f(*self.text_colour)  # text is black
         GL.glRasterPos2f(x_pos, y_pos)
         font = GLUT.GLUT_BITMAP_HELVETICA_12
 
@@ -346,6 +349,18 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         """Reset the view to the initial view and zoom."""
         self.reset_pan()
         self.reset_zoom()
+    
+    def change_colour(self):
+        """Change the colour scheme of the canvas.
+        Must change the background colour, signals and axes
+        """
+        colour_mode = self.parent.colour_mode
+        self.canvas_colour = self.parent.colour_palette[colour_mode]["Canvas Colour"]
+        self.axes_colour = self.parent.colour_palette[colour_mode]["Axes Colour"]
+        self.signal_colour = self.parent.colour_palette[colour_mode]["Signal Colour"]
+        self.text_colour = self.parent.colour_palette[colour_mode]["Canvas Text Colour"]
+        self.init = False
+        self.Refresh()
 
 
 class SwitchPanel(wx.Panel):
@@ -795,7 +810,7 @@ class RightPanel(wx.Panel):
         for child in child.GetChildren():
             if isinstance(child, wx.StaticText):
                 child.SetForegroundColour(
-                    self.parent.colour_palette[self.parent.colour_mode]["Text Colour"])
+                    self.parent.colour_palette[self.parent.colour_mode]["Panel Text Colour"])
             if isinstance(child, wx.Button):
                 child.SetBackgroundColour(
                     self.parent.colour_palette[self.parent.colour_mode]["Panel Colour"])
@@ -900,8 +915,12 @@ class Gui(wx.Frame):
             self.SetSizeHints(600, 600)
             self.SetSizer(main_sizer)
 
-        self.colour_palette = {"Light Mode": {"Text Colour": "black", "Panel Colour": "light grey"},
-                               "Dark Mode": {"Text Colour": "light grey", "Panel Colour": "dark grey"}}
+        self.colour_palette = {"Light Mode": {"Panel Text Colour": "black", "Panel Colour": "light grey",
+                                              "Canvas Colour": (1, 1, 1, 0), "Signal Colour": (0, 0, 1), 
+                                              "Axes Colour": (0, 0, 0, 1), "Canvas Text Colour": (0, 0, 0)},
+                               "Dark Mode": {"Panel Text Colour": "light grey", "Panel Colour": "dark grey",
+                                             "Canvas Colour": (0.1725, 0.1725, 0.1725, 1), "Signal Colour": (1, 1, 1),
+                                             "Axes Colour": (1, 1, 1), "Canvas Text Colour": (1, 1, 1)}}
 
         self.colour_mode = "Light Mode"
         self.change_colour()
@@ -926,14 +945,12 @@ class Gui(wx.Frame):
 
     def change_colour(self):
         for child in self.GetChildren():
+            # Change the colour of right panel
             if isinstance(child, wx.Panel):
                 child.change_colour()
-        menu = self.GetMenuBar()
-        menu.SetBackgroundColour(
-            self.colour_palette[self.colour_mode]["Panel Colour"])
-        menu.SetForegroundColour(
-            self.colour_palette[self.colour_mode]["Text Colour"])
-        # self.canvas.SetColour('white')
+            # Change the colour of the menu bar
+            if isinstance(child, wxcanvas.GLCanvas):
+                child.change_colour()
 
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
@@ -970,6 +987,7 @@ class Gui(wx.Frame):
                 box.Destroy()
 
         elif Id == self.change_colour_id:
+            # Flip the current mode and call the change_colour method
             if self.colour_mode == "Light Mode":
                 self.colour_mode = "Dark Mode"
                 self.change_colour()
