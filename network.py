@@ -55,13 +55,18 @@ class Network:
                                     signal value.
     
     execute_rc(self, device_id): Simulates an RC device and updates its output
-                                    signal value.  (MAINTENANCE)            
-
+                                    signal value.  (MAINTENANCE)           
+    
+    execute_siggen(self, device_id): Simulates a SIGGEN device and updates its output
+                                    signal value.  (MAINTENANCE)
+                    
     update_clocks(self): If it is time to do so, sets clock signals to RISING
                          or FALLING.
     
     update_rc(self): If it is time to do so, sets RC signals to FALLING.
-                        (MAINTENANCE)   
+                        (MAINTENANCE)
+    
+    update_siggen(self): If it is time to do so, sets SIGGEN signals to 0 or 1.
 
     execute_network(self): Executes all the devices in the network for one
                            simulation cycle.
@@ -373,11 +378,13 @@ class Network:
     def execute_siggen(self, device_id):  # MAINTENANCE
         """Simulate a SIGGEN device and update its output signal value.
 
-        Return True if successful. --- mirrors to clocks
+        Return True if successful. --- mirrors execute_clock method
         """
         device = self.devices.get_device(device_id)
         output_signal = device.outputs[None]
 
+        # Mirrors execute clock - similar in the edge triggering sense 
+        # but arbitrary waveform generated as defined by user
         if output_signal == self.devices.RISING:
             new_signal = self.update_signal(output_signal, self.devices.HIGH)
             if new_signal is None:
@@ -411,15 +418,16 @@ class Network:
         for device_id in siggen_devices:
             device = self.devices.get_device(device_id)
             current_output = device.outputs[None]
-
+            
+            # Reset counter if it has reached the end of the waveform
             if device.siggen_counter == len(device.siggen_waveform):
                 device.siggen_counter = 0
             
             desired_output = device.siggen_waveform[device.siggen_counter]
-            # Change downwards
+            # If current output is not the desired output and change is downwards
             if (current_output != desired_output) and desired_output == self.devices.LOW:
                 device.outputs[None] = self.devices.FALLING
-            # Change upwards
+            # If current output is not the desired output and change is upwards
             if (current_output != desired_output) and desired_output == self.devices.HIGH:
                 device.outputs[None] = self.devices.RISING
             device.siggen_counter += 1      

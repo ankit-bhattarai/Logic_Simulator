@@ -43,7 +43,7 @@ class Device:
         self.dtype_memory = None
         self.rc_period = None  # MAINTENANCE
         self.rc_counter = None  # MAINTENANCE
-        self.siggen_waveform = None # MAINTENANCE - stores the waveform in a list of bools
+        self.siggen_waveform = None # MAINTENANCE - stores the waveform as a list of ints
         self.siggen_counter = None # MAINTENANCE - stores the current position in the waveform 
 
 
@@ -99,8 +99,8 @@ class Devices:
                                             period. (MAINTENANCE)         
 
     make_siggen(self, device_id, waveform): Makes a siggen device with the specified
-                                                waveform (passed as string)
-                                                (MAINTENANCE)                        
+                                            waveform (passed as string)
+                                            (MAINTENANCE)                        
 
     cold_startup(self): Simulates cold start-up of D-types and clocks.
 
@@ -334,7 +334,7 @@ class Devices:
         """
         # Maintenance: Process device_property if it is not None
         if device_property is not None:
-            if device_kind != self.SIGGEN:
+            if device_kind != self.SIGGEN: # Only siggen has string property
                 device_property = int(device_property)
             
         # Device has already been added to the devices_list
