@@ -92,10 +92,10 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_MIDDLE_DOWN, self.reset_pan)
         self.Bind(wx.EVT_RIGHT_DOWN, self.reset_view)
 
-        self.canvas_colour = (1, 1, 1, 0) # Default colour is white
-        self.axes_colour = (0, 0, 0) # Default colour is black
-        self.signal_colour = (0, 0, 1) # Default colour is blue
-        self.text_colour = (0, 0, 0) # Default colour is black
+        self.canvas_colour = (1, 1, 1, 0)  # Default colour is white
+        self.axes_colour = (0, 0, 0)  # Default colour is black
+        self.signal_colour = (0, 0, 1)  # Default colour is blue
+        self.text_colour = (0, 0, 0)  # Default colour is black
 
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
@@ -130,10 +130,9 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         height: int
             height of the signal.
         """
+        # Initialising variables for drawing axes
         axes_offset_x = 5
         axes_offset_y = 5
-        GL.glColor3f(*self.axes_colour)
-        GL.glBegin(GL.GL_LINES)
         axes_offset_y = 8
         axes_offset_x = 8
         ticker_offset = 3
@@ -142,14 +141,21 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         value_offset_down_y = 5
         value_offset_left_y = 15
         x_end = x_start + width * values
+
+        # Drawing the x axis
+        GL.glColor3f(*self.axes_colour)
+        GL.glBegin(GL.GL_LINES)
         GL.glVertex2f(x_start - axes_offset_x, y_start - axes_offset_y)
         GL.glVertex2f(x_end + axes_offset_x, y_start - axes_offset_y)
         GL.glEnd()
+
+        # Drawing the y axis
         GL.glBegin(GL.GL_LINES)
         GL.glVertex2f(x_start - axes_offset_x, y_start - axes_offset_y)
         GL.glVertex2f(x_start - axes_offset_x,
                       y_start + height + axes_offset_y)
         GL.glEnd()
+
         # Drawing ticks on x axis
         for i in range(1, values + 1):
             GL.glBegin(GL.GL_LINES)
@@ -205,7 +211,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         x = x_start
         y = y_start
         for i, value in enumerate(values):
-            if value is None:
+            if value is None:  # Ignore and move to next value if None
                 x += width
             else:
                 if value == 0:
@@ -221,6 +227,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
     def render_signals(self):
         """Method to render all signals."""
+        # Initialising variables for drawing signals
         height_above_signal = 100
         base_x = 40
         base_y = 80
@@ -349,7 +356,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         """Reset the view to the initial view and zoom."""
         self.reset_pan()
         self.reset_zoom()
-    
+
     def change_colour(self):
         """Change the colour scheme of the canvas - called when colour mode is changed
         by the parent. The colour attributes are set to the appropriate values and the
@@ -443,7 +450,6 @@ class SwitchPanel(wx.Panel):
         self.button_switch.Hide()
         self.switch_state_display.Hide()
 
-
         self.SetSizer(self.main_sizer)
 
     def renderSwitchBoxes(self):
@@ -466,7 +472,7 @@ class SwitchPanel(wx.Panel):
 
         self.main_sizer.Layout()
         self.parent.GetSizer().Layout()
-        #self.grand_parent.GetSizer().Layout()
+        # self.grand_parent.GetSizer().Layout()
 
     def OnComboSwitch(self, event):
         """Method called when the combo box is changed.
@@ -480,10 +486,12 @@ class SwitchPanel(wx.Panel):
 
             self.switch_state_display.Show()
             if switch_state == 1:
-                switch_state_string = self.grand_parent.GetTranslation("CLOSED")
+                switch_state_string = self.grand_parent.GetTranslation(
+                    "CLOSED")
             else:
-                switch_state_string = self.grand_parent.GetTranslation("OPENED")
-            
+                switch_state_string = self.grand_parent.GetTranslation(
+                    "OPENED")
+
             self.switch_state_display.SetLabel(
                 f'{self.switch_text} : {switch_state_string}')
 
@@ -495,7 +503,7 @@ class SwitchPanel(wx.Panel):
 
         self.main_sizer.Layout()
         self.parent.GetSizer().Layout()
-        #self.grand_parent.GetSizer().Layout()
+        # self.grand_parent.GetSizer().Layout()
 
     def OnButtonSwitch(self, event):
         """Method called when button is pressed.
@@ -522,7 +530,7 @@ class SwitchPanel(wx.Panel):
 
             self.main_sizer.Layout()
             self.parent.GetSizer().Layout()
-            #self.grand_parent.GetSizer().Layout()
+            # self.grand_parent.GetSizer().Layout()
 
 
 class MonitorPanel(wx.Panel):
@@ -623,7 +631,7 @@ class MonitorPanel(wx.Panel):
 
         self.main_sizer.Layout()
         self.parent.GetSizer().Layout()
-        #self.grand_parent.GetSizer().Layout()
+        # self.grand_parent.GetSizer().Layout()
 
     def OnComboMonitor(self, event):
         """Method called when the combo box is changed.
@@ -646,8 +654,8 @@ class MonitorPanel(wx.Panel):
             self.grand_parent.canvas.render(
                 f"Combo box changed. New_value: {combo_value}")
             self.main_sizer.Layout()
-            #self.parent.GetSizer().Layout()
-            #self.grand_parent.GetSizer().Layout()
+            # self.parent.GetSizer().Layout()
+            # self.grand_parent.GetSizer().Layout()
 
         else:
             self.grand_parent.canvas.render("Invalid Selection Made")
@@ -676,7 +684,7 @@ class MonitorPanel(wx.Panel):
             self.grand_parent.canvas.render(text)
             self.main_sizer.Layout()
             self.parent.GetSizer().Layout()
-            #self.grand_parent.GetSizer().Layout()
+            # self.grand_parent.GetSizer().Layout()
 
 
 class RunPanel(wx.Panel):
@@ -829,7 +837,7 @@ class RightPanel(wx.Panel):
         self.Refresh()
         self.Layout()
         self.parent.GetSizer().Layout()
-    
+
     def change_colour(self):
         """Change the colour scheme of the panel - method called by the parent"""
         for child in self.GetChildren():
@@ -837,6 +845,7 @@ class RightPanel(wx.Panel):
         panel_colour = self.parent.colour_palette[self.parent.colour_mode]["Panel Colour"]
         self.SetBackgroundColour(panel_colour)
         self.Refresh()
+
 
 class Gui(wx.Frame):
     """Configure the main window and all the widgets.
@@ -928,10 +937,10 @@ class Gui(wx.Frame):
 
             self.SetSizeHints(600, 600)
             self.SetSizer(main_sizer)
-        
+
         # String are wxpython colour names, tuples are RGB{A} for opengl rendering
         self.colour_palette = {"Light Mode": {"Panel Text Colour": "black", "Panel Colour": "light grey",
-                                              "Canvas Colour": (1, 1, 1, 0), "Signal Colour": (0, 0, 1), 
+                                              "Canvas Colour": (1, 1, 1, 0), "Signal Colour": (0, 0, 1),
                                               "Axes Colour": (0, 0, 0), "Canvas Text Colour": (0, 0, 0)},
                                "Dark Mode": {"Panel Text Colour": "white", "Panel Colour": "black",
                                              "Canvas Colour": (0.1725, 0.1725, 0.1725, 1), "Signal Colour": (1, 1, 1),
@@ -998,7 +1007,8 @@ class Gui(wx.Frame):
         elif Id == self.def_file_show_id:
             file_path = self.guiint.scanner.path
             with open(file_path, "r") as f:
-                title = self.GetTranslation("Definition File") + " - " + file_path
+                title = self.GetTranslation(
+                    "Definition File") + " - " + file_path
                 box = MyDialog(self, message=f.read(),
                                title=title,
                                editable=False)
