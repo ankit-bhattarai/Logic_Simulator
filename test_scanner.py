@@ -9,7 +9,7 @@ from names import Names
 def new_scanner():
     """Return a new instance of the Scanner class."""
     new_names = Names()
-    new_scanner = Scanner("file_for_test_scanner.txt", new_names)
+    new_scanner = Scanner("test_misc_files/file_for_test_scanner.txt", new_names)
     return new_scanner
 
 

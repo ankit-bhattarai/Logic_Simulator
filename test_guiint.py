@@ -52,7 +52,7 @@ def new_monitors(new_names, new_devices, new_network):
 @pytest.fixture
 def new_scanner(new_names):
     """Return a new scanner instance for the first test file."""
-    return Scanner("file_for_test_guiint.txt", new_names)
+    return Scanner("test_misc_files/file_for_test_guiint.txt", new_names)
 
 
 @pytest.fixture
