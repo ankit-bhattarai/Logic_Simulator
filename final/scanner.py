@@ -599,8 +599,6 @@ class Scanner:
                 if character == "\n":  # Reached end of line
                     return self.get_next_char()  # Move to next line
                 if character == "":  # Reached end of file
-                    self.print_error(
-                        None, 0, "Multi-line comment not terminated")
                     return character
                 continue
         else:  # Multi-line comment
@@ -790,7 +788,10 @@ class Scanner:
         try:
             # Add logic for when the symbol is None
             if symbol is None:
-                print(message)
+                if not self.print_to_gui:
+                    print(message)
+                else:
+                    self.error_messages += message + "\n"
                 return
             line_number = symbol.line_number
             line_string = self.get_line(line_number)
