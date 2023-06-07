@@ -444,8 +444,9 @@ class Network:
         nand_devices = self.devices.find_devices(self.devices.NAND)
         nor_devices = self.devices.find_devices(self.devices.NOR)
         xor_devices = self.devices.find_devices(self.devices.XOR)
-        rc_devices = self.devices.find_devices(self.devices.RC)  # MAINTENANCE
-        siggen_devices = self.devices.find_devices(self.devices.SIGGEN)  # MAINTENANCE
+        # MAINTENANCE
+        rc_devices = self.devices.find_devices(self.devices.RC)  
+        siggen_devices = self.devices.find_devices(self.devices.SIGGEN)  
 
         # This sets clock signals to RISING or FALLING, where necessary
         self.update_clocks()

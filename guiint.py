@@ -1,8 +1,9 @@
 """
-Interface between GUI and devices, names, network, monitors, parser and scanner.
+Interface between GUI and devices, names, network, monitor, parser and scanner.
 Classes
 -------
-GuiInterface - interface between GUI and devices, names, network, monitors, parser and scanner.
+GuiInterface - interface between GUI and devices, names, network, monitors,
+parser and scanner.
 """
 from names import Names
 from devices import Devices
@@ -30,17 +31,21 @@ class GuiInterface():
 
     set_switch_state(self, switch_name, switch_state): sets switch state
 
-    get_output_state(self, output_name): returns state of monitor (bool 0 if unmonitored)
+    get_output_state(self, output_name): returns state of monitor (bool 0 if 
+                                          unmonitored)
 
     set_output_state(self, output_name, output_state): add or remove monitor
 
     run_network(self, n_cycles): resets and runs the network for n-cycles
 
-    continue_network(self, n_cycles): continues running the network for n-cycles
+    continue_network(self, n_cycles): continues running the network for
+                                      n-cycles
 
-    get_signals(self): returns dictionary of all monitered signal states for each monitored output
+    get_signals(self): returns dictionary of all monitered signal states for
+                       each monitored output
 
-    update_network(self, definition_file_path): updates network based on the new definition file
+    update_network(self, definition_file_path): updates network based on the
+                                                new definition file
     """
 
     def __init__(self, names, devices, network, monitors, scanner):
@@ -78,7 +83,7 @@ class GuiInterface():
         for device in self.devices.devices_list:
             device_name = self.names.get_name_string(device.device_id)
             for output_port_id in device.outputs.keys():
-                if output_port_id:  # if there is an output port - add it to the name
+                if output_port_id: # if there is an port, add it to the name
                     output_names.append(
                         device_name + "." + self.names.get_name_string(output_port_id))
                 else:
@@ -157,7 +162,8 @@ class GuiInterface():
         n_cycles: number of cycles to run (int)
         Returns
         -------
-        Return True if network is running, "Network oscillating!" if network is oscillating
+        Return True if network is running, "Network oscillating!" if network 
+        is oscillating
         """
         self.devices.cold_startup()
         self.monitors.reset_monitors()
@@ -175,7 +181,8 @@ class GuiInterface():
         n_cycles: number of cycles to run (int)
         Returns
         -------
-        Return True if network is running, "Network oscillating!" if network is oscillating
+        Return True if network is running, "Network oscillating!" if network 
+        is oscillating
         """
         for i in range(n_cycles):
             if not self.network.execute_network():
@@ -185,7 +192,8 @@ class GuiInterface():
         return True
 
     def get_signals(self):
-        """Returns dictionary of all monitered signal states for each monitored output
+        """Returns dictionary of all monitered signal states for each monitored
+        output
         Parameters
         ----------
         No parameters.
@@ -194,7 +202,8 @@ class GuiInterface():
         Dictionary of all monitered signal states for each monitored output
         """
         max_length = -1
-        signals_dictionary = {} # Output signal name (str): list of signal values (bool)
+        # Key - output signal name (str), Value - list of signal values (ints)
+        signals_dictionary = {} 
 
         for key, value in self.monitors.monitors_dictionary.items():
             device_id, port_id = key
