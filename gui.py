@@ -861,12 +861,13 @@ class Gui(wx.Frame):
         self.load_dictionary(locale_text)
         if locale is not None:
             allowed_locale = [wx.LANGUAGE_CHINESE_SIMPLIFIED,
-                              wx.LANGUAGE_ENGLISH, wx.LANGUAGE_FRENCH]
+                              wx.LANGUAGE_ENGLISH]
             if locale not in allowed_locale:
                 print("Locale not supported, using default locale - English")
             else:
                 locale = wx.Locale(locale)
                 wx.Locale.AddCatalogLookupPathPrefix('locale')
+
         if load_graphically:
             self.start_graphically_control()
             # Can only reach this stage if a valid circuit file has been loaded
@@ -986,8 +987,9 @@ class Gui(wx.Frame):
         elif Id == self.def_file_show_id:
             file_path = self.guiint.scanner.path
             with open(file_path, "r") as f:
+                title = self.GetTranslation("Definition File") + " - " + file_path
                 box = MyDialog(self, message=f.read(),
-                               title=self.GetTranslation("Definition File"),
+                               title=title,
                                editable=False)
                 box.ShowModal()
                 box.Destroy()

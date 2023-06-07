@@ -26,8 +26,7 @@ from parse import Parser
 from userint import UserInterface
 from gui import Gui
 
-other_locale = {"es_ES.utf8": wx.LANGUAGE_SPANISH,
-                "fr_FR.utf8": wx.LANGUAGE_FRENCH, "zh_CN.utf8": wx.LANGUAGE_CHINESE_SIMPLIFIED}
+other_locale = {"zh_CN.utf8": wx.LANGUAGE_CHINESE_SIMPLIFIED}
 if os.environ.get('LANG') in other_locale:
     lang = other_locale[os.environ.get('LANG')]
     locale_text = os.environ.get('LANG')
