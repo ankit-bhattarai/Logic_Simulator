@@ -922,7 +922,7 @@ class Gui(wx.Frame):
         self.colour_palette = {"Light Mode": {"Panel Text Colour": "black", "Panel Colour": "light grey",
                                               "Canvas Colour": (1, 1, 1, 0), "Signal Colour": (0, 0, 1), 
                                               "Axes Colour": (0, 0, 0), "Canvas Text Colour": (0, 0, 0)},
-                               "Dark Mode": {"Panel Text Colour": "light grey", "Panel Colour": "dark grey",
+                               "Dark Mode": {"Panel Text Colour": "white", "Panel Colour": "black",
                                              "Canvas Colour": (0.1725, 0.1725, 0.1725, 1), "Signal Colour": (1, 1, 1),
                                              "Axes Colour": (1, 1, 1), "Canvas Text Colour": (1, 1, 1)}}
 
