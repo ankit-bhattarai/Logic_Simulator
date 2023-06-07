@@ -192,7 +192,8 @@ class SemanticErrorHandler:
         # Find the name of the connected output device and port (if any)
         connected_output_name = self.names.get_name_string(connected_device_id)
         if connected_port_id:
-            connected_output_name += self.names.get_name_string(connected_port_id)
+            connected_output_name += self.names.get_name_string(
+                connected_port_id)
 
         error_message = f"Signal {connected_output_name} is already connected to the input pin {input_name}. Only one signal must be connected to an input."
         # Pointing at the input pin where the error is

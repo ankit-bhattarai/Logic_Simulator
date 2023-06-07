@@ -44,9 +44,9 @@ class Device:
         self.rc_period = None  # MAINTENANCE
         self.rc_counter = None  # MAINTENANCE
         # MAINTENANCE - stores the waveform as a list of ints
-        self.siggen_waveform = None  
+        self.siggen_waveform = None
         # MAINTENANCE - stores the current position in the waveform
-        self.siggen_counter = None  
+        self.siggen_counter = None
 
 
 class Devices:
@@ -100,8 +100,8 @@ class Devices:
     make_rc(self, device_id, rc_period): Makes an RC device with the specified
                                             period. (MAINTENANCE)
 
-    make_siggen(self, device_id, waveform): Makes a siggen device with the 
-                                            specified waveform (passed as 
+    make_siggen(self, device_id, waveform): Makes a siggen device with the
+                                            specified waveform (passed as
                                             string) (MAINTENANCE)
 
     cold_startup(self): Simulates cold start-up of D-types and clocks.
@@ -304,7 +304,7 @@ class Devices:
         Make the RCs begin from the start of their cycles and set their outputs
         to high.
 
-        Make the siggens begin from the start of their cycles and set their 
+        Make the siggens begin from the start of their cycles and set their
         outputs
         """
         for device in self.devices_list:

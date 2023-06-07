@@ -57,8 +57,8 @@ class Network:
     execute_rc(self, device_id): Simulates an RC device and updates its output
                                     signal value.  (MAINTENANCE)
 
-    execute_siggen(self, device_id): Simulates a SIGGEN device and updates its output
-                                    signal value.  (MAINTENANCE)
+    execute_siggen(self, device_id): Simulates a SIGGEN device and updates its
+                                    output signal value.  (MAINTENANCE)
 
     update_clocks(self): If it is time to do so, sets clock signals to RISING
                          or FALLING.
@@ -445,8 +445,8 @@ class Network:
         nor_devices = self.devices.find_devices(self.devices.NOR)
         xor_devices = self.devices.find_devices(self.devices.XOR)
         # MAINTENANCE
-        rc_devices = self.devices.find_devices(self.devices.RC)  
-        siggen_devices = self.devices.find_devices(self.devices.SIGGEN)  
+        rc_devices = self.devices.find_devices(self.devices.RC)
+        siggen_devices = self.devices.find_devices(self.devices.SIGGEN)
 
         # This sets clock signals to RISING or FALLING, where necessary
         self.update_clocks()

@@ -31,7 +31,7 @@ class GuiInterface():
 
     set_switch_state(self, switch_name, switch_state): sets switch state
 
-    get_output_state(self, output_name): returns state of monitor (bool 0 if 
+    get_output_state(self, output_name): returns state of monitor (bool 0 if
                                           unmonitored)
 
     set_output_state(self, output_name, output_state): add or remove monitor
@@ -78,12 +78,12 @@ class GuiInterface():
         -------
         List of output names (strings)
         """
-        output_names = [] 
+        output_names = []
 
         for device in self.devices.devices_list:
             device_name = self.names.get_name_string(device.device_id)
             for output_port_id in device.outputs.keys():
-                if output_port_id: # if there is an port, add it to the name
+                if output_port_id:  # if there is an port, add it to the name
                     output_names.append(
                         device_name + "." + self.names.get_name_string(output_port_id))
                 else:
@@ -131,7 +131,7 @@ class GuiInterface():
         device_id = self.names.query(split_name[0])
         port_id = self.names.query(
             split_name[1]) if len(split_name) == 2 else None
-        # if the output is in the monitor dictionary, return True 
+        # if the output is in the monitor dictionary, return True
         if (device_id, port_id) in self.monitors.monitors_dictionary:
             return True
         return False
@@ -150,9 +150,9 @@ class GuiInterface():
         device_id = self.names.query(split_name[0])
         port_id = self.names.query(
             split_name[1]) if len(split_name) == 2 else None
-        if output_state: # Add monitor
+        if output_state:  # Add monitor
             self.monitors.make_monitor(device_id, port_id)
-        else: # Remove monitor
+        else:  # Remove monitor
             self.monitors.remove_monitor(device_id, port_id)
 
     def run_network(self, n_cycles):
@@ -162,7 +162,7 @@ class GuiInterface():
         n_cycles: number of cycles to run (int)
         Returns
         -------
-        Return True if network is running, "Network oscillating!" if network 
+        Return True if network is running, "Network oscillating!" if network
         is oscillating
         """
         self.devices.cold_startup()
@@ -181,7 +181,7 @@ class GuiInterface():
         n_cycles: number of cycles to run (int)
         Returns
         -------
-        Return True if network is running, "Network oscillating!" if network 
+        Return True if network is running, "Network oscillating!" if network
         is oscillating
         """
         for i in range(n_cycles):
@@ -203,7 +203,7 @@ class GuiInterface():
         """
         max_length = -1
         # Key - output signal name (str), Value - list of signal values (ints)
-        signals_dictionary = {} 
+        signals_dictionary = {}
 
         for key, value in self.monitors.monitors_dictionary.items():
             device_id, port_id = key
@@ -213,7 +213,7 @@ class GuiInterface():
 
             signals_dictionary[output_name_string] = value
             max_length = max(max_length, len(value))
-        
+
         # Pad the signals with None values to make them all the same length
         # (signal values are only recorded when they are monitored)
         for key, value in signals_dictionary.items():
@@ -259,7 +259,7 @@ class GuiInterface():
             self.scanner = new_scanner
             passed = True
         else:  # Don't update the network if the new definition file is invalid
-            passed = False 
+            passed = False
         # Get any error messages from the scanner - for printing to GUI
         error_messages = new_scanner.get_error_messages()
         return passed, error_messages

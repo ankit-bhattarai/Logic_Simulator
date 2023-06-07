@@ -123,7 +123,7 @@ def test_name_error_identification(definition_file, name_error_indices, error_sy
 def test_early_termination_error_identification(early_termination_definition_file, new_names,
                                                 new_devices, new_network,
                                                 new_monitors):
-    """Test that the correct syntax error is identified when the file ends too early for several 
+    """Test that the correct syntax error is identified when the file ends too early for several
     early termination locations."""
     new_scanner = Scanner(early_termination_definition_file, new_names)
     new_scanner.print_error = MagicMock()
@@ -179,7 +179,7 @@ def test_syntax_error_identification(definition_file, error_type, error_symbol_i
 
     By using mock functions, it is tested whether the scanner.print_error
     is being called correctly or not. A benefit of this approach is that the
-    scanner.print_error method can be changed in the future without affecting 
+    scanner.print_error method can be changed in the future without affecting
     these tests at all.
     """
     new_scanner = Scanner(definition_file, new_names)
@@ -210,10 +210,10 @@ def test_syntax_error_identification(definition_file, error_type, error_symbol_i
 @pytest.fixture
 def network_dict_1():
     """
-    Fixture to populate the expected network dictionary 
+    Fixture to populate the expected network dictionary
     for the test file - "test_parse_files/test_build_network_dict_1.txt"
     """
-    network_dict = {} # MAINTENANCE - change to dict
+    network_dict = {}  # MAINTENANCE - change to dict
     network_dict['DEVICES'] = [[Symbol("CLOCK", 5, 1, 10),
                                Symbol("clock1", 18, 1, 16),
                                Symbol("10", 19, 1, 23)]]
@@ -229,7 +229,7 @@ def network_dict_1():
 
 def test_build_network_dict_1(new_names, network_dict_1, new_devices, new_network,
                               new_monitors):
-    """Test that the network dictionary, used later to check semantics and 
+    """Test that the network dictionary, used later to check semantics and
        to build the network, is built correctly - for increasingly complex files
        - through test_build_network_dict_{1, 2, 3}.
 
@@ -252,26 +252,32 @@ def test_build_network_dict_1(new_names, network_dict_1, new_devices, new_networ
 @pytest.fixture
 def network_dict_2():
     """
-    Fixture to populate the expected network dictionary 
+    Fixture to populate the expected network dictionary
     for the second test file - "test_parse_files/test_build_network_dict_2.txt"
     """
-    network_dict_2 = {} # MAINTENANCE - change to dict
+    network_dict_2 = {}  # MAINTENANCE - change to dict
     network_dict_2["DEVICES"] = [[Symbol("SWITCH", 6, 1, 10), Symbol("switch1", 18, 1, 17), Symbol("0", 19, 1, 25)],
-                                 [Symbol("SWITCH", 6, 1, 28), Symbol("switch2", 21, 1, 35), Symbol("0", 19, 1, 43)],
-                                 [Symbol("AND", 0, 1, 46), Symbol("and1", 22, 1, 50), Symbol("2", 23, 1, 55)],
-                                 [Symbol("OR", 1, 1, 58), Symbol("or1", 24, 1, 61), Symbol("2", 23, 1, 65)],
+                                 [Symbol("SWITCH", 6, 1, 28), Symbol(
+                                     "switch2", 21, 1, 35), Symbol("0", 19, 1, 43)],
+                                 [Symbol("AND", 0, 1, 46), Symbol(
+                                     "and1", 22, 1, 50), Symbol("2", 23, 1, 55)],
+                                 [Symbol("OR", 1, 1, 58), Symbol(
+                                     "or1", 24, 1, 61), Symbol("2", 23, 1, 65)],
                                  [Symbol("NAND", 2, 1, 68), Symbol("nand1", 25, 1, 73), Symbol("2", 23, 1, 79)]]
-    network_dict_2['CONNECT'] = [[Symbol("switch1", 18, 2, 10), Symbol(">", 28, 2, 18), Symbol("and1", 22, 2, 20), 
-                                  Symbol(".", 29, 2, 24), Symbol("I1", 30, 2, 25)], [Symbol("switch1", 18, 2, 29), 
-                                  Symbol(">", 28, 2, 37), Symbol("or1", 24, 2, 39), Symbol(".", 29, 2, 42), 
-                                  Symbol("I1", 30, 2, 43)], [Symbol("switch2", 21, 2, 47), Symbol(">", 28, 2, 55),
-                                  Symbol("and1", 22, 2, 57), Symbol(".", 29, 2, 61), Symbol("I2", 31, 2, 62)], 
-                                  [Symbol("switch2", 21, 2, 66), Symbol(">", 28, 2, 74), Symbol("or1", 24, 2, 76), 
-                                  Symbol(".", 29, 2, 79), Symbol("I2", 31, 2, 80)], [Symbol("and1", 22, 3, 2), 
-                                  Symbol(">", 28, 3, 7), Symbol("nand1", 25, 3, 9), Symbol(".", 29, 3, 14),
-                                  Symbol("I1", 30, 3, 15)], [Symbol("or1", 24, 3, 19), Symbol(">", 28, 3, 23), 
-                                  Symbol("nand1", 25, 3, 25), Symbol(".", 29, 3, 30), Symbol("I2", 31, 3, 31)]]
-    network_dict_2['MONITOR'] = [[Symbol("and1", 22, 4, 10)], [Symbol( "or1", 24, 4, 16)], [Symbol("nand1", 25, 4, 21)]]
+    network_dict_2['CONNECT'] = [[Symbol("switch1", 18, 2, 10), Symbol(">", 28, 2, 18), Symbol("and1", 22, 2, 20),
+                                  Symbol(".", 29, 2, 24), Symbol("I1", 30, 2, 25)], [Symbol("switch1", 18, 2, 29),
+                                                                                     Symbol(">", 28, 2, 37), Symbol(
+                                                                                         "or1", 24, 2, 39), Symbol(".", 29, 2, 42),
+                                                                                     Symbol("I1", 30, 2, 43)], [Symbol("switch2", 21, 2, 47), Symbol(">", 28, 2, 55),
+                                                                                                                Symbol("and1", 22, 2, 57), Symbol(".", 29, 2, 61), Symbol("I2", 31, 2, 62)],
+                                 [Symbol("switch2", 21, 2, 66), Symbol(">", 28, 2, 74), Symbol("or1", 24, 2, 76),
+                                  Symbol(".", 29, 2, 79), Symbol("I2", 31, 2, 80)], [Symbol("and1", 22, 3, 2),
+                                                                                     Symbol(">", 28, 3, 7), Symbol(
+                                      "nand1", 25, 3, 9), Symbol(".", 29, 3, 14),
+        Symbol("I1", 30, 3, 15)], [Symbol("or1", 24, 3, 19), Symbol(">", 28, 3, 23),
+                                   Symbol("nand1", 25, 3, 25), Symbol(".", 29, 3, 30), Symbol("I2", 31, 3, 31)]]
+    network_dict_2['MONITOR'] = [[Symbol("and1", 22, 4, 10)], [Symbol(
+        "or1", 24, 4, 16)], [Symbol("nand1", 25, 4, 21)]]
 
     return network_dict_2
 
@@ -294,33 +300,40 @@ def test_build_network_dict_2(network_dict_2, new_names, new_devices, new_networ
 @pytest.fixture
 def network_dict_3():
     """
-    Fixture to populate the expected network dictionary 
+    Fixture to populate the expected network dictionary
     for the third test file - "test_parse_files/test_build_network_dict_3.txt"
     """
-    network_dict_3 = {} # MAINTENANCE - change to dict
+    network_dict_3 = {}  # MAINTENANCE - change to dict
     network_dict_3['DEVICES'] = [[Symbol("SWITCH", 6, 1, 10), Symbol("switch1", 18, 1, 17), Symbol("1", 19, 1, 25)],
-                                 [Symbol("SWITCH", 6, 1, 28), Symbol("switch2", 21, 1, 35), Symbol("0", 22, 1, 43)],
-                                 [Symbol("CLOCK", 5, 1, 46), Symbol("clock1", 23, 1, 52), Symbol("2", 24, 1, 59)],
+                                 [Symbol("SWITCH", 6, 1, 28), Symbol(
+                                     "switch2", 21, 1, 35), Symbol("0", 22, 1, 43)],
+                                 [Symbol("CLOCK", 5, 1, 46), Symbol(
+                                     "clock1", 23, 1, 52), Symbol("2", 24, 1, 59)],
                                  [Symbol("DTYPE", 7, 1, 62), Symbol("dtype1", 25, 1, 68)], [Symbol("NOR", 3, 2, 10),
-                                  Symbol("nor1", 26, 2, 14), Symbol("2", 24, 2, 19)], [Symbol("XOR", 4, 2, 22),
-                                  Symbol("xor1", 27, 2, 26)]]
+                                                                                            Symbol("nor1", 26, 2, 14), Symbol("2", 24, 2, 19)], [Symbol("XOR", 4, 2, 22),
+                                                                                                                                                 Symbol("xor1", 27, 2, 26)]]
     network_dict_3['CONNECT'] = [[Symbol("switch1", 18, 3, 10), Symbol(">", 30, 3, 18), Symbol("dtype1", 25, 3, 20),
                                   Symbol(".", 31, 3, 26), Symbol("DATA", 13, 3, 27)], [Symbol("switch1", 18, 3, 33),
-                                  Symbol(">", 30, 3, 41), Symbol("dtype1", 25, 3, 43), Symbol(".", 31, 3, 49),
-                                  Symbol("SET", 11, 3, 50)], [Symbol("switch1", 18, 3, 55), Symbol(">", 30, 3, 63),
-                                  Symbol("nor1", 26, 3, 65), Symbol(".", 31, 3, 69), Symbol("I1", 32, 3, 70)],
-                                  [Symbol("switch2", 21, 4, 1), Symbol(">", 30, 4, 9), Symbol("dtype1", 25, 4, 11),
+                                                                                       Symbol(">", 30, 3, 41), Symbol(
+                                                                                           "dtype1", 25, 3, 43), Symbol(".", 31, 3, 49),
+                                                                                       Symbol("SET", 11, 3, 50)], [Symbol("switch1", 18, 3, 55), Symbol(">", 30, 3, 63),
+                                                                                                                   Symbol("nor1", 26, 3, 65), Symbol(".", 31, 3, 69), Symbol("I1", 32, 3, 70)],
+                                 [Symbol("switch2", 21, 4, 1), Symbol(">", 30, 4, 9), Symbol("dtype1", 25, 4, 11),
                                   Symbol(".", 31, 4, 17), Symbol("CLEAR", 12, 4, 18)], [Symbol("switch2", 21, 4, 25),
-                                  Symbol(">", 30, 4, 33), Symbol("xor1", 27, 4, 35), Symbol(".", 31, 4, 39),
-                                  Symbol("I2", 33, 4, 40)], [Symbol("dtype1", 25, 4, 44), Symbol(".", 31, 4, 50),
-                                  Symbol("Q", 14, 4, 51), Symbol(">", 30, 4, 53), Symbol("nor1", 26, 4, 55),
-                                  Symbol(".", 31, 4, 59), Symbol("I2", 33, 4, 60)], [Symbol("dtype1", 25, 5, 1), 
-                                  Symbol(".", 31, 5, 7), Symbol("QBAR", 15, 5, 8), Symbol(">", 30, 5, 13),
-                                  Symbol("xor1", 27, 5, 15), Symbol(".", 31, 5, 19), Symbol("I1", 32, 5, 20)], 
-                                  [Symbol("clock1", 23, 5, 24), Symbol(">", 30, 5, 31), Symbol("dtype1", 25, 5, 33), 
-                                   Symbol(".", 31, 5, 39), Symbol("CLK", 10, 5, 40)]] 
+                                                                                        Symbol(">", 30, 4, 33), Symbol(
+                                                                                            "xor1", 27, 4, 35), Symbol(".", 31, 4, 39),
+                                                                                        Symbol("I2", 33, 4, 40)], [Symbol("dtype1", 25, 4, 44), Symbol(".", 31, 4, 50),
+                                                                                                                   Symbol("Q", 14, 4, 51), Symbol(
+                                                                                                                       ">", 30, 4, 53), Symbol("nor1", 26, 4, 55),
+                                                                                                                   Symbol(".", 31, 4, 59), Symbol("I2", 33, 4, 60)], [Symbol("dtype1", 25, 5, 1),
+                                                                                                                                                                      Symbol(".", 31, 5, 7), Symbol(
+                                                                                                                       "QBAR", 15, 5, 8), Symbol(">", 30, 5, 13),
+        Symbol("xor1", 27, 5, 15), Symbol(".", 31, 5, 19), Symbol("I1", 32, 5, 20)],
+        [Symbol("clock1", 23, 5, 24), Symbol(">", 30, 5, 31), Symbol("dtype1", 25, 5, 33),
+         Symbol(".", 31, 5, 39), Symbol("CLK", 10, 5, 40)]]
     network_dict_3['MONITOR'] = [[Symbol("switch1", 18, 6, 10)], [Symbol("clock1", 23, 6, 19)], [Symbol("switch2", 21, 6, 27)],
-                                 [Symbol("dtype1", 25, 6, 36), Symbol(".", 31, 6, 42), Symbol("Q", 14, 6, 43)],
+                                 [Symbol("dtype1", 25, 6, 36), Symbol(
+                                     ".", 31, 6, 42), Symbol("Q", 14, 6, 43)],
                                  [Symbol("nor1", 26, 6, 46)], [Symbol("xor1", 27, 6, 52)]]
 
     return network_dict_3
@@ -382,8 +395,8 @@ def test_semantic_error_identification(definition_file, symbol_details,
 
     By using mock functions, it is tested whether the scanner.print_error
     is being called correctly or not. A benefit of this approach is that the
-    scanner.print_error method can be changed in the future without affecting 
-    these tests at all. Were this test to do a print assert check, if 
+    scanner.print_error method can be changed in the future without affecting
+    these tests at all. Were this test to do a print assert check, if
     print_error was changed for aesthetic or functionality reasons, all of
     these tests will have to be rewritten to suit the new style in which
     the mesaages are printed. The cost for this approach however is that the

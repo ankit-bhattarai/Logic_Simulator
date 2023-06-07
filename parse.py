@@ -489,8 +489,8 @@ class Parser:
             self.check_clock_rc(dev, dev_list)
         elif self.names.get_name_string(self.symbol.id) == 'SWITCH':
             self.check_switch(dev, dev_list)
-        elif self.names.get_name_string(self.symbol.id) == 'SIGGEN': 
-            self.check_siggen(dev, dev_list) # MAINTENANCE
+        elif self.names.get_name_string(self.symbol.id) == 'SIGGEN':
+            self.check_siggen(dev, dev_list)  # MAINTENANCE
         elif self.names.get_name_string(self.symbol.id) in {'AND', 'NAND',
                                                             'OR', 'NOR'}:
             self.check_logic_device(dev, dev_list)
@@ -555,8 +555,9 @@ class Parser:
         else:
             if self.names.get_name_string(self.symbol.id) == "CONNECT":
                 return None
-            self.display_syntax_error(19, self.scanner.list_of_symbols[self.scanner.list_of_symbols.index(self.symbol) - 1])
-            while self.names.get_name_string(self.symbol.id) != "CONNECT": 
+            self.display_syntax_error(
+                19, self.scanner.list_of_symbols[self.scanner.list_of_symbols.index(self.symbol) - 1])
+            while self.names.get_name_string(self.symbol.id) != "CONNECT":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
                     self.display_syntax_error(
@@ -749,7 +750,8 @@ class Parser:
         else:
             if self.names.get_name_string(self.symbol.id) == "MONITOR":
                 return None
-            self.display_syntax_error(13, self.scanner.list_of_symbols[self.scanner.list_of_symbols.index(self.symbol) - 1])
+            self.display_syntax_error(
+                13, self.scanner.list_of_symbols[self.scanner.list_of_symbols.index(self.symbol) - 1])
             while self.names.get_name_string(self.symbol.id) != "MONITOR":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
@@ -882,8 +884,9 @@ class Parser:
         else:
             if self.names.get_name_string(self.symbol.id) == "END":
                 return None
-            self.display_syntax_error(18, self.scanner.list_of_symbols[self.scanner.list_of_symbols.index(self.symbol) - 1])
-            while self.names.get_name_string(self.symbol.id) != "END": 
+            self.display_syntax_error(
+                18, self.scanner.list_of_symbols[self.scanner.list_of_symbols.index(self.symbol) - 1])
+            while self.names.get_name_string(self.symbol.id) != "END":
                 self.symbol = self.scanner.get_symbol()
                 if self.symbol is None:  # *
                     self.display_syntax_error(
@@ -1126,7 +1129,7 @@ class Parser:
         if self.num_of_errors == 0 and network_dict:
             # Build the logic network if there are no syntax errors
             build_network = self.build_network(network_dict=network_dict)
-        else: # Print the number of syntax errors detected in the file and exit
+        else:  # Print the number of syntax errors detected in the file and exit
             if self.num_of_errors == 1:
                 error_message = f"{self.num_of_errors} syntax error detected in the file"
             else:

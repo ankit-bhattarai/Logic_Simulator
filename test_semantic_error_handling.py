@@ -214,7 +214,7 @@ def test_display_device_present_error(new_semantic_error_handler, switch1,
     The test file is clean and doesn't contain any duplicate device
     names, this method just checks that semantic_error_handler's
     display_device_present_error method calls scanner's print_error
-    with the correct arguments properly as that is all which the method does. 
+    with the correct arguments properly as that is all which the method does.
     switch1 is the example device name which it is tested with.
 
     The scanner's print_error method is mocked to check that it is called with
@@ -379,8 +379,7 @@ def test_display_device_absent_error_no_call(new_semantic_error_handler,
                                              list_display_device_absent_error_connection_no_call,
                                              new_scanner, and1, new_parser):
     """Test the display_device_absent_error method to ensure it does not call print_error."""
-    parser = new_parser
-
+    parser = new_parser  # Needed for initalisation
     new_semantic_error_handler.display_device_absent_error(
         list_display_device_absent_error_connection_no_call)
     new_scanner.print_error.assert_not_called()
