@@ -443,6 +443,7 @@ class SwitchPanel(wx.Panel):
         self.button_switch.Hide()
         self.switch_state_display.Hide()
 
+
         self.SetSizer(self.main_sizer)
 
     def renderSwitchBoxes(self):
@@ -465,7 +466,7 @@ class SwitchPanel(wx.Panel):
 
         self.main_sizer.Layout()
         self.parent.GetSizer().Layout()
-        self.grand_parent.GetSizer().Layout()
+        #self.grand_parent.GetSizer().Layout()
 
     def OnComboSwitch(self, event):
         """Method called when the combo box is changed.
@@ -478,7 +479,11 @@ class SwitchPanel(wx.Panel):
             switch_state = self.guiint.get_switch_state(self.switch_text)
 
             self.switch_state_display.Show()
-            switch_state_string = "CLOSED" if switch_state == 1 else "OPENED"
+            if switch_state == 1:
+                switch_state_string = self.grand_parent.GetTranslation("CLOSED")
+            else:
+                switch_state_string = self.grand_parent.GetTranslation("OPENED")
+            
             self.switch_state_display.SetLabel(
                 f'{self.switch_text} : {switch_state_string}')
 
@@ -490,7 +495,7 @@ class SwitchPanel(wx.Panel):
 
         self.main_sizer.Layout()
         self.parent.GetSizer().Layout()
-        self.grand_parent.GetSizer().Layout()
+        #self.grand_parent.GetSizer().Layout()
 
     def OnButtonSwitch(self, event):
         """Method called when button is pressed.
@@ -517,7 +522,7 @@ class SwitchPanel(wx.Panel):
 
             self.main_sizer.Layout()
             self.parent.GetSizer().Layout()
-            self.grand_parent.GetSizer().Layout()
+            #self.grand_parent.GetSizer().Layout()
 
 
 class MonitorPanel(wx.Panel):
@@ -618,7 +623,7 @@ class MonitorPanel(wx.Panel):
 
         self.main_sizer.Layout()
         self.parent.GetSizer().Layout()
-        self.grand_parent.GetSizer().Layout()
+        #self.grand_parent.GetSizer().Layout()
 
     def OnComboMonitor(self, event):
         """Method called when the combo box is changed.
@@ -641,8 +646,8 @@ class MonitorPanel(wx.Panel):
             self.grand_parent.canvas.render(
                 f"Combo box changed. New_value: {combo_value}")
             self.main_sizer.Layout()
-            self.parent.GetSizer().Layout()
-            self.grand_parent.GetSizer().Layout()
+            #self.parent.GetSizer().Layout()
+            #self.grand_parent.GetSizer().Layout()
 
         else:
             self.grand_parent.canvas.render("Invalid Selection Made")
@@ -671,7 +676,7 @@ class MonitorPanel(wx.Panel):
             self.grand_parent.canvas.render(text)
             self.main_sizer.Layout()
             self.parent.GetSizer().Layout()
-            self.grand_parent.GetSizer().Layout()
+            #self.grand_parent.GetSizer().Layout()
 
 
 class RunPanel(wx.Panel):
