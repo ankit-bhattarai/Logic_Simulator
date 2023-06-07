@@ -6,7 +6,12 @@ or adjust the network properties.
 Classes:
 --------
 MyGLCanvas - handles all canvas drawing operations.
+SwitchPanel - handles the switch panel and its widgets.
+MonitorPanel - handles the monitor panel and its widgets.
+RunPanel - handles the run panel and its widgets.
+Rightpanel - Contains the switch, monitor and run panels.
 Gui - configures the main window and all the widgets.
+MyDialog - handles the dialog box for communicating with the user.
 """
 import os
 import wx
@@ -62,6 +67,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
     reset_zoom(self, event): Resets the zoom.
 
     reset_view(self, event): Resets the pan and zoom.
+
+    change_colour(self): Changes the colour of the canvas.
     """
 
     def __init__(self, parent, guiint):
@@ -237,7 +244,13 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                                values, name)
 
     def render(self, text):
-        """Handle all drawing operations."""
+        """Handle all drawing operations.
+
+        Parameters
+        ----------
+        text: str
+            text to be rendered on the canvas.
+        """
         self.SetCurrent(self.context)
         if not self.init:
             # Configure the viewport, modelview and projection matrices
@@ -392,6 +405,8 @@ class SwitchPanel(wx.Panel):
 
     OnComboSwitch(self, event): Handles the event when a switch is selected in
                                 the combo box.
+
+    OnButtonSwitch(self, event): Handles the event when a switch is clicked.
     """
 
     def __init__(self, parent, guiint):
@@ -550,7 +565,12 @@ class MonitorPanel(wx.Panel):
 
     Public Methods
     --------------
-    None
+    renderMonitorBoxes(self): Method renders the monitor boxes based on their
+                              current state.
+
+    OnComboMonitor(self, event): Method called when the combo box is changed.
+
+    onButtonMonitor(self, event): Method called when button is pressed.
     """
 
     def __init__(self, parent, guiint):
@@ -703,7 +723,11 @@ class RunPanel(wx.Panel):
 
     Public Methods
     --------------
-    None
+    OnButtonRun(event): Method called when the run button is pressed.
+
+    OnButtonContinue(event): Method called when the continue button is pressed.
+
+    OnSpin(event): Method called when the spin control is changed.
     """
 
     def __init__(self, parent, guiint):
@@ -799,7 +823,11 @@ class RightPanel(wx.Panel):
 
     Public Methods
     --------------
-    None
+    change_colour(event): Method called when the user changes the colour of the
+                          the dispay and changes colour of the panel.
+    change_colour_child(event): Method called when the user changes the colour
+                                of the the dispay and changes colour of the
+                                child objects in the panel.
     """
 
     def __init__(self, parent, guiint):
@@ -862,6 +890,16 @@ class Gui(wx.Frame):
     Parameters
     ----------
     title: title of the window.
+    path: path to the circuit file.
+    names: A Names object.
+    devices: A Devices object.
+    network: A Network object.
+    monitors: A Monitors object.
+    scanner: A Scanner object.
+    load_graphically: boolean to indicate whether to load the circuit file
+                        graphically or not.
+    locale: The locale to use for the GUI.
+    locale_text: The locale to use for the text in the GUI for translation.
 
     Public methods
     --------------
@@ -874,6 +912,22 @@ class Gui(wx.Frame):
                                 button.
 
     on_text_box(self, event): Event handler for when the user enters text.
+
+    load_dictionary(self, locale_text): Load the dictionary for the locale
+                                        specified to be used for translation.
+
+    GetTranslation(self, text): Get the translation of the text passed in.
+
+    change_colour(self): Change the colour scheme of the GUI.
+
+    start_graphically(self): Start the GUI in graphical mode.
+
+    start_graphically_control(self): Control loop for starting the GUI in
+                                     graphical mode with the user choosing
+                                     a valid circuit file.
+
+    load_graphically(self): Load the circuit file graphically once the program
+                            has already started with another circuit file.
     """
 
     def __init__(self, title, path, names, devices, network, monitors,
