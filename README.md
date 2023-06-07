@@ -3,6 +3,7 @@ The aim of this project is to develop a logic simulator program in Python. The p
 2. Display syntax or semantic errors of the text file in the terminal or GUI if there is any,
 3. Display the monitored signals,
 4. Execute commands by the user (see user guide). 
+Note: pytests must be run from after "cd final" command - test definition file paths are relative
 
 Some of the code files are not PEP 8 compliant because the maximum number of characters on the same line exceeds the required
 limit. This is intentional for the purpose of readability.
