@@ -508,9 +508,10 @@ class Scanner:
         if first_number is None:
             return None
         met_numbers = first_number
+        termination_characters = terminate_name_scan_characters
         while True:
             character = self.get_next_char()
-            if character.isspace() or character in terminate_name_scan_characters:
+            if character.isspace() or character in termination_characters:
                 return (met_numbers, character)
             else:
                 met_numbers += character
@@ -545,9 +546,10 @@ class Scanner:
             character after the name
         """
         met_name_characters = first_letter
+        termination_characters = terminate_name_scan_characters
         while True:
             character = self.get_next_char()
-            if character.isspace() or character in terminate_name_scan_characters:
+            if character.isspace() or character in termination_characters:
                 return (met_name_characters, character)
             else:
                 # Current character is not a space or a terminating character
