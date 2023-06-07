@@ -95,7 +95,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.canvas_colour = (1, 1, 1, 0) # Default colour is white
         self.axes_colour = (0, 0, 0) # Default colour is black
         self.signal_colour = (0, 0, 1) # Default colour is blue
-        self.text_colour = (0, 0, 0)
+        self.text_colour = (0, 0, 0) # Default colour is black
 
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
@@ -355,10 +355,12 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         by the parent. The colour attributes are set to the appropriate values and the
         canvas is refreshed."""
         colour_mode = self.parent.colour_mode
+        # Reset the attributes as per new colour scheme
         self.canvas_colour = self.parent.colour_palette[colour_mode]["Canvas Colour"]
         self.axes_colour = self.parent.colour_palette[colour_mode]["Axes Colour"]
         self.signal_colour = self.parent.colour_palette[colour_mode]["Signal Colour"]
         self.text_colour = self.parent.colour_palette[colour_mode]["Canvas Text Colour"]
+        # Re-render the canvas
         self.init = False
         self.Refresh()
 
@@ -809,13 +811,16 @@ class RightPanel(wx.Panel):
     def change_colour_child(self, child):
         """Change the colour of the children of 'child' depending on the type of the 
         children - StaticText or Button"""
-        for child in child.GetChildren():
-            if isinstance(child, wx.StaticText):
-                child.SetForegroundColour(
-                    self.parent.colour_palette[self.parent.colour_mode]["Panel Text Colour"])
-            if isinstance(child, wx.Button):
-                child.SetBackgroundColour(
-                    self.parent.colour_palette[self.parent.colour_mode]["Panel Colour"])
+        panel_colour = self.parent.colour_palette[self.parent.colour_mode]["Panel Colour"]
+        text_colour = self.parent.colour_palette[self.parent.colour_mode]["Panel Text Colour"]
+        # Change the background panel colour of the child
+        child.SetBackgroundColour(panel_colour)
+        # Recursively change the background/text colour of children of the child
+        for gchild in child.GetChildren():
+            if isinstance(gchild, wx.StaticText):
+                gchild.SetForegroundColour(text_colour)
+            if isinstance(gchild, wx.Button):
+                gchild.SetBackgroundColour(panel_colour)
         self.Refresh()
         self.Layout()
         self.parent.GetSizer().Layout()
@@ -824,8 +829,8 @@ class RightPanel(wx.Panel):
         """Change the colour scheme of the panel - method called by the parent"""
         for child in self.GetChildren():
             self.change_colour_child(child)
-        self.SetBackgroundColour(
-            self.parent.colour_palette[self.parent.colour_mode]["Panel Colour"])
+        panel_colour = self.parent.colour_palette[self.parent.colour_mode]["Panel Colour"]
+        self.SetBackgroundColour(panel_colour)
         self.Refresh()
 
 class Gui(wx.Frame):
@@ -928,6 +933,7 @@ class Gui(wx.Frame):
                                              "Axes Colour": (1, 1, 1), "Canvas Text Colour": (1, 1, 1)}}
 
         self.colour_mode = "Light Mode"
+        # Start of in light mode
         self.change_colour()
 
     def load_dictionary(self, locale_language):
@@ -955,7 +961,7 @@ class Gui(wx.Frame):
             # Change the colour of right panel
             if isinstance(child, wx.Panel):
                 child.change_colour()
-            # Change the colour of the menu bar
+            # Change the colour of the canvas
             if isinstance(child, wxcanvas.GLCanvas):
                 child.change_colour()
 
