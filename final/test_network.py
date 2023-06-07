@@ -231,9 +231,6 @@ def test_execute_non_xor_gates(new_network, gate_id, switch_outputs,
      I3] = names.lookup(["And1", "Or1", "Nand1", "Nor1", "Sw1", "Sw2", "Sw3",
                          "I1", "I2", "I3"])
 
-    LOW = devices.LOW
-    HIGH = devices.HIGH
-
     # Make devices
     gate_id = eval(gate_id)
     gate_kind = eval(gate_kind)

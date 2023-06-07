@@ -1,4 +1,4 @@
-"""Test the devices module."""
+"""Test the scanner module."""
 import pytest
 
 from scanner import Symbol, Scanner
