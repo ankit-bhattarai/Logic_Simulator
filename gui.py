@@ -41,7 +41,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
     render_signal(self, x_start, y_start,
                     values, name, colour,
-                    width, height): Draws a signal on the canvas based on 
+                    width, height): Draws a signal on the canvas based on
                                     the signal's values.
 
     render_signals(self): Renders all signals on the canvas.
@@ -61,7 +61,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
     reset_zoom(self, event): Resets the zoom.
 
-    reset_view(self, event): Resets the pan and zoom.    
+    reset_view(self, event): Resets the pan and zoom.
     """
 
     def __init__(self, parent, guiint):
@@ -358,15 +358,17 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.reset_zoom()
 
     def change_colour(self):
-        """Change the colour scheme of the canvas - called when colour mode is changed
-        by the parent. The colour attributes are set to the appropriate values and the
-        canvas is refreshed."""
+        """Change the colour scheme of the canvas.
+
+        Called when colour mode is changed by the parent. The colour attributes
+        are set to the appropriate values and the canvas is refreshed."""
         colour_mode = self.parent.colour_mode
+        colour_dict = self.parent.colour_palette[colour_mode]
         # Reset the attributes as per new colour scheme
-        self.canvas_colour = self.parent.colour_palette[colour_mode]["Canvas Colour"]
-        self.axes_colour = self.parent.colour_palette[colour_mode]["Axes Colour"]
-        self.signal_colour = self.parent.colour_palette[colour_mode]["Signal Colour"]
-        self.text_colour = self.parent.colour_palette[colour_mode]["Canvas Text Colour"]
+        self.canvas_colour = colour_dict["Canvas Colour"]
+        self.axes_colour = colour_dict["Axes Colour"]
+        self.signal_colour = colour_dict["Signal Colour"]
+        self.text_colour = colour_dict["Canvas Text Colour"]
         # Re-render the canvas
         self.init = False
         self.Refresh()
@@ -436,7 +438,7 @@ class SwitchPanel(wx.Panel):
         self.right_sizer.Add(self.switch_state_display, 1,
                              wx.EXPAND, wx.ALIGN_RIGHT | wx.ALL, 10)
 
-        # Create single button - SWITCHES state from the current state - dynamic
+        # Create single button - SWITCHES state from the current state
         self.switch_button_id = wx.NewIdRef(count=1)
         self.button_switch = wx.Button(
             self, self.switch_button_id, "")
@@ -515,7 +517,8 @@ class SwitchPanel(wx.Panel):
             pass
         else:
             switch_state = self.guiint.get_switch_state(switch_text)
-            desired_switch_state = 1 if switch_state == 0 else 0  # Flip the switch
+            # Flip the switch
+            desired_switch_state = 1 if switch_state == 0 else 0
             self.guiint.set_switch_state(
                 switch_text, desired_switch_state)  # Render the change
             self.renderSwitchBoxes()
@@ -822,13 +825,14 @@ class RightPanel(wx.Panel):
         self.SetSizer(main_sizer)
 
     def change_colour_child(self, child):
-        """Change the colour of the children of 'child' depending on the type of the 
-        children - StaticText or Button"""
-        panel_colour = self.parent.colour_palette[self.parent.colour_mode]["Panel Colour"]
-        text_colour = self.parent.colour_palette[self.parent.colour_mode]["Panel Text Colour"]
+        """Change the colour of the children of 'child'.
+        This depends on the type of the children - StaticText or Button"""
+        colour_dict = self.parent.colour_palette[self.parent.colour_mode]
+        panel_colour = colour_dict["Panel Colour"]
+        text_colour = colour_dict["Panel Text Colour"]
         # Change the background panel colour of the child
         child.SetBackgroundColour(panel_colour)
-        # Recursively change the background/text colour of children of the child
+        # Recursively change the background/text colour for all panels
         for gchild in child.GetChildren():
             if isinstance(gchild, wx.StaticText):
                 gchild.SetForegroundColour(text_colour)
@@ -839,10 +843,12 @@ class RightPanel(wx.Panel):
         self.parent.GetSizer().Layout()
 
     def change_colour(self):
-        """Change the colour scheme of the panel - method called by the parent"""
+        """Change the colour scheme of the panel - method called by the parent.
+        """
         for child in self.GetChildren():
             self.change_colour_child(child)
-        panel_colour = self.parent.colour_palette[self.parent.colour_mode]["Panel Colour"]
+        colour_dict = self.parent.colour_palette[self.parent.colour_mode]
+        panel_colour = colour_dict["Panel Colour"]
         self.SetBackgroundColour(panel_colour)
         self.Refresh()
 
@@ -871,7 +877,8 @@ class Gui(wx.Frame):
     """
 
     def __init__(self, title, path, names, devices, network, monitors,
-                 scanner=None, load_graphically=False, locale=None, locale_text=None):
+                 scanner=None, load_graphically=False, locale=None,
+                 locale_text=None):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(800, 600))
         # File path for circuit file which can be chosen from the GUI
@@ -938,20 +945,28 @@ class Gui(wx.Frame):
             self.SetSizeHints(600, 600)
             self.SetSizer(main_sizer)
 
-        # String are wxpython colour names, tuples are RGB{A} for opengl rendering
-        self.colour_palette = {"Light Mode": {"Panel Text Colour": "black", "Panel Colour": "light grey",
-                                              "Canvas Colour": (1, 1, 1, 0), "Signal Colour": (0, 0, 1),
-                                              "Axes Colour": (0, 0, 0), "Canvas Text Colour": (0, 0, 0)},
-                               "Dark Mode": {"Panel Text Colour": "white", "Panel Colour": "black",
-                                             "Canvas Colour": (0.1725, 0.1725, 0.1725, 1), "Signal Colour": (1, 1, 1),
-                                             "Axes Colour": (1, 1, 1), "Canvas Text Colour": (1, 1, 1)}}
+        # String are wxpython colour names, tuples are RGB{A} for opengl render
+        self.colour_palette = {"Light Mode": {"Panel Text Colour": "black",
+                                              "Panel Colour": "light grey",
+                                              "Canvas Colour": (1, 1, 1, 0),
+                                              "Signal Colour": (0, 0, 1),
+                                              "Axes Colour": (0, 0, 0),
+                                              "Canvas Text Colour": (0, 0, 0)},
+                               "Dark Mode": {"Panel Text Colour": "white",
+                                             "Panel Colour": "black",
+                                             "Canvas Colour": (0.1725, 0.1725,
+                                                               0.1725, 1),
+                                             "Signal Colour": (1, 1, 1),
+                                             "Axes Colour": (1, 1, 1),
+                                             "Canvas Text Colour": (1, 1, 1)}}
 
         self.colour_mode = "Light Mode"
         # Start of in light mode
         self.change_colour()
 
     def load_dictionary(self, locale_language):
-        if locale_language is not None:  # English or some other language not supported
+        # English or some other language not supported
+        if locale_language is not None:
             file = open(f"translations/{locale_language}.json", "r")
             self.translation_dict = json.load(file)
             file.close()
@@ -965,8 +980,8 @@ class Gui(wx.Frame):
                 self.translation_dict.get(string[1:], string[1:])
         else:  # No &
             translated = self.translation_dict.get(string, string)
-
-        return translated  # Return the string as it is if translation not found or translation
+        # Return the string as it is if translation not found or translation
+        return translated
 
     def change_colour(self):
         """Change the colour of the GUI by calling the change_colour method of
@@ -995,7 +1010,8 @@ class Gui(wx.Frame):
             with open("EBNF.txt", "r") as f:
                 # wx.MessageBox(f.read(), "EBNF Syntax")
                 box = MyDialog(self, message=f.read(),
-                               title=self.GetTranslation("EBNF Syntax"), allow_wrap=False)
+                               title=self.GetTranslation("EBNF Syntax"),
+                               allow_wrap=False)
                 box.ShowModal()
                 box.Destroy()
 
@@ -1090,7 +1106,7 @@ class Gui(wx.Frame):
         """Load the circuit definition file directly from the GUI.
 
         This is called when the user selects the "Open" option from the menu.
-        The selected file is sent to the GuiInterface object to be parsed and 
+        The selected file is sent to the GuiInterface object to be parsed and
         checked for errors. If errrors exist, they will be displayed in a
         dialog box and the current circuit will not be overwritten. If no
         errors exist, the circuit will be loaded and canvas updated."""
