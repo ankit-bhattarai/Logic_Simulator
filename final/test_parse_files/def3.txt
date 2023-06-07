@@ -1,0 +1,6 @@
+DEVICES: SWITCH switch1 1, CLOCK clock1 2, DTYPE dtype1,
+         RC rc1 3, SIGGEN siggen1 10110, OR or1 2;
+CONNECT: switch1 > dtype1.DATA, rc1 > dtype1.SET, switch1 > or1.I1, 
+siggen1 > or1.I2, siggen1 > dtype1.CLEAR, clock1 > dtype1.CLK;
+MONITOR: switch1, clock1, dtype1.Q, or1, siggen1, rc1;
+END;
