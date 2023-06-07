@@ -1,6 +1,0 @@
-DEVICES: SWITCH switch1 1, SWITCH switch2 0,
-         OR or1 2;
-# Simple circuit for testing guiint methods
-CONNECT: switch1 > or1.I1, switch2 > or1.I2;
-MONITOR: or1;
-END;
