@@ -24,5 +24,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install dateutils flake8 matplotlib numpy pytest requests
     - name: Test with pytest
+      working-directory: ./final
       run: |
         pytest
