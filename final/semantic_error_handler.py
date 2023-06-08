@@ -25,13 +25,11 @@ class SemanticErrorHandler:
 
     Public methods:
     ---------------
+    print_input_not_connected(self, symbol)
+    Prints the input not connected error at the
+    end of the connections section of the definition file.
     handle_error(self, unique_error_code, symbols)
         Handles the error code, printing if needed.
-    print_error(self, error_type, symbols, **kwargs)
-        Prints the semantic error directly.
-    print_input_not_connected(self, symbol)
-        Prints the input not connected error at the
-        end of the connections section of the definition file.
     """
 
     def __init__(self, names, devices, network, monitors, scanner):
