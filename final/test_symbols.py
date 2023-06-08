@@ -1,4 +1,4 @@
-"""Test the symnols class."""
+"""Test the symbols class."""
 import pytest
 
 from scanner import Symbol
